@@ -1,27 +1,36 @@
-# adanos-python-sdk
+# adanos
 
-`adanos-python-sdk` is the public source repository for the Python SDK for the [Adanos Finance Sentiment API](https://api.adanos.org/docs).
+`adanos` is the public Python SDK for the [Adanos Finance Sentiment API](https://api.adanos.org/docs).
+
+It gives you typed access to:
+- Reddit stock sentiment
+- News sentiment and source-filtered rankings
+- X/Twitter stock sentiment
+- Polymarket stock activity and market attention
+- Reddit crypto sentiment
 
 Links:
 - Source: https://github.com/adanos-software/adanos-python-sdk
-- PyPI: https://pypi.org/project/social-stock-sentiment/
+- PyPI: https://pypi.org/project/adanos/
 - API docs: https://api.adanos.org/docs
 - Homepage: https://adanos.org
 
-The package name on PyPI remains `social-stock-sentiment`. The Python import is `stocksentiment`.
+Package and import:
+- PyPI package: `adanos`
+- Python import: `adanos`
 
 ## Install
 
 ```bash
-python3 -m pip install social-stock-sentiment
+python3 -m pip install adanos
 ```
 
 ## Quick Start
 
 ```python
-from stocksentiment import StockSentimentClient
+from adanos import AdanosClient
 
-client = StockSentimentClient(api_key="sk_live_...")
+client = AdanosClient(api_key="sk_live_...")
 
 trending = client.reddit.trending(days=7, limit=10)
 tsla = client.reddit.stock("TSLA", days=14)
@@ -32,64 +41,14 @@ print(tsla.buzz_score)
 print(explanation.explanation)
 ```
 
-## News
+## What You Can Do
 
-```python
-from stocksentiment import StockSentimentClient
-
-client = StockSentimentClient(api_key="sk_live_...")
-
-news_trending = client.news.trending(days=7, source="reuters")
-nvda = client.news.stock("NVDA", days=7)
-comparison = client.news.compare(["NVDA", "AAPL"], days=7)
-```
-
-## X
-
-```python
-from stocksentiment import StockSentimentClient
-
-client = StockSentimentClient(api_key="sk_live_...")
-
-x_trending = client.x.trending(days=1, limit=20)
-nvda = client.x.stock("NVDA")
-```
-
-## Polymarket
-
-```python
-from stocksentiment import StockSentimentClient
-
-client = StockSentimentClient(api_key="sk_live_...")
-
-pm_trending = client.polymarket.trending(days=7, limit=20, type="stock")
-aapl = client.polymarket.stock("AAPL")
-```
-
-Polymarket semantics:
-- `buzz_score` is activity-first and optimized for current market attention
-- `total_liquidity` is a windowed signal over the selected `days`
-- `top_mentions` on `stock()` are relevance-sorted by trading activity first
-
-## Async Usage
-
-Every namespace method also has an `_async` variant.
-
-```python
-import asyncio
-from stocksentiment import StockSentimentClient
-
-
-async def main() -> None:
-    async with StockSentimentClient(api_key="sk_live_...") as client:
-        trending = await client.reddit.trending_async(days=7)
-        tsla = await client.reddit.stock_async("TSLA")
-        print(trending[0].ticker)
-        print(tsla.trend)
-
-
-asyncio.run(main())
-```
+- Rank trending stocks across Reddit, News, X, and Polymarket
+- Pull detailed ticker reports for a fixed lookback window
+- Search and compare tickers across datasets
+- Generate AI-written explanations for Reddit and News stock trends
+- Track Reddit crypto tokens via the same client
+- Use sync or async methods without changing the namespace structure
 
 ## Namespaces
 
@@ -97,22 +56,274 @@ asyncio.run(main())
 - `client.news.*` for News Stocks
 - `client.x.*` for X/Twitter Stocks
 - `client.polymarket.*` for Polymarket Stocks
+- `client.crypto.*` for Reddit Crypto
+- `client.reddit_crypto.*` is an alias for `client.crypto.*`
 
-## Authentication
+## Examples
+
+### Reddit Stocks
+
+```python
+from adanos import AdanosClient
+
+client = AdanosClient(api_key="sk_live_...")
+
+trending = client.reddit.trending(days=7, limit=10)
+sectors = client.reddit.trending_sectors(days=7, limit=10)
+countries = client.reddit.trending_countries(days=7, limit=10)
+tsla = client.reddit.stock("TSLA", days=14)
+explanation = client.reddit.explain("TSLA")
+results = client.reddit.search("Tesla")
+comparison = client.reddit.compare(["TSLA", "AAPL", "MSFT"], days=7)
+```
+
+### News
+
+```python
+from adanos import AdanosClient
+
+client = AdanosClient(api_key="sk_live_...")
+
+news_trending = client.news.trending(days=7, source="reuters")
+sectors = client.news.trending_sectors(days=7, source="reuters")
+countries = client.news.trending_countries(days=7, source="reuters")
+nvda = client.news.stock("NVDA", days=7)
+explanation = client.news.explain("NVDA")
+results = client.news.search("Nvidia")
+comparison = client.news.compare(["NVDA", "AAPL"], days=7)
+stats = client.news.stats()
+health = client.news.health()
+```
+
+### X/Twitter
+
+```python
+from adanos import AdanosClient
+
+client = AdanosClient(api_key="sk_live_...")
+
+x_trending = client.x.trending(days=1, limit=20)
+sectors = client.x.trending_sectors(days=1, limit=10)
+countries = client.x.trending_countries(days=1, limit=10)
+nvda = client.x.stock("NVDA")
+results = client.x.search("Nvidia")
+comparison = client.x.compare(["NVDA", "AMD"], days=7)
+stats = client.x.stats()
+health = client.x.health()
+```
+
+### Polymarket
+
+```python
+from adanos import AdanosClient
+
+client = AdanosClient(api_key="sk_live_...")
+
+pm_trending = client.polymarket.trending(days=7, limit=20, type="stock")
+sectors = client.polymarket.trending_sectors(days=7, limit=10)
+countries = client.polymarket.trending_countries(days=7, limit=10)
+aapl = client.polymarket.stock("AAPL")
+results = client.polymarket.search("Apple")
+comparison = client.polymarket.compare(["AAPL", "TSLA"], days=7)
+stats = client.polymarket.stats()
+health = client.polymarket.health()
+```
+
+Polymarket semantics:
+- `buzz_score` is activity-first and optimized for current market attention
+- `total_liquidity` is a windowed signal over the selected `days`
+- `top_mentions` on `stock()` are relevance-sorted by trading activity first
+
+### Reddit Crypto
+
+```python
+from adanos import AdanosClient
+
+client = AdanosClient(api_key="sk_live_...")
+
+trending = client.crypto.trending(days=7, limit=20)
+btc = client.crypto.token("BTC", days=14)
+results = client.crypto.search("bitcoin")
+comparison = client.crypto.compare(["BTC", "ETH"], days=7)
+stats = client.crypto.stats()
+health = client.crypto.health()
+```
+
+## Available Methods
+
+### `client.reddit.*`
+
+| Method | Description |
+|--------|-------------|
+| `trending(days, limit, offset, type)` | Trending stocks by buzz score |
+| `trending_sectors(days, limit, offset)` | Trending sectors |
+| `trending_countries(days, limit, offset)` | Trending countries |
+| `stock(ticker, days)` | Detailed sentiment for a ticker |
+| `explain(ticker)` | AI-generated trend explanation |
+| `search(query)` | Search stocks by name or ticker |
+| `compare(tickers, days)` | Compare up to 10 stocks |
+| `stats()` | Dataset statistics |
+| `health()` | Public service health |
+
+### `client.news.*`
+
+| Method | Description |
+|--------|-------------|
+| `trending(days, limit, offset, type, source)` | Trending stocks from news |
+| `trending_sectors(days, limit, offset, source)` | Trending sectors from news |
+| `trending_countries(days, limit, offset, source)` | Trending countries from news |
+| `stock(ticker, days)` | Detailed news sentiment for a ticker |
+| `explain(ticker)` | AI-generated explanation from news context |
+| `search(query)` | Search stocks in the news dataset |
+| `compare(tickers, days)` | Compare up to 10 stocks in news |
+| `stats()` | News dataset statistics |
+| `health()` | Public news service health |
+
+### `client.x.*`
+
+| Method | Description |
+|--------|-------------|
+| `trending(days, limit, offset, type)` | Trending stocks on X/Twitter |
+| `trending_sectors(days, limit, offset)` | Trending sectors |
+| `trending_countries(days, limit, offset)` | Trending countries |
+| `stock(ticker, days)` | Detailed X/Twitter sentiment |
+| `search(query)` | Search stocks |
+| `compare(tickers, days)` | Compare stocks |
+| `stats()` | Dataset statistics |
+| `health()` | Public service health |
+
+### `client.polymarket.*`
+
+| Method | Description |
+|--------|-------------|
+| `trending(days, limit, offset, type)` | Trending stocks on Polymarket with activity-first buzz and windowed liquidity |
+| `trending_sectors(days, limit, offset)` | Trending sectors |
+| `trending_countries(days, limit, offset)` | Trending countries |
+| `stock(ticker, days)` | Detailed Polymarket activity, sentiment, and relevance-sorted market questions |
+| `search(query)` | Search stocks |
+| `compare(tickers, days)` | Compare stocks with windowed Polymarket activity signals |
+| `stats()` | Dataset statistics |
+| `health()` | Public service health |
+
+### `client.crypto.*`
+
+| Method | Description |
+|--------|-------------|
+| `trending(days, limit, offset)` | Trending Reddit crypto tokens |
+| `token(symbol, days)` | Detailed token sentiment and buzz |
+| `search(query)` | Search tokens by symbol or name |
+| `compare(symbols, days)` | Compare multiple tokens |
+| `stats()` | Dataset statistics |
+| `health()` | Public service health |
+
+## Async Usage
+
+Every namespace method also has an `_async` variant.
+
+```python
+import asyncio
+
+from adanos import AdanosClient
+
+
+async def main() -> None:
+    async with AdanosClient(api_key="sk_live_...") as client:
+        trending = await client.reddit.trending_async(days=7)
+        tsla = await client.reddit.stock_async("TSLA")
+        explanation = await client.news.explain_async("NVDA")
+        print(trending[0].ticker)
+        print(tsla.trend)
+        print(explanation.explanation)
+
+
+asyncio.run(main())
+```
+
+## Authentication and Configuration
 
 Get an API key at https://api.adanos.org/docs
 
 ```python
-from stocksentiment import StockSentimentClient
+from adanos import AdanosClient
 
-client = StockSentimentClient(
+client = AdanosClient(
     api_key="sk_live_...",
     base_url="https://api.adanos.org",
     timeout=60.0,
 )
 ```
 
-Priority is explicit in your application code; the SDK does not auto-load local profiles.
+Notes:
+- `api_key` is required for protected endpoints
+- `base_url` lets you target another deployment or staging environment
+- `timeout` is passed through to the underlying `httpx` client
+- the SDK does not auto-load local CLI profiles or env-specific config files
+
+Context management:
+
+```python
+from adanos import AdanosClient
+
+with AdanosClient(api_key="sk_live_...") as client:
+    print(client.reddit.health())
+```
+
+## Errors and Responses
+
+- The SDK returns typed models from the generated OpenAPI client
+- Documented API errors are returned as typed error models
+- Undocumented statuses raise `UnexpectedStatus`
+- For long-lived processes, use `with`, `async with`, `close()`, or `aclose()` to release HTTP resources
+
+## Rate Limits
+
+Typical platform limits:
+
+| Tier | Monthly Requests | Burst Limit |
+|------|------------------|-------------|
+| Free | 250 | 100/min |
+| Paid | Unlimited | 1000/min |
+
+See the live API docs for the current contract and plan details.
+
+## Migration from `social-stock-sentiment`
+
+Version `1.0.0` starts the new `adanos` package line and renames both the PyPI package and the Python import path.
+
+Old:
+
+```bash
+python3 -m pip install social-stock-sentiment
+```
+
+```python
+from stocksentiment import StockSentimentClient
+```
+
+New:
+
+```bash
+python3 -m pip install adanos
+```
+
+```python
+from adanos import AdanosClient
+```
+
+The client API and namespace layout stay the same. Most upgrades only need a dependency rename and an import rewrite.
+
+`AdanosClient` is now the primary public client name. `StockSentimentClient` remains available as a compatibility alias.
+
+If you adopted the pre-release `adanos-python-sdk` naming locally, switch that install/import pair too:
+
+```bash
+python3 -m pip uninstall adanos-python-sdk
+python3 -m pip install adanos
+```
+
+```python
+from adanos import AdanosClient
+```
 
 ## Development
 

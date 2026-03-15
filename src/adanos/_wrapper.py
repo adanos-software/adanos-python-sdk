@@ -801,7 +801,7 @@ class _RedditCryptoNamespace:
         return await get_reddit_crypto_health.asyncio(client=self._client)
 
 
-class StockSentimentClient:
+class AdanosClient:
     """Client for the Finance Sentiment API.
 
     Args:
@@ -811,9 +811,9 @@ class StockSentimentClient:
 
     Example::
 
-        from stocksentiment import StockSentimentClient
+        from adanos import AdanosClient
 
-        client = StockSentimentClient(api_key="sk_live_...")
+        client = AdanosClient(api_key="sk_live_...")
         trending = client.reddit.trending(days=7, limit=10)
     """
 
@@ -848,16 +848,20 @@ class StockSentimentClient:
         """Close underlying async HTTP connections."""
         await self._client.__aexit__(None, None, None)
 
-    def __enter__(self) -> "StockSentimentClient":
+    def __enter__(self) -> "AdanosClient":
         self._client.__enter__()
         return self
 
     def __exit__(self, *args: Any) -> None:
         self._client.__exit__(*args)
 
-    async def __aenter__(self) -> "StockSentimentClient":
+    async def __aenter__(self) -> "AdanosClient":
         await self._client.__aenter__()
         return self
 
     async def __aexit__(self, *args: Any) -> None:
         await self._client.__aexit__(*args)
+
+
+# Backwards-compatible alias for earlier SDK naming.
+StockSentimentClient = AdanosClient

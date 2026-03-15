@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "social-stock-sentiment"
+name = "adanos"
 dynamic = ["version"]
 description = "Python SDK for the Adanos Finance Sentiment API"
 readme = "README.md"
@@ -45,13 +45,13 @@ Documentation = "https://github.com/adanos-software/adanos-python-sdk#readme"
 Repository = "https://github.com/adanos-software/adanos-python-sdk"
 Issues = "https://github.com/adanos-software/adanos-python-sdk/issues"
 Changelog = "https://github.com/adanos-software/adanos-python-sdk/blob/main/CHANGELOG.md"
-PyPI = "https://pypi.org/project/social-stock-sentiment/"
+PyPI = "https://pypi.org/project/adanos/"
 
 [tool.hatch.version]
-path = "src/stocksentiment/__init__.py"
+path = "src/adanos/__init__.py"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/stocksentiment"]
+packages = ["src/adanos"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

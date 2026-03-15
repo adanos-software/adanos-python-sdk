@@ -5,14 +5,21 @@ All notable changes to the Adanos Python SDK will be documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
-## [1.20.0] - 2026-03-15
+## [1.0.0] - 2026-03-15
 
 ### Added
-- First public standalone Python SDK repository under `adanos-software/adanos-python-sdk`.
-- Public README focused on installation, namespace usage, and async examples.
+- First public release of `adanos` as a standalone Python SDK package.
 - Standalone GitHub Actions CI for tests, build, and isolated wheel smoke installation.
 - Standalone Trusted Publishing workflow for PyPI from this repository.
 
 ### Changed
-- Packaging now builds from the repository-local `src/` layout instead of monorepo-specific paths.
-- Package metadata now points to the public repository, API docs, and PyPI project.
+- Renamed the PyPI package from `social-stock-sentiment` to `adanos`.
+- Renamed the Python import path from `stocksentiment` to `adanos`.
+- Renamed the primary client class from `StockSentimentClient` to `AdanosClient`.
+- Package metadata now points to the public repository, API docs, and the new PyPI project.
+- CI and release smoke tests now validate the renamed distribution and import path.
+
+### Migration
+- Replace `pip install social-stock-sentiment` with `pip install adanos`.
+- Replace `from stocksentiment import StockSentimentClient` with `from adanos import AdanosClient`.
+- `StockSentimentClient` remains available as a compatibility alias.

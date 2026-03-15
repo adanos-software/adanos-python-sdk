@@ -33,7 +33,7 @@ jobs:
           VERSION=$(python - <<'PY'
           import re
           from pathlib import Path
-          text = Path("src/stocksentiment/__init__.py").read_text(encoding="utf-8")
+          text = Path("src/adanos/__init__.py").read_text(encoding="utf-8")
           print(re.search(r'__version__\s*=\s*"([^"]+)"', text).group(1))
           PY
           )
@@ -65,13 +65,13 @@ jobs:
 
       - name: Smoke install built SDK
         run: |
-          python -m venv /tmp/social-stock-sentiment-release-smoke
-          /tmp/social-stock-sentiment-release-smoke/bin/pip install dist/social_stock_sentiment-*.whl
-          /tmp/social-stock-sentiment-release-smoke/bin/python - <<'PY'
-          from stocksentiment import StockSentimentClient, __version__
+          python -m venv /tmp/adanos-python-sdk-release-smoke
+          /tmp/adanos-python-sdk-release-smoke/bin/pip install dist/adanos-*.whl
+          /tmp/adanos-python-sdk-release-smoke/bin/python - <<'PY'
+          from adanos import AdanosClient, __version__
 
           assert __version__
-          client = StockSentimentClient(api_key="sk_live_example", base_url="https://api.adanos.org")
+          client = AdanosClient(api_key="sk_live_example", base_url="https://api.adanos.org")
           assert client.reddit is not None
           assert client.polymarket is not None
           client.close()

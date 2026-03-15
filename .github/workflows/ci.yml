@@ -28,13 +28,13 @@ jobs:
 
       - name: Smoke install built SDK
         run: |
-          python -m venv /tmp/social-stock-sentiment-smoke
-          /tmp/social-stock-sentiment-smoke/bin/pip install dist/social_stock_sentiment-*.whl
-          /tmp/social-stock-sentiment-smoke/bin/python - <<'PY'
-          from stocksentiment import StockSentimentClient, __version__
+          python -m venv /tmp/adanos-python-sdk-smoke
+          /tmp/adanos-python-sdk-smoke/bin/pip install dist/adanos-*.whl
+          /tmp/adanos-python-sdk-smoke/bin/python - <<'PY'
+          from adanos import AdanosClient, __version__
 
           assert __version__
-          client = StockSentimentClient(api_key="sk_live_example", base_url="https://api.adanos.org")
+          client = AdanosClient(api_key="sk_live_example", base_url="https://api.adanos.org")
           assert client.reddit is not None
           assert client.news is not None
           client.close()

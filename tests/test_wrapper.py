@@ -1,4 +1,4 @@
-"""Tests for the StockSentimentClient wrapper."""
+"""Tests for the AdanosClient wrapper."""
 
 import sys
 from pathlib import Path
@@ -12,8 +12,8 @@ SDK_SRC = Path(__file__).resolve().parents[1] / "src"
 if str(SDK_SRC) not in sys.path:
     sys.path.insert(0, str(SDK_SRC))
 
-from stocksentiment import StockSentimentClient  # noqa: E402
-from stocksentiment._generated.errors import UnexpectedStatus  # noqa: E402
+from adanos import AdanosClient, StockSentimentClient  # noqa: E402
+from adanos._generated.errors import UnexpectedStatus  # noqa: E402
 
 BASE_URL = "https://api.adanos.org"
 API_KEY = "sdk_test_key_1234567890abcdef1234567890"
@@ -172,7 +172,7 @@ TRENDING_COUNTRY = {
 
 @pytest.fixture
 def client():
-    c = StockSentimentClient(api_key=API_KEY, base_url=BASE_URL)
+    c = AdanosClient(api_key=API_KEY, base_url=BASE_URL)
     yield c
     c.close()
 
@@ -191,7 +191,7 @@ class TestAuth:
         assert request.headers["X-API-Key"] == API_KEY
 
     def test_custom_base_url(self):
-        c = StockSentimentClient(api_key=API_KEY, base_url="https://custom.example.com")
+        c = AdanosClient(api_key=API_KEY, base_url="https://custom.example.com")
         assert c._client._base_url == "https://custom.example.com"
 
 
@@ -426,7 +426,7 @@ class TestAsync:
         route = respx.get(f"{BASE_URL}/reddit/stocks/v1/trending").mock(
             return_value=httpx.Response(200, json=[TRENDING_STOCK])
         )
-        async with StockSentimentClient(api_key=API_KEY, base_url=BASE_URL) as client:
+        async with AdanosClient(api_key=API_KEY, base_url=BASE_URL) as client:
             result = await client.reddit.trending_async(days=7)
         assert route.called
         assert len(result) == 1
@@ -438,7 +438,7 @@ class TestAsync:
         respx.get(f"{BASE_URL}/reddit/stocks/v1/stock/TSLA").mock(
             return_value=httpx.Response(200, json=STOCK_SENTIMENT)
         )
-        async with StockSentimentClient(api_key=API_KEY, base_url=BASE_URL) as client:
+        async with AdanosClient(api_key=API_KEY, base_url=BASE_URL) as client:
             result = await client.reddit.stock_async("TSLA")
         assert result.ticker == "TSLA"
 
@@ -448,7 +448,7 @@ class TestAsync:
         route = respx.get(f"{BASE_URL}/x/stocks/v1/trending").mock(
             return_value=httpx.Response(200, json=[X_TRENDING_STOCK])
         )
-        async with StockSentimentClient(api_key=API_KEY, base_url=BASE_URL) as client:
+        async with AdanosClient(api_key=API_KEY, base_url=BASE_URL) as client:
             result = await client.x.trending_async()
         assert route.called
         assert result[0].ticker == "NVDA"
@@ -459,7 +459,7 @@ class TestAsync:
         respx.get(f"{BASE_URL}/reddit/stocks/v1/search").mock(
             return_value=httpx.Response(200, json=SEARCH_RESPONSE)
         )
-        async with StockSentimentClient(api_key=API_KEY, base_url=BASE_URL) as client:
+        async with AdanosClient(api_key=API_KEY, base_url=BASE_URL) as client:
             result = await client.reddit.search_async("Tesla")
         assert result.count == 1
 
@@ -469,7 +469,7 @@ class TestAsync:
         route = respx.get(f"{BASE_URL}/polymarket/stocks/v1/trending").mock(
             return_value=httpx.Response(200, json=[POLYMARKET_TRENDING_STOCK])
         )
-        async with StockSentimentClient(api_key=API_KEY, base_url=BASE_URL) as client:
+        async with AdanosClient(api_key=API_KEY, base_url=BASE_URL) as client:
             result = await client.polymarket.trending_async(days=7)
         assert route.called
         assert len(result) == 1
@@ -481,7 +481,7 @@ class TestAsync:
         route = respx.get(f"{BASE_URL}/reddit/stocks/v1/compare").mock(
             return_value=httpx.Response(200, json=COMPARE_RESPONSE)
         )
-        async with StockSentimentClient(api_key=API_KEY, base_url=BASE_URL) as client:
+        async with AdanosClient(api_key=API_KEY, base_url=BASE_URL) as client:
             await client.reddit.compare_async(["TSLA", "AAPL"])
         assert request_params(route)["tickers"] == "TSLA,AAPL"
 
@@ -491,7 +491,7 @@ class TestAsync:
         route = respx.get(f"{BASE_URL}/news/stocks/v1/trending").mock(
             return_value=httpx.Response(200, json=[TRENDING_STOCK])
         )
-        async with StockSentimentClient(api_key=API_KEY, base_url=BASE_URL) as client:
+        async with AdanosClient(api_key=API_KEY, base_url=BASE_URL) as client:
             result = await client.news.trending_async(days=7, source="reuters")
         assert route.called
         assert request_params(route)["source"] == "reuters"
@@ -624,9 +624,13 @@ class TestContextManager:
         route = respx.get(f"{BASE_URL}/reddit/stocks/v1/trending").mock(
             return_value=httpx.Response(200, json=[])
         )
-        with StockSentimentClient(api_key=API_KEY, base_url=BASE_URL) as client:
+        with AdanosClient(api_key=API_KEY, base_url=BASE_URL) as client:
             client.reddit.trending()
         assert route.called
+
+
+def test_legacy_client_alias() -> None:
+    assert StockSentimentClient is AdanosClient
 
 
 # --- Error handling ---
