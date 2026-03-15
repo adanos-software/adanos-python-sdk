@@ -41,10 +41,10 @@ dev = [
 [project.urls]
 Homepage = "https://adanos.org"
 API_Docs = "https://api.adanos.org/docs"
-Documentation = "https://github.com/adanos-software/social-stock-sentiment#readme"
-Repository = "https://github.com/adanos-software/social-stock-sentiment"
-Issues = "https://github.com/adanos-software/social-stock-sentiment/issues"
-Changelog = "https://github.com/adanos-software/social-stock-sentiment/blob/main/CHANGELOG.md"
+Documentation = "https://github.com/adanos-software/adanos-python-sdk#readme"
+Repository = "https://github.com/adanos-software/adanos-python-sdk"
+Issues = "https://github.com/adanos-software/adanos-python-sdk/issues"
+Changelog = "https://github.com/adanos-software/adanos-python-sdk/blob/main/CHANGELOG.md"
 PyPI = "https://pypi.org/project/social-stock-sentiment/"
 
 [tool.hatch.version]

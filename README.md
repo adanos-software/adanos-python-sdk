@@ -1,14 +1,14 @@
-# social-stock-sentiment
+# adanos-python-sdk
 
-`social-stock-sentiment` is the Python SDK for the [Adanos Finance Sentiment API](https://api.adanos.org/docs).
+`adanos-python-sdk` is the public source repository for the Python SDK for the [Adanos Finance Sentiment API](https://api.adanos.org/docs).
 
 Links:
-- Source: https://github.com/adanos-software/social-stock-sentiment
+- Source: https://github.com/adanos-software/adanos-python-sdk
 - PyPI: https://pypi.org/project/social-stock-sentiment/
 - API docs: https://api.adanos.org/docs
 - Homepage: https://adanos.org
 
-The package name is `social-stock-sentiment`. The Python import is `stocksentiment`.
+The package name on PyPI remains `social-stock-sentiment`. The Python import is `stocksentiment`.
 
 ## Install
 
