@@ -15,10 +15,14 @@ from ...types import UNSET, Response
 def _get_kwargs(
     *,
     q: str,
+    days: int | Any = UNSET,
+    limit: int | Any = UNSET,
 ) -> dict[str, Any]:
     params: dict[str, Any] = {}
 
     params["q"] = q
+    params["days"] = days
+    params["limit"] = limit
 
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
@@ -82,16 +86,20 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     q: str,
+    days: int | Any = UNSET,
+    limit: int | Any = UNSET,
 ) -> Response[
     ErrorResponse | HTTPValidationError | HistoricalLimitError | SearchResponse
 ]:
     """Search for stocks
 
-     Search for stocks by ticker symbol or company name. Results are sorted by mention_count descending
-    (most discussed stocks first).
+     Search for stocks by ticker symbol or company name. Results include a platform-specific `summary`
+    block for the selected lookback window and are ranked by match relevance before recent activity.
 
     Args:
         q (str): Search query (ticker or company name)
+        days (int | Any): Lookback window for the summary block.
+        limit (int | Any): Maximum number of search results to return.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -103,6 +111,8 @@ def sync_detailed(
 
     kwargs = _get_kwargs(
         q=q,
+        days=days,
+        limit=limit,
     )
 
     response = client.get_httpx_client().request(
@@ -116,14 +126,18 @@ def sync(
     *,
     client: AuthenticatedClient,
     q: str,
+    days: int | Any = UNSET,
+    limit: int | Any = UNSET,
 ) -> ErrorResponse | HTTPValidationError | HistoricalLimitError | SearchResponse | None:
     """Search for stocks
 
-     Search for stocks by ticker symbol or company name. Results are sorted by mention_count descending
-    (most discussed stocks first).
+     Search for stocks by ticker symbol or company name. Results include a platform-specific `summary`
+    block for the selected lookback window and are ranked by match relevance before recent activity.
 
     Args:
         q (str): Search query (ticker or company name)
+        days (int | Any): Lookback window for the summary block.
+        limit (int | Any): Maximum number of search results to return.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -136,6 +150,8 @@ def sync(
     return sync_detailed(
         client=client,
         q=q,
+        days=days,
+        limit=limit,
     ).parsed
 
 
@@ -143,16 +159,20 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     q: str,
+    days: int | Any = UNSET,
+    limit: int | Any = UNSET,
 ) -> Response[
     ErrorResponse | HTTPValidationError | HistoricalLimitError | SearchResponse
 ]:
     """Search for stocks
 
-     Search for stocks by ticker symbol or company name. Results are sorted by mention_count descending
-    (most discussed stocks first).
+     Search for stocks by ticker symbol or company name. Results include a platform-specific `summary`
+    block for the selected lookback window and are ranked by match relevance before recent activity.
 
     Args:
         q (str): Search query (ticker or company name)
+        days (int | Any): Lookback window for the summary block.
+        limit (int | Any): Maximum number of search results to return.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -164,6 +184,8 @@ async def asyncio_detailed(
 
     kwargs = _get_kwargs(
         q=q,
+        days=days,
+        limit=limit,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -175,14 +197,18 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     q: str,
+    days: int | Any = UNSET,
+    limit: int | Any = UNSET,
 ) -> ErrorResponse | HTTPValidationError | HistoricalLimitError | SearchResponse | None:
     """Search for stocks
 
-     Search for stocks by ticker symbol or company name. Results are sorted by mention_count descending
-    (most discussed stocks first).
+     Search for stocks by ticker symbol or company name. Results include a platform-specific `summary`
+    block for the selected lookback window and are ranked by match relevance before recent activity.
 
     Args:
         q (str): Search query (ticker or company name)
+        days (int | Any): Lookback window for the summary block.
+        limit (int | Any): Maximum number of search results to return.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -196,5 +222,7 @@ async def asyncio(
         await asyncio_detailed(
             client=client,
             q=q,
+            days=days,
+            limit=limit,
         )
     ).parsed

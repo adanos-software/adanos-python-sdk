@@ -13,73 +13,60 @@ T = TypeVar("T", bound="CryptoCompareTokenItem")
 
 @_attrs_define
 class CryptoCompareTokenItem:
-    """Individual crypto token in a compare response.
-
-    Attributes:
-        symbol (str):
-        buzz_score (float):
-        mentions (int):
-        upvotes (int):
-        name (None | str | Unset):
-        sentiment (float | None | Unset):
-    """
+    """Individual crypto token in a compare response."""
 
     symbol: str
     buzz_score: float
     mentions: int
-    upvotes: int
+    trend_history: list[float]
     name: None | str | Unset = UNSET
+    trend: None | str | Unset = UNSET
+    unique_posts: int | None | Unset = UNSET
+    subreddit_count: int | None | Unset = UNSET
+    sentiment_score: float | None | Unset = UNSET
     sentiment: float | None | Unset = UNSET
+    bullish_pct: int | None | Unset = UNSET
+    bearish_pct: int | None | Unset = UNSET
+    total_upvotes: int | None | Unset = UNSET
+    upvotes: int | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        symbol = self.symbol
-
-        buzz_score = self.buzz_score
-
-        mentions = self.mentions
-
-        upvotes = self.upvotes
-
-        name: None | str | Unset
-        if isinstance(self.name, Unset):
-            name = UNSET
-        else:
-            name = self.name
-
-        sentiment: float | None | Unset
-        if isinstance(self.sentiment, Unset):
-            sentiment = UNSET
-        else:
-            sentiment = self.sentiment
-
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
-                "symbol": symbol,
-                "buzz_score": buzz_score,
-                "mentions": mentions,
-                "upvotes": upvotes,
+                "symbol": self.symbol,
+                "buzz_score": self.buzz_score,
+                "mentions": self.mentions,
+                "trend_history": self.trend_history,
             }
         )
-        if name is not UNSET:
-            field_dict["name"] = name
-        if sentiment is not UNSET:
-            field_dict["sentiment"] = sentiment
-
+        if self.name is not UNSET:
+            field_dict["name"] = self.name
+        if self.trend is not UNSET:
+            field_dict["trend"] = self.trend
+        if self.unique_posts is not UNSET:
+            field_dict["unique_posts"] = self.unique_posts
+        if self.subreddit_count is not UNSET:
+            field_dict["subreddit_count"] = self.subreddit_count
+        if self.sentiment_score is not UNSET:
+            field_dict["sentiment_score"] = self.sentiment_score
+        if self.sentiment is not UNSET:
+            field_dict["sentiment"] = self.sentiment
+        if self.bullish_pct is not UNSET:
+            field_dict["bullish_pct"] = self.bullish_pct
+        if self.bearish_pct is not UNSET:
+            field_dict["bearish_pct"] = self.bearish_pct
+        if self.total_upvotes is not UNSET:
+            field_dict["total_upvotes"] = self.total_upvotes
+        if self.upvotes is not UNSET:
+            field_dict["upvotes"] = self.upvotes
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
-        symbol = d.pop("symbol")
-
-        buzz_score = d.pop("buzz_score")
-
-        mentions = d.pop("mentions")
-
-        upvotes = d.pop("upvotes")
 
         def _parse_name(data: object) -> None | str | Unset:
             if data is None:
@@ -88,24 +75,42 @@ class CryptoCompareTokenItem:
                 return data
             return cast(None | str | Unset, data)
 
-        name = _parse_name(d.pop("name", UNSET))
+        def _parse_string(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
 
-        def _parse_sentiment(data: object) -> float | None | Unset:
+        def _parse_float(data: object) -> float | None | Unset:
             if data is None:
                 return data
             if isinstance(data, Unset):
                 return data
             return cast(float | None | Unset, data)
 
-        sentiment = _parse_sentiment(d.pop("sentiment", UNSET))
+        def _parse_int(data: object) -> int | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(int | None | Unset, data)
 
         crypto_compare_token_item = cls(
-            symbol=symbol,
-            buzz_score=buzz_score,
-            mentions=mentions,
-            upvotes=upvotes,
-            name=name,
-            sentiment=sentiment,
+            symbol=d.pop("symbol"),
+            buzz_score=d.pop("buzz_score"),
+            mentions=d.pop("mentions"),
+            trend_history=cast(list[float], d.pop("trend_history")),
+            name=_parse_name(d.pop("name", UNSET)),
+            trend=_parse_string(d.pop("trend", UNSET)),
+            unique_posts=_parse_int(d.pop("unique_posts", UNSET)),
+            subreddit_count=_parse_int(d.pop("subreddit_count", UNSET)),
+            sentiment_score=_parse_float(d.pop("sentiment_score", UNSET)),
+            sentiment=_parse_float(d.pop("sentiment", UNSET)),
+            bullish_pct=_parse_int(d.pop("bullish_pct", UNSET)),
+            bearish_pct=_parse_int(d.pop("bearish_pct", UNSET)),
+            total_upvotes=_parse_int(d.pop("total_upvotes", UNSET)),
+            upvotes=_parse_int(d.pop("upvotes", UNSET)),
         )
 
         crypto_compare_token_item.additional_properties = d

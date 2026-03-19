@@ -73,7 +73,7 @@ sectors = client.reddit.trending_sectors(days=7, limit=10)
 countries = client.reddit.trending_countries(days=7, limit=10)
 tsla = client.reddit.stock("TSLA", days=14)
 explanation = client.reddit.explain("TSLA")
-results = client.reddit.search("Tesla")
+results = client.reddit.search("Tesla", days=7, limit=10)
 comparison = client.reddit.compare(["TSLA", "AAPL", "MSFT"], days=7)
 ```
 
@@ -89,7 +89,7 @@ sectors = client.news.trending_sectors(days=7, source="reuters")
 countries = client.news.trending_countries(days=7, source="reuters")
 nvda = client.news.stock("NVDA", days=7)
 explanation = client.news.explain("NVDA")
-results = client.news.search("Nvidia")
+results = client.news.search("Nvidia", days=7, limit=10)
 comparison = client.news.compare(["NVDA", "AAPL"], days=7)
 stats = client.news.stats()
 health = client.news.health()
@@ -106,7 +106,7 @@ x_trending = client.x.trending(days=1, limit=20)
 sectors = client.x.trending_sectors(days=1, limit=10)
 countries = client.x.trending_countries(days=1, limit=10)
 nvda = client.x.stock("NVDA")
-results = client.x.search("Nvidia")
+results = client.x.search("Nvidia", days=7, limit=10)
 comparison = client.x.compare(["NVDA", "AMD"], days=7)
 stats = client.x.stats()
 health = client.x.health()
@@ -123,7 +123,7 @@ pm_trending = client.polymarket.trending(days=7, limit=20, type="stock")
 sectors = client.polymarket.trending_sectors(days=7, limit=10)
 countries = client.polymarket.trending_countries(days=7, limit=10)
 aapl = client.polymarket.stock("AAPL")
-results = client.polymarket.search("Apple")
+results = client.polymarket.search("Apple", days=7, limit=10)
 comparison = client.polymarket.compare(["AAPL", "TSLA"], days=7)
 stats = client.polymarket.stats()
 health = client.polymarket.health()
@@ -143,7 +143,7 @@ client = AdanosClient(api_key="sk_live_...")
 
 trending = client.crypto.trending(days=7, limit=20)
 btc = client.crypto.token("BTC", days=14)
-results = client.crypto.search("bitcoin")
+results = client.crypto.search("bitcoin", days=7, limit=10)
 comparison = client.crypto.compare(["BTC", "ETH"], days=7)
 stats = client.crypto.stats()
 health = client.crypto.health()
@@ -160,7 +160,7 @@ health = client.crypto.health()
 | `trending_countries(days, limit, offset)` | Trending countries |
 | `stock(ticker, days)` | Detailed sentiment for a ticker |
 | `explain(ticker)` | AI-generated trend explanation |
-| `search(query)` | Search stocks by name or ticker |
+| `search(query, days, limit)` | Search stocks by name or ticker with a summary block |
 | `compare(tickers, days)` | Compare up to 10 stocks |
 | `stats()` | Dataset statistics |
 | `health()` | Public service health |
@@ -174,7 +174,7 @@ health = client.crypto.health()
 | `trending_countries(days, limit, offset, source)` | Trending countries from news |
 | `stock(ticker, days)` | Detailed news sentiment for a ticker |
 | `explain(ticker)` | AI-generated explanation from news context |
-| `search(query)` | Search stocks in the news dataset |
+| `search(query, days, limit)` | Search stocks in the news dataset with a summary block |
 | `compare(tickers, days)` | Compare up to 10 stocks in news |
 | `stats()` | News dataset statistics |
 | `health()` | Public news service health |
@@ -187,7 +187,7 @@ health = client.crypto.health()
 | `trending_sectors(days, limit, offset)` | Trending sectors |
 | `trending_countries(days, limit, offset)` | Trending countries |
 | `stock(ticker, days)` | Detailed X/Twitter sentiment |
-| `search(query)` | Search stocks |
+| `search(query, days, limit)` | Search stocks with a summary block |
 | `compare(tickers, days)` | Compare stocks |
 | `stats()` | Dataset statistics |
 | `health()` | Public service health |
@@ -200,7 +200,7 @@ health = client.crypto.health()
 | `trending_sectors(days, limit, offset)` | Trending sectors |
 | `trending_countries(days, limit, offset)` | Trending countries |
 | `stock(ticker, days)` | Detailed Polymarket activity, sentiment, and relevance-sorted market questions |
-| `search(query)` | Search stocks |
+| `search(query, days, limit)` | Search stocks with a summary block |
 | `compare(tickers, days)` | Compare stocks with windowed Polymarket activity signals |
 | `stats()` | Dataset statistics |
 | `health()` | Public service health |
@@ -211,7 +211,7 @@ health = client.crypto.health()
 |--------|-------------|
 | `trending(days, limit, offset)` | Trending Reddit crypto tokens |
 | `token(symbol, days)` | Detailed token sentiment and buzz |
-| `search(query)` | Search tokens by symbol or name |
+| `search(query, days, limit)` | Search tokens by symbol or name with a summary block |
 | `compare(symbols, days)` | Compare multiple tokens |
 | `stats()` | Dataset statistics |
 | `health()` | Public service health |

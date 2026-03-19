@@ -13,73 +13,50 @@ T = TypeVar("T", bound="NewsCompareStockItem")
 
 @_attrs_define
 class NewsCompareStockItem:
-    """Individual stock in news comparison.
-
-    Attributes:
-        ticker (str): Stock ticker symbol
-        buzz_score (float): Buzz Score (0-100). Asymptotic scaling above 50.
-        mentions (int): Total mentions in period
-        source_count (int): Number of distinct news sources with mentions in period
-        company_name (None | str | Unset): Company name from ticker_reference
-        sentiment (float | None | Unset): Average sentiment (-1 to +1, null if no mentions)
-    """
+    """Individual stock in news comparison."""
 
     ticker: str
     buzz_score: float
     mentions: int
     source_count: int
+    trend_history: list[float]
     company_name: None | str | Unset = UNSET
+    trend: None | str | Unset = UNSET
+    sentiment_score: float | None | Unset = UNSET
     sentiment: float | None | Unset = UNSET
+    bullish_pct: int | None | Unset = UNSET
+    bearish_pct: int | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        ticker = self.ticker
-
-        buzz_score = self.buzz_score
-
-        mentions = self.mentions
-
-        source_count = self.source_count
-
-        company_name: None | str | Unset
-        if isinstance(self.company_name, Unset):
-            company_name = UNSET
-        else:
-            company_name = self.company_name
-
-        sentiment: float | None | Unset
-        if isinstance(self.sentiment, Unset):
-            sentiment = UNSET
-        else:
-            sentiment = self.sentiment
-
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
-                "ticker": ticker,
-                "buzz_score": buzz_score,
-                "mentions": mentions,
-                "source_count": source_count,
+                "ticker": self.ticker,
+                "buzz_score": self.buzz_score,
+                "mentions": self.mentions,
+                "source_count": self.source_count,
+                "trend_history": self.trend_history,
             }
         )
-        if company_name is not UNSET:
-            field_dict["company_name"] = company_name
-        if sentiment is not UNSET:
-            field_dict["sentiment"] = sentiment
-
+        if self.company_name is not UNSET:
+            field_dict["company_name"] = self.company_name
+        if self.trend is not UNSET:
+            field_dict["trend"] = self.trend
+        if self.sentiment_score is not UNSET:
+            field_dict["sentiment_score"] = self.sentiment_score
+        if self.sentiment is not UNSET:
+            field_dict["sentiment"] = self.sentiment
+        if self.bullish_pct is not UNSET:
+            field_dict["bullish_pct"] = self.bullish_pct
+        if self.bearish_pct is not UNSET:
+            field_dict["bearish_pct"] = self.bearish_pct
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
-        ticker = d.pop("ticker")
-
-        buzz_score = d.pop("buzz_score")
-
-        mentions = d.pop("mentions")
-
-        source_count = d.pop("source_count")
 
         def _parse_company_name(data: object) -> None | str | Unset:
             if data is None:
@@ -88,24 +65,39 @@ class NewsCompareStockItem:
                 return data
             return cast(None | str | Unset, data)
 
-        company_name = _parse_company_name(d.pop("company_name", UNSET))
+        def _parse_string(data: object) -> None | str | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(None | str | Unset, data)
 
-        def _parse_sentiment(data: object) -> float | None | Unset:
+        def _parse_float(data: object) -> float | None | Unset:
             if data is None:
                 return data
             if isinstance(data, Unset):
                 return data
             return cast(float | None | Unset, data)
 
-        sentiment = _parse_sentiment(d.pop("sentiment", UNSET))
+        def _parse_int(data: object) -> int | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(int | None | Unset, data)
 
         news_compare_stock_item = cls(
-            ticker=ticker,
-            buzz_score=buzz_score,
-            mentions=mentions,
-            source_count=source_count,
-            company_name=company_name,
-            sentiment=sentiment,
+            ticker=d.pop("ticker"),
+            buzz_score=d.pop("buzz_score"),
+            mentions=d.pop("mentions"),
+            source_count=d.pop("source_count"),
+            trend_history=cast(list[float], d.pop("trend_history")),
+            company_name=_parse_company_name(d.pop("company_name", UNSET)),
+            trend=_parse_string(d.pop("trend", UNSET)),
+            sentiment_score=_parse_float(d.pop("sentiment_score", UNSET)),
+            sentiment=_parse_float(d.pop("sentiment", UNSET)),
+            bullish_pct=_parse_int(d.pop("bullish_pct", UNSET)),
+            bearish_pct=_parse_int(d.pop("bearish_pct", UNSET)),
         )
 
         news_compare_stock_item.additional_properties = d

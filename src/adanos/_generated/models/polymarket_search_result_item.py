@@ -18,30 +18,28 @@ class PolymarketSearchResultItem:
     Attributes:
         ticker (str): Stock ticker symbol
         name (str): Company name
-        trade_count (int): Current UTC-day trade count from latest active persisted snapshot
         type_ (None | str | Unset): Asset type (Stock, ETF, etc.)
         exchange (None | str | Unset): Stock exchange
         sector (None | str | Unset): Industry sector
         country (None | str | Unset): Country of headquarters
         aliases (list[str] | Unset): Alternative names/aliases
+        summary (dict[str, Any] | None | Unset): Recent-period summary block for this asset
     """
 
     ticker: str
     name: str
-    trade_count: int
     type_: None | str | Unset = UNSET
     exchange: None | str | Unset = UNSET
     sector: None | str | Unset = UNSET
     country: None | str | Unset = UNSET
     aliases: list[str] | Unset = UNSET
+    summary: dict[str, Any] | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         ticker = self.ticker
 
         name = self.name
-
-        trade_count = self.trade_count
 
         type_: None | str | Unset
         if isinstance(self.type_, Unset):
@@ -71,13 +69,18 @@ class PolymarketSearchResultItem:
         if not isinstance(self.aliases, Unset):
             aliases = self.aliases
 
+        summary: dict[str, Any] | None | Unset
+        if isinstance(self.summary, Unset):
+            summary = UNSET
+        else:
+            summary = self.summary
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
                 "ticker": ticker,
                 "name": name,
-                "trade_count": trade_count,
             }
         )
         if type_ is not UNSET:
@@ -90,6 +93,8 @@ class PolymarketSearchResultItem:
             field_dict["country"] = country
         if aliases is not UNSET:
             field_dict["aliases"] = aliases
+        if summary is not UNSET:
+            field_dict["summary"] = summary
 
         return field_dict
 
@@ -99,8 +104,6 @@ class PolymarketSearchResultItem:
         ticker = d.pop("ticker")
 
         name = d.pop("name")
-
-        trade_count = d.pop("trade_count")
 
         def _parse_type_(data: object) -> None | str | Unset:
             if data is None:
@@ -139,16 +142,17 @@ class PolymarketSearchResultItem:
         country = _parse_country(d.pop("country", UNSET))
 
         aliases = cast(list[str], d.pop("aliases", UNSET))
+        summary = cast(dict[str, Any] | None | Unset, d.pop("summary", UNSET))
 
         polymarket_search_result_item = cls(
             ticker=ticker,
             name=name,
-            trade_count=trade_count,
             type_=type_,
             exchange=exchange,
             sector=sector,
             country=country,
             aliases=aliases,
+            summary=summary,
         )
 
         polymarket_search_result_item.additional_properties = d

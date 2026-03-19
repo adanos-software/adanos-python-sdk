@@ -33,7 +33,8 @@ class CryptoTokenSentiment:
         found (bool): Whether mentions were found
         name (None | str | Unset): Token name
         buzz_score (float | None | Unset): Buzz score
-        total_mentions (int | None | Unset): Explicit mentions in selected period
+        mentions (int | None | Unset): Canonical explicit mentions in selected period
+        total_mentions (int | None | Unset): Deprecated alias for ``mentions``
         sentiment_score (float | None | Unset): Average sentiment
         positive_count (int | None | Unset): Positive mention count
         negative_count (int | None | Unset): Negative mention count
@@ -54,6 +55,7 @@ class CryptoTokenSentiment:
     found: bool
     name: None | str | Unset = UNSET
     buzz_score: float | None | Unset = UNSET
+    mentions: int | None | Unset = UNSET
     total_mentions: int | None | Unset = UNSET
     sentiment_score: float | None | Unset = UNSET
     positive_count: int | None | Unset = UNSET
@@ -89,6 +91,12 @@ class CryptoTokenSentiment:
             buzz_score = UNSET
         else:
             buzz_score = self.buzz_score
+
+        mentions: int | None | Unset
+        if isinstance(self.mentions, Unset):
+            mentions = UNSET
+        else:
+            mentions = self.mentions
 
         total_mentions: int | None | Unset
         if isinstance(self.total_mentions, Unset):
@@ -212,6 +220,8 @@ class CryptoTokenSentiment:
             field_dict["name"] = name
         if buzz_score is not UNSET:
             field_dict["buzz_score"] = buzz_score
+        if mentions is not UNSET:
+            field_dict["mentions"] = mentions
         if total_mentions is not UNSET:
             field_dict["total_mentions"] = total_mentions
         if sentiment_score is not UNSET:
@@ -280,6 +290,15 @@ class CryptoTokenSentiment:
 
         buzz_score = _parse_buzz_score(d.pop("buzz_score", UNSET))
 
+        def _parse_mentions(data: object) -> int | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(int | None | Unset, data)
+
+        mentions = _parse_mentions(d.pop("mentions", UNSET))
+
         def _parse_total_mentions(data: object) -> int | None | Unset:
             if data is None:
                 return data
@@ -288,6 +307,10 @@ class CryptoTokenSentiment:
             return cast(int | None | Unset, data)
 
         total_mentions = _parse_total_mentions(d.pop("total_mentions", UNSET))
+        if isinstance(mentions, Unset):
+            mentions = total_mentions
+        if isinstance(total_mentions, Unset):
+            total_mentions = mentions
 
         def _parse_sentiment_score(data: object) -> float | None | Unset:
             if data is None:
@@ -491,6 +514,7 @@ class CryptoTokenSentiment:
             found=found,
             name=name,
             buzz_score=buzz_score,
+            mentions=mentions,
             total_mentions=total_mentions,
             sentiment_score=sentiment_score,
             positive_count=positive_count,

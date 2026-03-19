@@ -18,13 +18,15 @@ class XDailyTrendItem:
     Attributes:
         date (str): Date in YYYY-MM-DD format
         mentions (int): Number of tweet mentions on this date
-        sentiment (float | None | Unset): Average sentiment score for the day
+        sentiment_score (float | None | Unset): Canonical average sentiment score for the day
+        sentiment (float | None | Unset): Deprecated alias for ``sentiment_score``
         avg_rank (float | None | Unset): Average X rank on this date (X-specific)
         buzz_score (float | None | Unset): Buzz score for this date (0-100)
     """
 
     date: str
     mentions: int
+    sentiment_score: float | None | Unset = UNSET
     sentiment: float | None | Unset = UNSET
     avg_rank: float | None | Unset = UNSET
     buzz_score: float | None | Unset = UNSET
@@ -34,6 +36,12 @@ class XDailyTrendItem:
         date = self.date
 
         mentions = self.mentions
+
+        sentiment_score: float | None | Unset
+        if isinstance(self.sentiment_score, Unset):
+            sentiment_score = UNSET
+        else:
+            sentiment_score = self.sentiment_score
 
         sentiment: float | None | Unset
         if isinstance(self.sentiment, Unset):
@@ -61,6 +69,8 @@ class XDailyTrendItem:
                 "mentions": mentions,
             }
         )
+        if sentiment_score is not UNSET:
+            field_dict["sentiment_score"] = sentiment_score
         if sentiment is not UNSET:
             field_dict["sentiment"] = sentiment
         if avg_rank is not UNSET:
@@ -76,6 +86,15 @@ class XDailyTrendItem:
         date = d.pop("date")
 
         mentions = d.pop("mentions")
+
+        def _parse_sentiment_score(data: object) -> float | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(float | None | Unset, data)
+
+        sentiment_score = _parse_sentiment_score(d.pop("sentiment_score", UNSET))
 
         def _parse_sentiment(data: object) -> float | None | Unset:
             if data is None:
@@ -107,6 +126,7 @@ class XDailyTrendItem:
         x_daily_trend_item = cls(
             date=date,
             mentions=mentions,
+            sentiment_score=sentiment_score,
             sentiment=sentiment,
             avg_rank=avg_rank,
             buzz_score=buzz_score,

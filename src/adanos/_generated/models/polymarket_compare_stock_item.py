@@ -13,90 +13,55 @@ T = TypeVar("T", bound="PolymarketCompareStockItem")
 
 @_attrs_define
 class PolymarketCompareStockItem:
-    """Single stock item for Polymarket compare endpoint.
-
-    Attributes:
-        ticker (str): Stock ticker symbol
-        buzz_score (float): Buzz score (0-100)
-        trade_count (int): Trade count in selected period
-        market_count (int): Number of active markets for ticker
-        total_liquidity (float): Total liquidity (USD)
-        company_name (None | str | Unset): Company name from ticker_reference
-        unique_traders (int | None | Unset): Sum of per-market day unique trader counters (can overcount across markets)
-        sentiment (float | None | Unset): Implied sentiment
-    """
+    """Single stock item for Polymarket compare endpoint."""
 
     ticker: str
     buzz_score: float
     trade_count: int
     market_count: int
     total_liquidity: float
+    trend_history: list[float]
     company_name: None | str | Unset = UNSET
+    trend: None | str | Unset = UNSET
     unique_traders: int | None | Unset = UNSET
+    sentiment_score: float | None | Unset = UNSET
     sentiment: float | None | Unset = UNSET
+    bullish_pct: int | None | Unset = UNSET
+    bearish_pct: int | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        ticker = self.ticker
-
-        buzz_score = self.buzz_score
-
-        trade_count = self.trade_count
-
-        market_count = self.market_count
-
-        total_liquidity = self.total_liquidity
-
-        company_name: None | str | Unset
-        if isinstance(self.company_name, Unset):
-            company_name = UNSET
-        else:
-            company_name = self.company_name
-
-        unique_traders: int | None | Unset
-        if isinstance(self.unique_traders, Unset):
-            unique_traders = UNSET
-        else:
-            unique_traders = self.unique_traders
-
-        sentiment: float | None | Unset
-        if isinstance(self.sentiment, Unset):
-            sentiment = UNSET
-        else:
-            sentiment = self.sentiment
-
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
-                "ticker": ticker,
-                "buzz_score": buzz_score,
-                "trade_count": trade_count,
-                "market_count": market_count,
-                "total_liquidity": total_liquidity,
+                "ticker": self.ticker,
+                "buzz_score": self.buzz_score,
+                "trade_count": self.trade_count,
+                "market_count": self.market_count,
+                "total_liquidity": self.total_liquidity,
+                "trend_history": self.trend_history,
             }
         )
-        if company_name is not UNSET:
-            field_dict["company_name"] = company_name
-        if unique_traders is not UNSET:
-            field_dict["unique_traders"] = unique_traders
-        if sentiment is not UNSET:
-            field_dict["sentiment"] = sentiment
-
+        if self.company_name is not UNSET:
+            field_dict["company_name"] = self.company_name
+        if self.trend is not UNSET:
+            field_dict["trend"] = self.trend
+        if self.unique_traders is not UNSET:
+            field_dict["unique_traders"] = self.unique_traders
+        if self.sentiment_score is not UNSET:
+            field_dict["sentiment_score"] = self.sentiment_score
+        if self.sentiment is not UNSET:
+            field_dict["sentiment"] = self.sentiment
+        if self.bullish_pct is not UNSET:
+            field_dict["bullish_pct"] = self.bullish_pct
+        if self.bearish_pct is not UNSET:
+            field_dict["bearish_pct"] = self.bearish_pct
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
-        ticker = d.pop("ticker")
-
-        buzz_score = d.pop("buzz_score")
-
-        trade_count = d.pop("trade_count")
-
-        market_count = d.pop("market_count")
-
-        total_liquidity = d.pop("total_liquidity")
 
         def _parse_company_name(data: object) -> None | str | Unset:
             if data is None:
@@ -105,35 +70,41 @@ class PolymarketCompareStockItem:
                 return data
             return cast(None | str | Unset, data)
 
-        company_name = _parse_company_name(d.pop("company_name", UNSET))
-
-        def _parse_unique_traders(data: object) -> int | None | Unset:
+        def _parse_string(data: object) -> None | str | Unset:
             if data is None:
                 return data
             if isinstance(data, Unset):
                 return data
-            return cast(int | None | Unset, data)
+            return cast(None | str | Unset, data)
 
-        unique_traders = _parse_unique_traders(d.pop("unique_traders", UNSET))
-
-        def _parse_sentiment(data: object) -> float | None | Unset:
+        def _parse_float(data: object) -> float | None | Unset:
             if data is None:
                 return data
             if isinstance(data, Unset):
                 return data
             return cast(float | None | Unset, data)
 
-        sentiment = _parse_sentiment(d.pop("sentiment", UNSET))
+        def _parse_int(data: object) -> int | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(int | None | Unset, data)
 
         polymarket_compare_stock_item = cls(
-            ticker=ticker,
-            buzz_score=buzz_score,
-            trade_count=trade_count,
-            market_count=market_count,
-            total_liquidity=total_liquidity,
-            company_name=company_name,
-            unique_traders=unique_traders,
-            sentiment=sentiment,
+            ticker=d.pop("ticker"),
+            buzz_score=d.pop("buzz_score"),
+            trade_count=d.pop("trade_count"),
+            market_count=d.pop("market_count"),
+            total_liquidity=d.pop("total_liquidity"),
+            trend_history=cast(list[float], d.pop("trend_history")),
+            company_name=_parse_company_name(d.pop("company_name", UNSET)),
+            trend=_parse_string(d.pop("trend", UNSET)),
+            unique_traders=_parse_int(d.pop("unique_traders", UNSET)),
+            sentiment_score=_parse_float(d.pop("sentiment_score", UNSET)),
+            sentiment=_parse_float(d.pop("sentiment", UNSET)),
+            bullish_pct=_parse_int(d.pop("bullish_pct", UNSET)),
+            bearish_pct=_parse_int(d.pop("bearish_pct", UNSET)),
         )
 
         polymarket_compare_stock_item.additional_properties = d

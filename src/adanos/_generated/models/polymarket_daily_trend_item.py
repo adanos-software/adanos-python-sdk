@@ -18,12 +18,14 @@ class PolymarketDailyTrendItem:
     Attributes:
         date (str): Date in YYYY-MM-DD format
         trade_count (int): Trade count on this date
-        sentiment (float | None | Unset): Implied sentiment on this date
+        sentiment_score (float | None | Unset): Canonical implied sentiment on this date
+        sentiment (float | None | Unset): Deprecated alias for ``sentiment_score``
         buzz_score (float | None | Unset): Buzz score on this date
     """
 
     date: str
     trade_count: int
+    sentiment_score: float | None | Unset = UNSET
     sentiment: float | None | Unset = UNSET
     buzz_score: float | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
@@ -32,6 +34,12 @@ class PolymarketDailyTrendItem:
         date = self.date
 
         trade_count = self.trade_count
+
+        sentiment_score: float | None | Unset
+        if isinstance(self.sentiment_score, Unset):
+            sentiment_score = UNSET
+        else:
+            sentiment_score = self.sentiment_score
 
         sentiment: float | None | Unset
         if isinstance(self.sentiment, Unset):
@@ -53,6 +61,8 @@ class PolymarketDailyTrendItem:
                 "trade_count": trade_count,
             }
         )
+        if sentiment_score is not UNSET:
+            field_dict["sentiment_score"] = sentiment_score
         if sentiment is not UNSET:
             field_dict["sentiment"] = sentiment
         if buzz_score is not UNSET:
@@ -66,6 +76,15 @@ class PolymarketDailyTrendItem:
         date = d.pop("date")
 
         trade_count = d.pop("trade_count")
+
+        def _parse_sentiment_score(data: object) -> float | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(float | None | Unset, data)
+
+        sentiment_score = _parse_sentiment_score(d.pop("sentiment_score", UNSET))
 
         def _parse_sentiment(data: object) -> float | None | Unset:
             if data is None:
@@ -88,6 +107,7 @@ class PolymarketDailyTrendItem:
         polymarket_daily_trend_item = cls(
             date=date,
             trade_count=trade_count,
+            sentiment_score=sentiment_score,
             sentiment=sentiment,
             buzz_score=buzz_score,
         )

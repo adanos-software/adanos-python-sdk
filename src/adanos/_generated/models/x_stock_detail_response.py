@@ -28,7 +28,8 @@ class XStockDetailResponse:
             company_name (None | str | Unset): Company name from ticker_reference
             found (bool | Unset): Whether ticker was found in X trending Default: True.
             buzz_score (float | None | Unset): V5.4 buzz score from real tweet data (null if not found)
-            total_mentions (int | None | Unset): Total tweet mentions within period
+            mentions (int | None | Unset): Canonical total tweet mentions within period
+            total_mentions (int | None | Unset): Deprecated alias for ``mentions``
             sentiment_score (float | None | Unset): Average sentiment score from tweet analysis (-1 to +1)
             positive_count (int | None | Unset): Bullish tweet mentions
             negative_count (int | None | Unset): Bearish tweet mentions
@@ -50,6 +51,7 @@ class XStockDetailResponse:
     company_name: None | str | Unset = UNSET
     found: bool | Unset = True
     buzz_score: float | None | Unset = UNSET
+    mentions: int | None | Unset = UNSET
     total_mentions: int | None | Unset = UNSET
     sentiment_score: float | None | Unset = UNSET
     positive_count: int | None | Unset = UNSET
@@ -82,6 +84,12 @@ class XStockDetailResponse:
             buzz_score = UNSET
         else:
             buzz_score = self.buzz_score
+
+        mentions: int | None | Unset
+        if isinstance(self.mentions, Unset):
+            mentions = UNSET
+        else:
+            mentions = self.mentions
 
         total_mentions: int | None | Unset
         if isinstance(self.total_mentions, Unset):
@@ -190,6 +198,8 @@ class XStockDetailResponse:
             field_dict["found"] = found
         if buzz_score is not UNSET:
             field_dict["buzz_score"] = buzz_score
+        if mentions is not UNSET:
+            field_dict["mentions"] = mentions
         if total_mentions is not UNSET:
             field_dict["total_mentions"] = total_mentions
         if sentiment_score is not UNSET:
@@ -249,6 +259,15 @@ class XStockDetailResponse:
 
         buzz_score = _parse_buzz_score(d.pop("buzz_score", UNSET))
 
+        def _parse_mentions(data: object) -> int | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(int | None | Unset, data)
+
+        mentions = _parse_mentions(d.pop("mentions", UNSET))
+
         def _parse_total_mentions(data: object) -> int | None | Unset:
             if data is None:
                 return data
@@ -257,6 +276,10 @@ class XStockDetailResponse:
             return cast(int | None | Unset, data)
 
         total_mentions = _parse_total_mentions(d.pop("total_mentions", UNSET))
+        if isinstance(mentions, Unset):
+            mentions = total_mentions
+        if isinstance(total_mentions, Unset):
+            total_mentions = mentions
 
         def _parse_sentiment_score(data: object) -> float | None | Unset:
             if data is None:
@@ -411,6 +434,7 @@ class XStockDetailResponse:
             company_name=company_name,
             found=found,
             buzz_score=buzz_score,
+            mentions=mentions,
             total_mentions=total_mentions,
             sentiment_score=sentiment_score,
             positive_count=positive_count,

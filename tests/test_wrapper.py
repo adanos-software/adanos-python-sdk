@@ -34,17 +34,47 @@ TRENDING_STOCK = {
 }
 
 STOCK_SENTIMENT = {
-    "ticker": "TSLA", "found": True,
+    "ticker": "TSLA",
+    "found": True,
+    "mentions": 342,
+    "total_mentions": 342,
+    "sentiment_score": 0.271,
+    "daily_trend": [
+        {
+            "date": "2026-03-18",
+            "mentions": 61,
+            "sentiment_score": 0.245,
+            "sentiment": 0.245,
+            "buzz_score": 71.2,
+        }
+    ],
 }
 
 SEARCH_RESPONSE = {
-    "query": "Tesla", "count": 1, "results": [
-        {"ticker": "TSLA", "name": "Tesla Inc"},
+    "query": "Tesla",
+    "count": 1,
+    "period_days": 7,
+    "results": [
+        {
+            "ticker": "TSLA",
+            "name": "Tesla Inc",
+            "summary": {
+                "mentions": 342,
+                "buzz_score": 87.5,
+                "trend": "rising",
+                "sentiment_score": 0.231,
+                "bullish_pct": 58,
+                "bearish_pct": 16,
+                "unique_posts": 112,
+                "subreddit_count": 7,
+                "total_upvotes": 9042,
+            },
+        },
     ],
 }
 
 POLYMARKET_SEARCH_RESPONSE = {
-    "query": "AAPL", "count": 1, "results": [
+    "query": "AAPL", "count": 1, "period_days": 7, "results": [
         {
             "ticker": "AAPL",
             "name": "Apple Inc.",
@@ -53,13 +83,41 @@ POLYMARKET_SEARCH_RESPONSE = {
             "sector": "Technology",
             "country": "United States",
             "aliases": ["Apple"],
-            "trade_count": 12,
+            "summary": {
+                "trade_count": 12,
+                "market_count": 3,
+                "unique_traders": 9,
+                "total_liquidity": 45200.0,
+                "buzz_score": 71.4,
+                "trend": "stable",
+                "sentiment_score": 0.118,
+                "bullish_pct": 55,
+                "bearish_pct": 45,
+            },
         },
     ],
 }
 
 COMPARE_RESPONSE = {
-    "period_days": 7, "stocks": [],
+    "period_days": 7,
+    "stocks": [
+        {
+            "ticker": "TSLA",
+            "company_name": "Tesla, Inc.",
+            "buzz_score": 87.5,
+            "trend": "rising",
+            "mentions": 342,
+            "unique_posts": 112,
+            "subreddit_count": 7,
+            "sentiment_score": 0.231,
+            "sentiment": 0.231,
+            "bullish_pct": 58,
+            "bearish_pct": 16,
+            "total_upvotes": 9042,
+            "upvotes": 9042,
+            "trend_history": [51.2, 58.4, 64.1, 70.2, 75.9, 81.4, 87.5],
+        }
+    ],
 }
 
 NEWS_COMPARE_RESPONSE = {
@@ -71,7 +129,12 @@ NEWS_COMPARE_RESPONSE = {
             "buzz_score": 61.2,
             "mentions": 42,
             "source_count": 7,
+            "trend": "rising",
+            "sentiment_score": 0.31,
             "sentiment": 0.31,
+            "bullish_pct": 57,
+            "bearish_pct": 18,
+            "trend_history": [22.4, 24.9, 28.5, 33.2, 39.4, 47.0, 61.2],
         }
     ],
 }
@@ -123,6 +186,19 @@ X_TRENDING_STOCK = {
 
 X_STOCK_DETAIL = {
     "ticker": "NVDA",
+    "mentions": 156,
+    "total_mentions": 156,
+    "sentiment_score": 0.276,
+    "daily_trend": [
+        {
+            "date": "2026-03-18",
+            "mentions": 48,
+            "sentiment_score": 0.244,
+            "sentiment": 0.244,
+            "avg_rank": 5.2,
+            "buzz_score": 74.1,
+        }
+    ],
 }
 
 POLYMARKET_TRENDING_STOCK = {
@@ -140,6 +216,15 @@ POLYMARKET_TRENDING_STOCK = {
 POLYMARKET_STOCK_DETAIL = {
     "ticker": "AAPL",
     "found": True,
+    "daily_trend": [
+        {
+            "date": "2026-03-18",
+            "trade_count": 8,
+            "sentiment_score": 0.114,
+            "sentiment": 0.114,
+            "buzz_score": 71.4,
+        }
+    ],
 }
 
 POLYMARKET_COMPARE_RESPONSE = {
@@ -150,7 +235,13 @@ POLYMARKET_COMPARE_RESPONSE = {
         "trade_count": 8,
         "market_count": 4,
         "unique_traders": 6,
+        "trend": "rising",
+        "sentiment_score": 0.265,
+        "sentiment": 0.265,
+        "bullish_pct": 67,
+        "bearish_pct": 33,
         "total_liquidity": 94750.0,
+        "trend_history": [45.2, 49.1, 53.7, 58.0, 63.4, 68.9, 71.4],
     }],
 }
 
@@ -240,6 +331,10 @@ class TestRedditStock:
         assert route.called
         assert result.ticker == "TSLA"
         assert result.found is True
+        assert result.mentions == 342
+        assert result.total_mentions == 342
+        assert result.daily_trend[0].sentiment_score == 0.245
+        assert result.daily_trend[0].sentiment == 0.245
 
     @respx.mock
     def test_stock_with_days(self, client):
@@ -267,10 +362,14 @@ class TestRedditSearch:
         route = respx.get(f"{BASE_URL}/reddit/stocks/v1/search").mock(
             return_value=httpx.Response(200, json=SEARCH_RESPONSE)
         )
-        result = client.reddit.search("Tesla")
+        result = client.reddit.search("Tesla", days=7, limit=5)
         assert route.called
         assert request_params(route)["q"] == "Tesla"
+        assert request_params(route)["days"] == "7"
+        assert request_params(route)["limit"] == "5"
         assert result.count == 1
+        assert result.period_days == 7
+        assert result.results[0].summary["mentions"] == 342
 
 
 class TestRedditCompare:
@@ -279,9 +378,12 @@ class TestRedditCompare:
         route = respx.get(f"{BASE_URL}/reddit/stocks/v1/compare").mock(
             return_value=httpx.Response(200, json=COMPARE_RESPONSE)
         )
-        client.reddit.compare(["TSLA", "AAPL"], days=7)
+        result = client.reddit.compare(["TSLA", "AAPL"], days=7)
         assert route.called
         assert request_params(route)["tickers"] == "TSLA,AAPL"
+        assert result.stocks[0].trend == "rising"
+        assert result.stocks[0].trend_history[-1] == 87.5
+        assert result.stocks[0].total_upvotes == 9042
 
 
 class TestRedditTrendingSectors:
@@ -339,6 +441,8 @@ class TestNews:
         result = client.news.stock("TSLA")
         assert route.called
         assert result.ticker == "TSLA"
+        assert result.mentions == 342
+        assert result.total_mentions == 342
         assert request_params(route) == {"days": "7"}
 
     @respx.mock
@@ -399,12 +503,16 @@ class TestNews:
         route = respx.get(f"{BASE_URL}/news/stocks/v1/search").mock(
             return_value=httpx.Response(200, json=SEARCH_RESPONSE)
         )
-        result = client.news.search("Tesla")
+        result = client.news.search("Tesla", days=7, limit=5)
         assert route.called
         params = request_params(route)
         assert params["q"] == "Tesla"
+        assert params["days"] == "7"
+        assert params["limit"] == "5"
         assert "source" not in params
         assert result.count == 1
+        assert result.period_days == 7
+        assert result.results[0].summary["buzz_score"] == 87.5
 
     @respx.mock
     def test_news_stats(self, client):
@@ -460,8 +568,9 @@ class TestAsync:
             return_value=httpx.Response(200, json=SEARCH_RESPONSE)
         )
         async with AdanosClient(api_key=API_KEY, base_url=BASE_URL) as client:
-            result = await client.reddit.search_async("Tesla")
+            result = await client.reddit.search_async("Tesla", days=7, limit=5)
         assert result.count == 1
+        assert result.period_days == 7
 
     @respx.mock
     @pytest.mark.asyncio
@@ -529,6 +638,9 @@ class TestXStock:
         result = client.x.stock("NVDA")
         assert route.called
         assert result.ticker == "NVDA"
+        assert result.mentions == 156
+        assert result.total_mentions == 156
+        assert result.daily_trend[0].sentiment_score == 0.244
 
 
 class TestXSearch:
@@ -537,8 +649,11 @@ class TestXSearch:
         route = respx.get(f"{BASE_URL}/x/stocks/v1/search").mock(
             return_value=httpx.Response(200, json={**SEARCH_RESPONSE, "query": "NVDA"})
         )
-        client.x.search("NVDA")
+        result = client.x.search("NVDA", days=7, limit=5)
         assert route.called
+        assert request_params(route)["days"] == "7"
+        assert request_params(route)["limit"] == "5"
+        assert result.period_days == 7
 
 
 class TestXCompare:
@@ -547,9 +662,10 @@ class TestXCompare:
         route = respx.get(f"{BASE_URL}/x/stocks/v1/compare").mock(
             return_value=httpx.Response(200, json=COMPARE_RESPONSE)
         )
-        client.x.compare(["NVDA", "AMD"])
+        result = client.x.compare(["NVDA", "AMD"])
         assert route.called
         assert request_params(route)["tickers"] == "NVDA,AMD"
+        assert result.stocks[0].trend_history[-1] == 87.5
 
 
 # --- Polymarket namespace ---
@@ -587,6 +703,8 @@ class TestPolymarketStock:
         assert route.called
         assert result.ticker == "AAPL"
         assert result.found is True
+        assert result.daily_trend[0].sentiment_score == 0.114
+        assert result.daily_trend[0].sentiment == 0.114
 
 
 class TestPolymarketSearch:
@@ -595,12 +713,15 @@ class TestPolymarketSearch:
         route = respx.get(f"{BASE_URL}/polymarket/stocks/v1/search").mock(
             return_value=httpx.Response(200, json=POLYMARKET_SEARCH_RESPONSE)
         )
-        result = client.polymarket.search("AAPL")
+        result = client.polymarket.search("AAPL", days=7, limit=5)
         assert route.called
         assert request_params(route)["q"] == "AAPL"
+        assert request_params(route)["days"] == "7"
+        assert request_params(route)["limit"] == "5"
         assert result.query == "AAPL"
         assert result.count == 1
-        assert result.results[0].trade_count == 12
+        assert result.period_days == 7
+        assert result.results[0].summary["trade_count"] == 12
 
 
 class TestPolymarketCompare:
@@ -614,6 +735,7 @@ class TestPolymarketCompare:
         assert request_params(route)["tickers"] == "AAPL,TSLA"
         assert result.stocks[0].trade_count == 8
         assert result.stocks[0].market_count == 4
+        assert result.stocks[0].trend_history[-1] == 71.4
 
 
 # --- Context manager ---
@@ -671,8 +793,18 @@ CRYPTO_TOKEN_DETAIL = {
     "found": True,
     "name": "Bitcoin",
     "buzz_score": 90.1,
+    "mentions": 321,
     "total_mentions": 321,
     "sentiment_score": 0.42,
+    "daily_trend": [
+        {
+            "date": "2026-03-18",
+            "mentions": 54,
+            "sentiment_score": 0.33,
+            "sentiment": 0.33,
+            "buzz_score": 75.1,
+        }
+    ],
 }
 
 CRYPTO_TRENDING = [
@@ -694,15 +826,62 @@ CRYPTO_TRENDING = [
 CRYPTO_COMPARE = {
     "period_days": 7,
     "tokens": [
-        {"symbol": "BTC", "buzz_score": 90.1, "mentions": 321, "sentiment": 0.42, "upvotes": 9900},
-        {"symbol": "ETH", "buzz_score": 75.3, "mentions": 210, "sentiment": 0.31, "upvotes": 6500},
+        {
+            "symbol": "BTC",
+            "name": "Bitcoin",
+            "buzz_score": 90.1,
+            "trend": "rising",
+            "mentions": 321,
+            "unique_posts": 120,
+            "subreddit_count": 15,
+            "sentiment_score": 0.42,
+            "sentiment": 0.42,
+            "bullish_pct": 58,
+            "bearish_pct": 14,
+            "total_upvotes": 9900,
+            "upvotes": 9900,
+            "trend_history": [60.1, 64.2, 70.4, 74.3, 81.8, 86.0, 90.1],
+        },
+        {
+            "symbol": "ETH",
+            "name": "Ethereum",
+            "buzz_score": 75.3,
+            "trend": "stable",
+            "mentions": 210,
+            "unique_posts": 88,
+            "subreddit_count": 12,
+            "sentiment_score": 0.31,
+            "sentiment": 0.31,
+            "bullish_pct": 49,
+            "bearish_pct": 18,
+            "total_upvotes": 6500,
+            "upvotes": 6500,
+            "trend_history": [51.3, 53.0, 58.6, 60.2, 66.9, 71.4, 75.3],
+        },
     ],
 }
 
 CRYPTO_SEARCH = {
     "query": "btc",
     "count": 1,
-    "results": [{"symbol": "BTC", "name": "Bitcoin", "mention_count": 321}],
+    "period_days": 7,
+    "results": [
+        {
+            "symbol": "BTC",
+            "name": "Bitcoin",
+            "summary": {
+                "mentions": 321,
+                "buzz_score": 90.1,
+                "trend": "rising",
+                "sentiment_score": 0.42,
+                "bullish_pct": 58,
+                "bearish_pct": 14,
+                "unique_posts": 120,
+                "subreddit_count": 15,
+                "total_upvotes": 9900,
+            },
+        }
+    ],
 }
 
 CRYPTO_STATS = {
@@ -737,6 +916,9 @@ class TestCryptoNamespace:
         assert route.called
         assert result.symbol == "BTC"
         assert result.found is True
+        assert result.mentions == 321
+        assert result.total_mentions == 321
+        assert result.daily_trend[0].sentiment_score == 0.33
 
     @respx.mock
     def test_crypto_trending(self, client):
@@ -752,10 +934,14 @@ class TestCryptoNamespace:
         route = respx.get(f"{BASE_URL}/reddit/crypto/v1/search").mock(
             return_value=httpx.Response(200, json=CRYPTO_SEARCH)
         )
-        result = client.crypto.search("btc")
+        result = client.crypto.search("btc", days=7, limit=5)
         assert route.called
         assert request_params(route)["q"] == "btc"
+        assert request_params(route)["days"] == "7"
+        assert request_params(route)["limit"] == "5"
         assert result.count == 1
+        assert result.period_days == 7
+        assert result.results[0].summary["mentions"] == 321
 
     @respx.mock
     def test_crypto_compare(self, client):
@@ -767,6 +953,7 @@ class TestCryptoNamespace:
         assert request_params(route)["symbols"] == "BTC,ETH"
         assert result.tokens[0].symbol == "BTC"
         assert result.tokens[0].mentions == 321
+        assert result.tokens[0].trend_history[-1] == 90.1
 
     @respx.mock
     def test_crypto_compare_fallback_when_compare_shape_drifts(self, client):

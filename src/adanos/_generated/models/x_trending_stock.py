@@ -32,8 +32,8 @@ class XTrendingStock:
             total_upvotes (int | None | Unset): Total likes across all tweet mentions
             unique_tweets (int | None | Unset): Number of unique tweets mentioning this ticker (distinct tweet_id)
             is_validated (bool | Unset): Also trending on Reddit (cross-platform validation) Default: False.
-            trend_history (list[float] | Unset): Daily buzz scores for the last 7 days (oldest to newest). Last element is
-                yesterday's score. Today's live score is in buzz_score.
+            trend_history (list[float] | Unset): Daily buzz scores (oldest to newest). Length = max(days, 7). The last
+                element equals the current `buzz_score`.
     """
 
     ticker: str

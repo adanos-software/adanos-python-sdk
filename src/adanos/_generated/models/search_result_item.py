@@ -23,7 +23,7 @@ class SearchResultItem:
         sector (None | str | Unset): Industry sector
         country (None | str | Unset): Country of headquarters
         aliases (list[str] | None | Unset): Alternative names/aliases
-        mention_count (int | None | Unset): Total mentions in database
+        summary (dict[str, Any] | None | Unset): Recent-period summary block for this asset
     """
 
     ticker: str
@@ -33,7 +33,7 @@ class SearchResultItem:
     sector: None | str | Unset = UNSET
     country: None | str | Unset = UNSET
     aliases: list[str] | None | Unset = UNSET
-    mention_count: int | None | Unset = UNSET
+    summary: dict[str, Any] | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -74,11 +74,11 @@ class SearchResultItem:
         else:
             aliases = self.aliases
 
-        mention_count: int | None | Unset
-        if isinstance(self.mention_count, Unset):
-            mention_count = UNSET
+        summary: dict[str, Any] | None | Unset
+        if isinstance(self.summary, Unset):
+            summary = UNSET
         else:
-            mention_count = self.mention_count
+            summary = self.summary
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
@@ -98,8 +98,8 @@ class SearchResultItem:
             field_dict["country"] = country
         if aliases is not UNSET:
             field_dict["aliases"] = aliases
-        if mention_count is not UNSET:
-            field_dict["mention_count"] = mention_count
+        if summary is not UNSET:
+            field_dict["summary"] = summary
 
         return field_dict
 
@@ -163,14 +163,14 @@ class SearchResultItem:
 
         aliases = _parse_aliases(d.pop("aliases", UNSET))
 
-        def _parse_mention_count(data: object) -> int | None | Unset:
+        def _parse_summary(data: object) -> dict[str, Any] | None | Unset:
             if data is None:
                 return data
             if isinstance(data, Unset):
                 return data
-            return cast(int | None | Unset, data)
+            return cast(dict[str, Any] | None | Unset, data)
 
-        mention_count = _parse_mention_count(d.pop("mention_count", UNSET))
+        summary = _parse_summary(d.pop("summary", UNSET))
 
         search_result_item = cls(
             ticker=ticker,
@@ -180,7 +180,7 @@ class SearchResultItem:
             sector=sector,
             country=country,
             aliases=aliases,
-            mention_count=mention_count,
+            summary=summary,
         )
 
         search_result_item.additional_properties = d

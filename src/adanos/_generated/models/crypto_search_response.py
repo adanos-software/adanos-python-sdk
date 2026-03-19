@@ -20,11 +20,13 @@ class CryptoSearchResponse:
     Attributes:
         query (str):
         count (int):
+        period_days (int):
         results (list[CryptoSearchItem]):
     """
 
     query: str
     count: int
+    period_days: int
     results: list[CryptoSearchItem]
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
@@ -32,6 +34,8 @@ class CryptoSearchResponse:
         query = self.query
 
         count = self.count
+
+        period_days = self.period_days
 
         results = []
         for results_item_data in self.results:
@@ -44,6 +48,7 @@ class CryptoSearchResponse:
             {
                 "query": query,
                 "count": count,
+                "period_days": period_days,
                 "results": results,
             }
         )
@@ -59,6 +64,8 @@ class CryptoSearchResponse:
 
         count = d.pop("count")
 
+        period_days = d.pop("period_days")
+
         results = []
         _results = d.pop("results")
         for results_item_data in _results:
@@ -69,6 +76,7 @@ class CryptoSearchResponse:
         crypto_search_response = cls(
             query=query,
             count=count,
+            period_days=period_days,
             results=results,
         )
 

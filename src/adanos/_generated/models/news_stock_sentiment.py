@@ -27,7 +27,8 @@ class NewsStockSentiment:
         found (bool): Whether mentions were found for this ticker
         company_name (None | str | Unset): Company name from ticker_reference (null if not found)
         buzz_score (float | None | Unset): Buzz Score (0-100). Asymptotic scaling above 50.
-        total_mentions (int | None | Unset): Total number of mentions
+        mentions (int | None | Unset): Canonical total number of mentions
+        total_mentions (int | None | Unset): Deprecated alias for ``mentions``
         sentiment_score (float | None | Unset): Average sentiment score (-1 bearish to +1 bullish)
         positive_count (int | None | Unset): Number of positive mentions
         negative_count (int | None | Unset): Number of negative mentions
@@ -48,6 +49,7 @@ class NewsStockSentiment:
     found: bool
     company_name: None | str | Unset = UNSET
     buzz_score: float | None | Unset = UNSET
+    mentions: int | None | Unset = UNSET
     total_mentions: int | None | Unset = UNSET
     sentiment_score: float | None | Unset = UNSET
     positive_count: int | None | Unset = UNSET
@@ -79,6 +81,12 @@ class NewsStockSentiment:
             buzz_score = UNSET
         else:
             buzz_score = self.buzz_score
+
+        mentions: int | None | Unset
+        if isinstance(self.mentions, Unset):
+            mentions = UNSET
+        else:
+            mentions = self.mentions
 
         total_mentions: int | None | Unset
         if isinstance(self.total_mentions, Unset):
@@ -190,6 +198,8 @@ class NewsStockSentiment:
             field_dict["company_name"] = company_name
         if buzz_score is not UNSET:
             field_dict["buzz_score"] = buzz_score
+        if mentions is not UNSET:
+            field_dict["mentions"] = mentions
         if total_mentions is not UNSET:
             field_dict["total_mentions"] = total_mentions
         if sentiment_score is not UNSET:
@@ -248,6 +258,15 @@ class NewsStockSentiment:
 
         buzz_score = _parse_buzz_score(d.pop("buzz_score", UNSET))
 
+        def _parse_mentions(data: object) -> int | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(int | None | Unset, data)
+
+        mentions = _parse_mentions(d.pop("mentions", UNSET))
+
         def _parse_total_mentions(data: object) -> int | None | Unset:
             if data is None:
                 return data
@@ -256,6 +275,10 @@ class NewsStockSentiment:
             return cast(int | None | Unset, data)
 
         total_mentions = _parse_total_mentions(d.pop("total_mentions", UNSET))
+        if isinstance(mentions, Unset):
+            mentions = total_mentions
+        if isinstance(total_mentions, Unset):
+            total_mentions = mentions
 
         def _parse_sentiment_score(data: object) -> float | None | Unset:
             if data is None:
@@ -423,6 +446,7 @@ class NewsStockSentiment:
             found=found,
             company_name=company_name,
             buzz_score=buzz_score,
+            mentions=mentions,
             total_mentions=total_mentions,
             sentiment_score=sentiment_score,
             positive_count=positive_count,

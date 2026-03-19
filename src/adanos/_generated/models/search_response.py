@@ -20,11 +20,13 @@ class SearchResponse:
     Attributes:
         query (str): Original search query
         count (int): Number of results found
+        period_days (int): Lookback window used for each summary block
         results (list[SearchResultItem]): List of matching stocks
     """
 
     query: str
     count: int
+    period_days: int
     results: list[SearchResultItem]
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
@@ -32,6 +34,8 @@ class SearchResponse:
         query = self.query
 
         count = self.count
+
+        period_days = self.period_days
 
         results = []
         for results_item_data in self.results:
@@ -44,6 +48,7 @@ class SearchResponse:
             {
                 "query": query,
                 "count": count,
+                "period_days": period_days,
                 "results": results,
             }
         )
@@ -59,6 +64,8 @@ class SearchResponse:
 
         count = d.pop("count")
 
+        period_days = d.pop("period_days")
+
         results = []
         _results = d.pop("results")
         for results_item_data in _results:
@@ -69,6 +76,7 @@ class SearchResponse:
         search_response = cls(
             query=query,
             count=count,
+            period_days=period_days,
             results=results,
         )
 

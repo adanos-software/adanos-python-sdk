@@ -115,11 +115,11 @@ def sync_detailed(
 
     **Response includes:**
     - `buzz_score`: V5.4 score from tweet data (mentions, sentiment, likes, diversity)
-    - `total_mentions`: Number of tweet mentions within period
+    - `mentions`: Canonical number of tweet mentions within period (`total_mentions` remains as a legacy alias)
     - `sentiment_score`: Average sentiment from tweet analysis (-1 to +1)
     - `positive_count`, `negative_count`, `neutral_count`: Sentiment breakdown
     - `total_upvotes`: Total likes across tweet mentions
-    - `daily_trend`: Daily data with mentions, sentiment, and avg_rank
+    - `daily_trend`: Daily data with mentions, canonical `sentiment_score`, legacy `sentiment`, and avg_rank
     - `is_validated`: Also trending on Reddit (cross-platform validation)
 
     Returns 404 when ticker data is not available in the requested window.
@@ -167,11 +167,11 @@ def sync(
 
     **Response includes:**
     - `buzz_score`: V5.4 score from tweet data (mentions, sentiment, likes, diversity)
-    - `total_mentions`: Number of tweet mentions within period
+    - `mentions`: Canonical number of tweet mentions within period (`total_mentions` remains as a legacy alias)
     - `sentiment_score`: Average sentiment from tweet analysis (-1 to +1)
     - `positive_count`, `negative_count`, `neutral_count`: Sentiment breakdown
     - `total_upvotes`: Total likes across tweet mentions
-    - `daily_trend`: Daily data with mentions, sentiment, and avg_rank
+    - `daily_trend`: Daily data with mentions, canonical `sentiment_score`, legacy `sentiment`, and avg_rank
     - `is_validated`: Also trending on Reddit (cross-platform validation)
 
     Returns 404 when ticker data is not available in the requested window.
@@ -213,11 +213,11 @@ async def asyncio_detailed(
 
     **Response includes:**
     - `buzz_score`: V5.4 score from tweet data (mentions, sentiment, likes, diversity)
-    - `total_mentions`: Number of tweet mentions within period
+    - `mentions`: Canonical number of tweet mentions within period (`total_mentions` remains as a legacy alias)
     - `sentiment_score`: Average sentiment from tweet analysis (-1 to +1)
     - `positive_count`, `negative_count`, `neutral_count`: Sentiment breakdown
     - `total_upvotes`: Total likes across tweet mentions
-    - `daily_trend`: Daily data with mentions, sentiment, and avg_rank
+    - `daily_trend`: Daily data with mentions, canonical `sentiment_score`, legacy `sentiment`, and avg_rank
     - `is_validated`: Also trending on Reddit (cross-platform validation)
 
     Returns 404 when ticker data is not available in the requested window.
@@ -263,11 +263,11 @@ async def asyncio(
 
     **Response includes:**
     - `buzz_score`: V5.4 score from tweet data (mentions, sentiment, likes, diversity)
-    - `total_mentions`: Number of tweet mentions within period
+    - `mentions`: Canonical number of tweet mentions within period (`total_mentions` remains as a legacy alias)
     - `sentiment_score`: Average sentiment from tweet analysis (-1 to +1)
     - `positive_count`, `negative_count`, `neutral_count`: Sentiment breakdown
     - `total_upvotes`: Total likes across tweet mentions
-    - `daily_trend`: Daily data with mentions, sentiment, and avg_rank
+    - `daily_trend`: Daily data with mentions, canonical `sentiment_score`, legacy `sentiment`, and avg_rank
     - `is_validated`: Also trending on Reddit (cross-platform validation)
 
     Returns 404 when ticker data is not available in the requested window.
