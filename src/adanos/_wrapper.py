@@ -39,6 +39,35 @@ def _resolve_polymarket_type(type: Optional[str]) -> Any:
     return GetPolymarketTrendingStocksTypeType0(type)
 
 
+def _request_json(client: AuthenticatedClient, path: str, *, params: Optional[dict[str, Any]] = None) -> Any:
+    """Perform a raw GET request for wrapper helpers not yet covered by generated code."""
+    response = client.get_httpx_client().request(
+        "get",
+        path,
+        params={key: value for key, value in (params or {}).items() if value is not None},
+    )
+    if response.status_code not in {400, 401, 403, 404, 409, 422, 429}:
+        response.raise_for_status()
+    return response.json()
+
+
+async def _request_json_async(
+    client: AuthenticatedClient,
+    path: str,
+    *,
+    params: Optional[dict[str, Any]] = None,
+) -> Any:
+    """Async companion to :func:`_request_json`."""
+    response = await client.get_async_httpx_client().request(
+        "get",
+        path,
+        params={key: value for key, value in (params or {}).items() if value is not None},
+    )
+    if response.status_code not in {400, 401, 403, 404, 409, 422, 429}:
+        response.raise_for_status()
+    return response.json()
+
+
 class _RedditNamespace:
     """Access Reddit sentiment endpoints via ``client.reddit.*``."""
 
@@ -159,6 +188,18 @@ class _RedditNamespace:
         """Async variant of :meth:`compare`."""
         from ._generated.api.reddit_stocks import compare_stocks
         return await compare_stocks.asyncio(client=self._client, tickers=",".join(tickers), days=days)
+
+    def market_sentiment(self, *, days: int = 1) -> Any:
+        """Get the service-level Reddit market sentiment snapshot."""
+        return _request_json(self._client, "/reddit/stocks/v1/market-sentiment", params={"days": days})
+
+    async def market_sentiment_async(self, *, days: int = 1) -> Any:
+        """Async variant of :meth:`market_sentiment`."""
+        return await _request_json_async(
+            self._client,
+            "/reddit/stocks/v1/market-sentiment",
+            params={"days": days},
+        )
 
     def stats(self) -> Any:
         """Get Reddit stock dataset statistics."""
@@ -371,6 +412,18 @@ class _NewsNamespace:
             days=days,
         )
 
+    def market_sentiment(self, *, days: int = 1) -> Any:
+        """Get the service-level News market sentiment snapshot."""
+        return _request_json(self._client, "/news/stocks/v1/market-sentiment", params={"days": days})
+
+    async def market_sentiment_async(self, *, days: int = 1) -> Any:
+        """Async variant of :meth:`market_sentiment`."""
+        return await _request_json_async(
+            self._client,
+            "/news/stocks/v1/market-sentiment",
+            params={"days": days},
+        )
+
     def stats(self) -> Any:
         """Get News stock dataset statistics."""
         from ._generated.api.news_stocks import get_news_stats
@@ -496,6 +549,18 @@ class _XNamespace:
         """Async variant of :meth:`compare`."""
         from ._generated.api.x_twitter_stocks import compare_x_stocks
         return await compare_x_stocks.asyncio(client=self._client, tickers=",".join(tickers), days=days)
+
+    def market_sentiment(self, *, days: int = 1) -> Any:
+        """Get the service-level X/Twitter market sentiment snapshot."""
+        return _request_json(self._client, "/x/stocks/v1/market-sentiment", params={"days": days})
+
+    async def market_sentiment_async(self, *, days: int = 1) -> Any:
+        """Async variant of :meth:`market_sentiment`."""
+        return await _request_json_async(
+            self._client,
+            "/x/stocks/v1/market-sentiment",
+            params={"days": days},
+        )
 
     def stats(self) -> Any:
         """Get X/Twitter dataset statistics."""
@@ -667,6 +732,18 @@ class _PolymarketNamespace:
             days=days,
         )
 
+    def market_sentiment(self, *, days: int = 1) -> Any:
+        """Get the service-level Polymarket market sentiment snapshot."""
+        return _request_json(self._client, "/polymarket/stocks/v1/market-sentiment", params={"days": days})
+
+    async def market_sentiment_async(self, *, days: int = 1) -> Any:
+        """Async variant of :meth:`market_sentiment`."""
+        return await _request_json_async(
+            self._client,
+            "/polymarket/stocks/v1/market-sentiment",
+            params={"days": days},
+        )
+
     def stats(self) -> Any:
         """Get Polymarket dataset statistics."""
         from ._generated.api.polymarket_stocks import get_polymarket_stats
@@ -786,6 +863,18 @@ class _RedditCryptoNamespace:
             response.raise_for_status()
             return response.json()
 
+    def market_sentiment(self, *, days: int = 1) -> Any:
+        """Get the service-level Reddit Crypto market sentiment snapshot."""
+        return _request_json(self._client, "/reddit/crypto/v1/market-sentiment", params={"days": days})
+
+    async def market_sentiment_async(self, *, days: int = 1) -> Any:
+        """Async variant of :meth:`market_sentiment`."""
+        return await _request_json_async(
+            self._client,
+            "/reddit/crypto/v1/market-sentiment",
+            params={"days": days},
+        )
+
     def stats(self) -> Any:
         """Get Reddit crypto dataset statistics."""
         from ._generated.api.reddit_crypto import get_reddit_crypto_stats
@@ -808,7 +897,7 @@ class _RedditCryptoNamespace:
 
 
 class AdanosClient:
-    """Client for the Finance Sentiment API.
+    """Client for the Adanos Market Sentiment API.
 
     Args:
         api_key: Your API key (``sk_live_...``).

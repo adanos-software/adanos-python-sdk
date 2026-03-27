@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "adanos"
 dynamic = ["version"]
-description = "Python SDK for the Adanos Finance Sentiment API"
+description = "Python SDK for the Adanos Market Sentiment API"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.10"

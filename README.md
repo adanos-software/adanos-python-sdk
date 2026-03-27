@@ -1,6 +1,6 @@
 # adanos
 
-`adanos` is the public Python SDK for the [Adanos Finance Sentiment API](https://api.adanos.org/docs).
+`adanos` is the public Python SDK for the [Adanos Market Sentiment API](https://api.adanos.org/docs).
 
 It gives you typed access to:
 - Reddit stock sentiment
@@ -44,6 +44,7 @@ print(explanation.explanation)
 ## What You Can Do
 
 - Rank trending stocks across Reddit, News, X, and Polymarket
+- Pull service-level market sentiment snapshots across every public namespace
 - Pull detailed ticker reports for a fixed lookback window
 - Search and compare tickers across datasets
 - Generate AI-written explanations for Reddit and News stock trends
@@ -75,6 +76,7 @@ tsla = client.reddit.stock("TSLA", days=14)
 explanation = client.reddit.explain("TSLA")
 results = client.reddit.search("Tesla", days=7, limit=10)
 comparison = client.reddit.compare(["TSLA", "AAPL", "MSFT"], days=7)
+market = client.reddit.market_sentiment(days=7)
 ```
 
 ### News
@@ -91,6 +93,7 @@ nvda = client.news.stock("NVDA", days=7)
 explanation = client.news.explain("NVDA")
 results = client.news.search("Nvidia", days=7, limit=10)
 comparison = client.news.compare(["NVDA", "AAPL"], days=7)
+market = client.news.market_sentiment(days=7)
 stats = client.news.stats()
 health = client.news.health()
 ```
@@ -108,6 +111,7 @@ countries = client.x.trending_countries(days=1, limit=10)
 nvda = client.x.stock("NVDA")
 results = client.x.search("Nvidia", days=7, limit=10)
 comparison = client.x.compare(["NVDA", "AMD"], days=7)
+market = client.x.market_sentiment(days=7)
 stats = client.x.stats()
 health = client.x.health()
 ```
@@ -125,6 +129,7 @@ countries = client.polymarket.trending_countries(days=7, limit=10)
 aapl = client.polymarket.stock("AAPL")
 results = client.polymarket.search("Apple", days=7, limit=10)
 comparison = client.polymarket.compare(["AAPL", "TSLA"], days=7)
+market = client.polymarket.market_sentiment(days=7)
 stats = client.polymarket.stats()
 health = client.polymarket.health()
 ```
@@ -145,6 +150,7 @@ trending = client.crypto.trending(days=7, limit=20)
 btc = client.crypto.token("BTC", days=14)
 results = client.crypto.search("bitcoin", days=7, limit=10)
 comparison = client.crypto.compare(["BTC", "ETH"], days=7)
+market = client.crypto.market_sentiment(days=7)
 stats = client.crypto.stats()
 health = client.crypto.health()
 ```
@@ -162,6 +168,7 @@ health = client.crypto.health()
 | `explain(ticker)` | AI-generated trend explanation |
 | `search(query, days, limit)` | Search stocks by name or ticker with a summary block |
 | `compare(tickers, days)` | Compare up to 10 stocks |
+| `market_sentiment(days)` | Service-level Reddit market sentiment snapshot |
 | `stats()` | Dataset statistics |
 | `health()` | Public service health |
 
@@ -176,6 +183,7 @@ health = client.crypto.health()
 | `explain(ticker)` | AI-generated explanation from news context |
 | `search(query, days, limit)` | Search stocks in the news dataset with a summary block |
 | `compare(tickers, days)` | Compare up to 10 stocks in news |
+| `market_sentiment(days)` | Service-level News market sentiment snapshot |
 | `stats()` | News dataset statistics |
 | `health()` | Public news service health |
 
@@ -189,6 +197,7 @@ health = client.crypto.health()
 | `stock(ticker, days)` | Detailed X/Twitter sentiment |
 | `search(query, days, limit)` | Search stocks with a summary block |
 | `compare(tickers, days)` | Compare stocks |
+| `market_sentiment(days)` | Service-level X/Twitter market sentiment snapshot |
 | `stats()` | Dataset statistics |
 | `health()` | Public service health |
 
@@ -202,6 +211,7 @@ health = client.crypto.health()
 | `stock(ticker, days)` | Detailed Polymarket activity, sentiment, and relevance-sorted market questions |
 | `search(query, days, limit)` | Search stocks with a summary block |
 | `compare(tickers, days)` | Compare stocks with windowed Polymarket activity signals |
+| `market_sentiment(days)` | Service-level Polymarket market sentiment snapshot |
 | `stats()` | Dataset statistics |
 | `health()` | Public service health |
 
@@ -213,6 +223,7 @@ health = client.crypto.health()
 | `token(symbol, days)` | Detailed token sentiment and buzz |
 | `search(query, days, limit)` | Search tokens by symbol or name with a summary block |
 | `compare(symbols, days)` | Compare multiple tokens |
+| `market_sentiment(days)` | Service-level Reddit Crypto market sentiment snapshot |
 | `stats()` | Dataset statistics |
 | `health()` | Public service health |
 
@@ -270,7 +281,8 @@ with AdanosClient(api_key="sk_live_...") as client:
 
 ## Errors and Responses
 
-- The SDK returns typed models from the generated OpenAPI client
+- Most SDK methods return typed models from the generated OpenAPI client
+- `market_sentiment()` methods return the live JSON payload directly so the new endpoint family is available before the next full generated refresh
 - Documented API errors are returned as typed error models
 - Undocumented statuses raise `UnexpectedStatus`
 - For long-lived processes, use `with`, `async with`, `close()`, or `aclose()` to release HTTP resources

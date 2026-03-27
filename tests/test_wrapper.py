@@ -245,6 +245,77 @@ POLYMARKET_COMPARE_RESPONSE = {
     }],
 }
 
+REDDIT_MARKET_SENTIMENT = {
+    "buzz_score": 57.4,
+    "trend": "stable",
+    "mentions": 3992,
+    "unique_posts": 418,
+    "subreddit_count": 21,
+    "total_upvotes": 15234,
+    "active_tickers": 1000,
+    "sentiment_score": 0.045,
+    "positive_count": 1440,
+    "negative_count": 998,
+    "neutral_count": 1554,
+    "bullish_pct": 36,
+    "bearish_pct": 25,
+    "trend_history": [49.8, 52.1, 50.7, 55.6, 58.3, 60.2, 57.4],
+    "drivers": [{"ticker": "SPY", "mentions": 129, "buzz_score": 74.1, "sentiment_score": 0.009}],
+}
+
+NEWS_MARKET_SENTIMENT = {
+    "buzz_score": 53.8,
+    "trend": "stable",
+    "mentions": 1298,
+    "unique_articles": 911,
+    "source_count": 44,
+    "active_tickers": 233,
+    "sentiment_score": 0.064,
+    "positive_count": 512,
+    "negative_count": 308,
+    "neutral_count": 478,
+    "bullish_pct": 39,
+    "bearish_pct": 24,
+    "trend_history": [49.1, 50.4, 48.7, 52.2, 55.1, 54.3, 53.8],
+    "drivers": [{"ticker": "AAPL", "mentions": 87, "buzz_score": 69.7, "sentiment_score": 0.22}],
+}
+
+X_MARKET_SENTIMENT = {
+    "buzz_score": 56.2,
+    "trend": "rising",
+    "mentions": 2847,
+    "unique_tweets": 913,
+    "unique_authors": 604,
+    "total_upvotes": 28471,
+    "active_tickers": 442,
+    "sentiment_score": 0.081,
+    "positive_count": 1198,
+    "negative_count": 741,
+    "neutral_count": 908,
+    "bullish_pct": 42,
+    "bearish_pct": 26,
+    "trend_history": [48.9, 50.7, 52.6, 54.4, 57.1, 58.3, 56.2],
+    "drivers": [{"ticker": "TSLA", "mentions": 156, "buzz_score": 72.5, "sentiment_score": 0.35}],
+}
+
+POLYMARKET_MARKET_SENTIMENT = {
+    "buzz_score": 58.4,
+    "trend": "rising",
+    "trade_count": 512,
+    "market_count": 93,
+    "unique_traders": 281,
+    "total_liquidity": 245000.0,
+    "active_tickers": 31,
+    "sentiment_score": 0.11,
+    "positive_count": 41,
+    "negative_count": 29,
+    "neutral_count": 23,
+    "bullish_pct": 44,
+    "bearish_pct": 31,
+    "trend_history": [52.1, 54.0, 56.8, 59.2, 61.0, 60.1, 58.4],
+    "drivers": [{"ticker": "AAPL", "trade_count": 52, "buzz_score": 68.9, "sentiment_score": 0.28}],
+}
+
 TRENDING_SECTOR = {
     "sector": "Technology", "buzz_score": 75.0, "trend": "rising",
     "mentions": 500, "unique_tickers": 20, "subreddit_count": 8,
@@ -386,6 +457,18 @@ class TestRedditCompare:
         assert result.stocks[0].total_upvotes == 9042
 
 
+class TestRedditMarketSentiment:
+    @respx.mock
+    def test_market_sentiment(self, client):
+        route = respx.get(f"{BASE_URL}/reddit/stocks/v1/market-sentiment").mock(
+            return_value=httpx.Response(200, json=REDDIT_MARKET_SENTIMENT)
+        )
+        result = client.reddit.market_sentiment(days=7)
+        assert route.called
+        assert request_params(route)["days"] == "7"
+        assert result["drivers"][0]["ticker"] == "SPY"
+
+
 class TestRedditTrendingSectors:
     @respx.mock
     def test_trending_sectors(self, client):
@@ -524,6 +607,16 @@ class TestNews:
         assert request_params(route) == {}
         assert result.total_mentions == NEWS_STATS["total_mentions"]
 
+    @respx.mock
+    def test_news_market_sentiment(self, client):
+        route = respx.get(f"{BASE_URL}/news/stocks/v1/market-sentiment").mock(
+            return_value=httpx.Response(200, json=NEWS_MARKET_SENTIMENT)
+        )
+        result = client.news.market_sentiment(days=3)
+        assert route.called
+        assert request_params(route)["days"] == "3"
+        assert result["source_count"] == 44
+
 
 # --- Async methods ---
 
@@ -606,6 +699,18 @@ class TestAsync:
         assert request_params(route)["source"] == "reuters"
         assert len(result) == 1
 
+    @respx.mock
+    @pytest.mark.asyncio
+    async def test_reddit_market_sentiment_async(self):
+        route = respx.get(f"{BASE_URL}/reddit/stocks/v1/market-sentiment").mock(
+            return_value=httpx.Response(200, json=REDDIT_MARKET_SENTIMENT)
+        )
+        async with AdanosClient(api_key=API_KEY, base_url=BASE_URL) as client:
+            result = await client.reddit.market_sentiment_async(days=5)
+        assert route.called
+        assert request_params(route)["days"] == "5"
+        assert result["buzz_score"] == 57.4
+
 
 # --- X namespace ---
 
@@ -666,6 +771,18 @@ class TestXCompare:
         assert route.called
         assert request_params(route)["tickers"] == "NVDA,AMD"
         assert result.stocks[0].trend_history[-1] == 87.5
+
+
+class TestXMarketSentiment:
+    @respx.mock
+    def test_market_sentiment(self, client):
+        route = respx.get(f"{BASE_URL}/x/stocks/v1/market-sentiment").mock(
+            return_value=httpx.Response(200, json=X_MARKET_SENTIMENT)
+        )
+        result = client.x.market_sentiment()
+        assert route.called
+        assert request_params(route)["days"] == "1"
+        assert result["unique_authors"] == 604
 
 
 # --- Polymarket namespace ---
@@ -736,6 +853,18 @@ class TestPolymarketCompare:
         assert result.stocks[0].trade_count == 8
         assert result.stocks[0].market_count == 4
         assert result.stocks[0].trend_history[-1] == 71.4
+
+
+class TestPolymarketMarketSentiment:
+    @respx.mock
+    def test_market_sentiment(self, client):
+        route = respx.get(f"{BASE_URL}/polymarket/stocks/v1/market-sentiment").mock(
+            return_value=httpx.Response(200, json=POLYMARKET_MARKET_SENTIMENT)
+        )
+        result = client.polymarket.market_sentiment(days=2)
+        assert route.called
+        assert request_params(route)["days"] == "2"
+        assert result["drivers"][0]["trade_count"] == 52
 
 
 # --- Context manager ---
@@ -904,6 +1033,23 @@ POLYMARKET_HEALTH = {
 X_STATS = {"total_appearances": 935, "unique_tickers": 100, "tickers": ["TSLA"], "supported_tickers": 11800, "validation_rate": 37.5}
 POLYMARKET_STATS = {"total_trades": 15420, "total_markets": 713, "unique_tickers": 119, "tickers": ["AAPL"], "supported_tickers": 11800}
 REDDIT_STATS = {"total_mentions": 12833, "unique_tickers": 65, "tickers": ["AAPL"], "supported_tickers": 11800}
+CRYPTO_MARKET_SENTIMENT = {
+    "buzz_score": 52.4,
+    "trend": "rising",
+    "mentions": 5412,
+    "unique_posts": 1184,
+    "subreddit_count": 37,
+    "total_upvotes": 41290,
+    "active_tickers": 89,
+    "sentiment_score": 0.117,
+    "positive_count": 2101,
+    "negative_count": 1318,
+    "neutral_count": 1993,
+    "bullish_pct": 39,
+    "bearish_pct": 24,
+    "trend_history": [47.1, 49.3, 50.4, 52.2, 51.8, 53.0, 52.4],
+    "drivers": [{"symbol": "BTC", "mentions": 423, "buzz_score": 78.1, "sentiment_score": 0.31}],
+}
 
 
 class TestCryptoNamespace:
@@ -918,7 +1064,16 @@ class TestCryptoNamespace:
         assert result.found is True
         assert result.mentions == 321
         assert result.total_mentions == 321
-        assert result.daily_trend[0].sentiment_score == 0.33
+
+    @respx.mock
+    def test_crypto_market_sentiment(self, client):
+        route = respx.get(f"{BASE_URL}/reddit/crypto/v1/market-sentiment").mock(
+            return_value=httpx.Response(200, json=CRYPTO_MARKET_SENTIMENT)
+        )
+        result = client.crypto.market_sentiment(days=4)
+        assert route.called
+        assert request_params(route)["days"] == "4"
+        assert result["drivers"][0]["symbol"] == "BTC"
 
     @respx.mock
     def test_crypto_trending(self, client):

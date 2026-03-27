@@ -1,6 +1,6 @@
-"""Adanos Finance Sentiment API — Python SDK."""
+"""Adanos Market Sentiment API — Python SDK."""
 
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 
 from ._wrapper import AdanosClient, StockSentimentClient
 
