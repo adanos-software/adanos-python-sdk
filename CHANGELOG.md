@@ -5,6 +5,14 @@ All notable changes to the Adanos Python SDK will be documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
+## [1.2.0] - 2026-03-27
+
+### Added
+- Added `market_sentiment()` and `market_sentiment_async()` across Reddit, News, X, Polymarket, and Reddit Crypto namespaces.
+
+### Changed
+- Renamed package metadata and docs from `Adanos Finance Sentiment API` to `Adanos Market Sentiment API`.
+
 ## [1.1.0] - 2026-03-19
 
 ### Added
