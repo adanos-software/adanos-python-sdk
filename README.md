@@ -1,5 +1,7 @@
 # adanos
 
+[![PyPI version](https://img.shields.io/pypi/v/adanos.svg)](https://pypi.org/project/adanos/)
+
 `adanos` is the public Python SDK for the [Adanos Market Sentiment API](https://api.adanos.org/docs).
 
 It gives you typed access to:
