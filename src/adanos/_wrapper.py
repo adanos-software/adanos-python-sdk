@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 from typing import Any, Optional
+from urllib.parse import quote
 
 from ._generated.client import AuthenticatedClient
 from ._generated.types import UNSET
+
+_EXPECTED_JSON_STATUS_CODES = {400, 401, 403, 404, 409, 422, 429, 503}
 
 
 def _resolve_reddit_type(type: Optional[str]) -> Any:
@@ -46,9 +49,20 @@ def _request_json(client: AuthenticatedClient, path: str, *, params: Optional[di
         path,
         params={key: value for key, value in (params or {}).items() if value is not None},
     )
-    if response.status_code not in {400, 401, 403, 404, 409, 422, 429}:
+    if response.status_code not in _EXPECTED_JSON_STATUS_CODES:
         response.raise_for_status()
+    if not response.content:
+        return None
     return response.json()
+
+
+def _parse_stock_explanation_payload(payload: Any) -> Any:
+    required_keys = {"ticker", "explanation", "cached", "generated_at"}
+    if isinstance(payload, dict) and required_keys.issubset(payload):
+        from ._generated.models.stock_explanation_response import StockExplanationResponse
+
+        return StockExplanationResponse.from_dict(payload)
+    return payload
 
 
 async def _request_json_async(
@@ -63,8 +77,10 @@ async def _request_json_async(
         path,
         params={key: value for key, value in (params or {}).items() if value is not None},
     )
-    if response.status_code not in {400, 401, 403, 404, 409, 422, 429}:
+    if response.status_code not in _EXPECTED_JSON_STATUS_CODES:
         response.raise_for_status()
+    if not response.content:
+        return None
     return response.json()
 
 
@@ -520,6 +536,22 @@ class _XNamespace:
         """Async variant of :meth:`stock`."""
         from ._generated.api.x_twitter_stocks import get_x_stock_sentiment
         return await get_x_stock_sentiment.asyncio(ticker, client=self._client, days=days)
+
+    def explain(self, ticker: str) -> Any:
+        """Get AI explanation for a stock trend on X/Twitter."""
+        payload = _request_json(
+            self._client,
+            f"/x/stocks/v1/stock/{quote(str(ticker), safe='')}/explain",
+        )
+        return _parse_stock_explanation_payload(payload)
+
+    async def explain_async(self, ticker: str) -> Any:
+        """Async variant of :meth:`explain`."""
+        payload = await _request_json_async(
+            self._client,
+            f"/x/stocks/v1/stock/{quote(str(ticker), safe='')}/explain",
+        )
+        return _parse_stock_explanation_payload(payload)
 
     def search(self, query: str, *, days: int = 7, limit: int = 20) -> Any:
         """Search for stocks by name or ticker on X/Twitter.

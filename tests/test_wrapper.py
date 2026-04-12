@@ -656,6 +656,17 @@ class TestAsync:
 
     @respx.mock
     @pytest.mark.asyncio
+    async def test_x_explain_async(self):
+        route = respx.get(f"{BASE_URL}/x/stocks/v1/stock/NVDA/explain").mock(
+            return_value=httpx.Response(200, json=EXPLAIN_RESPONSE)
+        )
+        async with AdanosClient(api_key=API_KEY, base_url=BASE_URL) as client:
+            result = await client.x.explain_async("NVDA")
+        assert route.called
+        assert result.explanation == EXPLAIN_RESPONSE["explanation"]
+
+    @respx.mock
+    @pytest.mark.asyncio
     async def test_reddit_search_async(self):
         respx.get(f"{BASE_URL}/reddit/stocks/v1/search").mock(
             return_value=httpx.Response(200, json=SEARCH_RESPONSE)
@@ -746,6 +757,36 @@ class TestXStock:
         assert result.mentions == 156
         assert result.total_mentions == 156
         assert result.daily_trend[0].sentiment_score == 0.244
+
+
+class TestXExplain:
+    @respx.mock
+    def test_explain(self, client):
+        route = respx.get(f"{BASE_URL}/x/stocks/v1/stock/NVDA/explain").mock(
+            return_value=httpx.Response(200, json=EXPLAIN_RESPONSE)
+        )
+        result = client.x.explain("NVDA")
+        assert route.called
+        assert request_params(route) == {}
+        assert result.explanation == EXPLAIN_RESPONSE["explanation"]
+
+    @respx.mock
+    def test_explain_encodes_ticker_path(self, client):
+        route = respx.get(f"{BASE_URL}/x/stocks/v1/stock/%24GME/explain").mock(
+            return_value=httpx.Response(200, json={**EXPLAIN_RESPONSE, "ticker": "GME"})
+        )
+        result = client.x.explain("$GME")
+        assert route.called
+        assert result.ticker == "GME"
+
+    @respx.mock
+    def test_explain_accepts_empty_503_response(self, client):
+        route = respx.get(f"{BASE_URL}/x/stocks/v1/stock/NVDA/explain").mock(
+            return_value=httpx.Response(503)
+        )
+        result = client.x.explain("NVDA")
+        assert route.called
+        assert result is None
 
 
 class TestXSearch:
