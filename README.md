@@ -111,6 +111,7 @@ x_trending = client.x.trending(days=1, limit=20)
 sectors = client.x.trending_sectors(days=1, limit=10)
 countries = client.x.trending_countries(days=1, limit=10)
 nvda = client.x.stock("NVDA")
+explanation = client.x.explain("NVDA")
 results = client.x.search("Nvidia", days=7, limit=10)
 comparison = client.x.compare(["NVDA", "AMD"], days=7)
 market = client.x.market_sentiment(days=7)
@@ -197,6 +198,7 @@ health = client.crypto.health()
 | `trending_sectors(days, limit, offset)` | Trending sectors |
 | `trending_countries(days, limit, offset)` | Trending countries |
 | `stock(ticker, days)` | Detailed X/Twitter sentiment |
+| `explain(ticker)` | AI-generated explanation from X/Twitter context |
 | `search(query, days, limit)` | Search stocks with a summary block |
 | `compare(tickers, days)` | Compare stocks |
 | `market_sentiment(days)` | Service-level X/Twitter market sentiment snapshot |

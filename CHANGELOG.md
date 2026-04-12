@@ -5,6 +5,11 @@ All notable changes to the Adanos Python SDK will be documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
+## [1.3.0] - 2026-04-12
+
+### Added
+- Added `client.x.explain()` and `client.x.explain_async()` for the X/Twitter stock explanation endpoint.
+
 ## [1.2.0] - 2026-03-27
 
 ### Added
