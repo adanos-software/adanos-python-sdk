@@ -37,14 +37,12 @@ STOCK_SENTIMENT = {
     "ticker": "TSLA",
     "found": True,
     "mentions": 342,
-    "total_mentions": 342,
     "sentiment_score": 0.271,
     "daily_trend": [
         {
             "date": "2026-03-18",
             "mentions": 61,
             "sentiment_score": 0.245,
-            "sentiment": 0.245,
             "buzz_score": 71.2,
         }
     ],
@@ -110,11 +108,9 @@ COMPARE_RESPONSE = {
             "unique_posts": 112,
             "subreddit_count": 7,
             "sentiment_score": 0.231,
-            "sentiment": 0.231,
             "bullish_pct": 58,
             "bearish_pct": 16,
             "total_upvotes": 9042,
-            "upvotes": 9042,
             "trend_history": [51.2, 58.4, 64.1, 70.2, 75.9, 81.4, 87.5],
         }
     ],
@@ -131,7 +127,6 @@ NEWS_COMPARE_RESPONSE = {
             "source_count": 7,
             "trend": "rising",
             "sentiment_score": 0.31,
-            "sentiment": 0.31,
             "bullish_pct": 57,
             "bearish_pct": 18,
             "trend_history": [22.4, 24.9, 28.5, 33.2, 39.4, 47.0, 61.2],
@@ -187,14 +182,12 @@ X_TRENDING_STOCK = {
 X_STOCK_DETAIL = {
     "ticker": "NVDA",
     "mentions": 156,
-    "total_mentions": 156,
     "sentiment_score": 0.276,
     "daily_trend": [
         {
             "date": "2026-03-18",
             "mentions": 48,
             "sentiment_score": 0.244,
-            "sentiment": 0.244,
             "avg_rank": 5.2,
             "buzz_score": 74.1,
         }
@@ -221,7 +214,6 @@ POLYMARKET_STOCK_DETAIL = {
             "date": "2026-03-18",
             "trade_count": 8,
             "sentiment_score": 0.114,
-            "sentiment": 0.114,
             "buzz_score": 71.4,
         }
     ],
@@ -237,7 +229,6 @@ POLYMARKET_COMPARE_RESPONSE = {
         "unique_traders": 6,
         "trend": "rising",
         "sentiment_score": 0.265,
-        "sentiment": 0.265,
         "bullish_pct": 67,
         "bearish_pct": 33,
         "total_liquidity": 94750.0,
@@ -403,9 +394,9 @@ class TestRedditStock:
         assert result.ticker == "TSLA"
         assert result.found is True
         assert result.mentions == 342
-        assert result.total_mentions == 342
+        assert "total_mentions" not in result.to_dict()
         assert result.daily_trend[0].sentiment_score == 0.245
-        assert result.daily_trend[0].sentiment == 0.245
+        assert "sentiment" not in result.daily_trend[0].to_dict()
 
     @respx.mock
     def test_stock_with_days(self, client):
@@ -455,6 +446,8 @@ class TestRedditCompare:
         assert result.stocks[0].trend == "rising"
         assert result.stocks[0].trend_history[-1] == 87.5
         assert result.stocks[0].total_upvotes == 9042
+        assert "sentiment" not in result.stocks[0].to_dict()
+        assert "upvotes" not in result.stocks[0].to_dict()
 
 
 class TestRedditMarketSentiment:
@@ -525,7 +518,7 @@ class TestNews:
         assert route.called
         assert result.ticker == "TSLA"
         assert result.mentions == 342
-        assert result.total_mentions == 342
+        assert "total_mentions" not in result.to_dict()
         assert request_params(route) == {"days": "7"}
 
     @respx.mock
@@ -755,7 +748,7 @@ class TestXStock:
         assert route.called
         assert result.ticker == "NVDA"
         assert result.mentions == 156
-        assert result.total_mentions == 156
+        assert "total_mentions" not in result.to_dict()
         assert result.daily_trend[0].sentiment_score == 0.244
 
 
@@ -862,7 +855,7 @@ class TestPolymarketStock:
         assert result.ticker == "AAPL"
         assert result.found is True
         assert result.daily_trend[0].sentiment_score == 0.114
-        assert result.daily_trend[0].sentiment == 0.114
+        assert "sentiment" not in result.daily_trend[0].to_dict()
 
 
 class TestPolymarketSearch:
@@ -964,14 +957,12 @@ CRYPTO_TOKEN_DETAIL = {
     "name": "Bitcoin",
     "buzz_score": 90.1,
     "mentions": 321,
-    "total_mentions": 321,
     "sentiment_score": 0.42,
     "daily_trend": [
         {
             "date": "2026-03-18",
             "mentions": 54,
             "sentiment_score": 0.33,
-            "sentiment": 0.33,
             "buzz_score": 75.1,
         }
     ],
@@ -1005,11 +996,9 @@ CRYPTO_COMPARE = {
             "unique_posts": 120,
             "subreddit_count": 15,
             "sentiment_score": 0.42,
-            "sentiment": 0.42,
             "bullish_pct": 58,
             "bearish_pct": 14,
             "total_upvotes": 9900,
-            "upvotes": 9900,
             "trend_history": [60.1, 64.2, 70.4, 74.3, 81.8, 86.0, 90.1],
         },
         {
@@ -1021,11 +1010,9 @@ CRYPTO_COMPARE = {
             "unique_posts": 88,
             "subreddit_count": 12,
             "sentiment_score": 0.31,
-            "sentiment": 0.31,
             "bullish_pct": 49,
             "bearish_pct": 18,
             "total_upvotes": 6500,
-            "upvotes": 6500,
             "trend_history": [51.3, 53.0, 58.6, 60.2, 66.9, 71.4, 75.3],
         },
     ],
@@ -1104,7 +1091,7 @@ class TestCryptoNamespace:
         assert result.symbol == "BTC"
         assert result.found is True
         assert result.mentions == 321
-        assert result.total_mentions == 321
+        assert "total_mentions" not in result.to_dict()
 
     @respx.mock
     def test_crypto_market_sentiment(self, client):
@@ -1150,6 +1137,8 @@ class TestCryptoNamespace:
         assert result.tokens[0].symbol == "BTC"
         assert result.tokens[0].mentions == 321
         assert result.tokens[0].trend_history[-1] == 90.1
+        assert "sentiment" not in result.tokens[0].to_dict()
+        assert "upvotes" not in result.tokens[0].to_dict()
 
     @respx.mock
     def test_crypto_compare_fallback_when_compare_shape_drifts(self, client):
@@ -1159,8 +1148,8 @@ class TestCryptoNamespace:
                 json={
                     "period_days": 7,
                     "tokens": [
-                        {"symbol": "BTC", "found": True, "buzz_score": 90.1, "total_mentions": 321, "sentiment_score": 0.42},
-                        {"symbol": "ETH", "found": True, "buzz_score": 75.3, "total_mentions": 210, "sentiment_score": 0.31},
+                        {"symbol": "BTC", "found": True, "buzz_score": 90.1, "mentions": 321, "sentiment_score": 0.42},
+                        {"symbol": "ETH", "found": True, "buzz_score": 75.3, "mentions": 210, "sentiment_score": 0.31},
                     ],
                 },
             )

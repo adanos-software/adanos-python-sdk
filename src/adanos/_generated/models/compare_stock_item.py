@@ -28,11 +28,9 @@ class CompareStockItem:
         subreddit_count (int | None | Unset): Distinct subreddit count
         unique_tweets (int | None | Unset): Distinct tweet count
         sentiment_score (float | None | Unset): Canonical sentiment field
-        sentiment (float | None | Unset): Deprecated alias for ``sentiment_score``
         bullish_pct (int | None | Unset): Percentage of bullish mentions
         bearish_pct (int | None | Unset): Percentage of bearish mentions
         total_upvotes (int | None | Unset): Canonical aggregate upvote/like count
-        upvotes (int | None | Unset): Deprecated alias for ``total_upvotes``
     """
 
     ticker: str
@@ -45,11 +43,9 @@ class CompareStockItem:
     subreddit_count: int | None | Unset = UNSET
     unique_tweets: int | None | Unset = UNSET
     sentiment_score: float | None | Unset = UNSET
-    sentiment: float | None | Unset = UNSET
     bullish_pct: int | None | Unset = UNSET
     bearish_pct: int | None | Unset = UNSET
     total_upvotes: int | None | Unset = UNSET
-    upvotes: int | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -94,12 +90,6 @@ class CompareStockItem:
         else:
             sentiment_score = self.sentiment_score
 
-        sentiment: float | None | Unset
-        if isinstance(self.sentiment, Unset):
-            sentiment = UNSET
-        else:
-            sentiment = self.sentiment
-
         bullish_pct: int | None | Unset
         if isinstance(self.bullish_pct, Unset):
             bullish_pct = UNSET
@@ -117,12 +107,6 @@ class CompareStockItem:
             total_upvotes = UNSET
         else:
             total_upvotes = self.total_upvotes
-
-        upvotes: int | None | Unset
-        if isinstance(self.upvotes, Unset):
-            upvotes = UNSET
-        else:
-            upvotes = self.upvotes
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
@@ -146,17 +130,12 @@ class CompareStockItem:
             field_dict["unique_tweets"] = unique_tweets
         if sentiment_score is not UNSET:
             field_dict["sentiment_score"] = sentiment_score
-        if sentiment is not UNSET:
-            field_dict["sentiment"] = sentiment
         if bullish_pct is not UNSET:
             field_dict["bullish_pct"] = bullish_pct
         if bearish_pct is not UNSET:
             field_dict["bearish_pct"] = bearish_pct
         if total_upvotes is not UNSET:
             field_dict["total_upvotes"] = total_upvotes
-        if upvotes is not UNSET:
-            field_dict["upvotes"] = upvotes
-
         return field_dict
 
     @classmethod
@@ -204,11 +183,9 @@ class CompareStockItem:
             return cast(float | None | Unset, data)
 
         sentiment_score = _parse_float(d.pop("sentiment_score", UNSET))
-        sentiment = _parse_float(d.pop("sentiment", UNSET))
         bullish_pct = _parse_int(d.pop("bullish_pct", UNSET))
         bearish_pct = _parse_int(d.pop("bearish_pct", UNSET))
         total_upvotes = _parse_int(d.pop("total_upvotes", UNSET))
-        upvotes = _parse_int(d.pop("upvotes", UNSET))
 
         compare_stock_item = cls(
             ticker=ticker,
@@ -221,11 +198,9 @@ class CompareStockItem:
             subreddit_count=subreddit_count,
             unique_tweets=unique_tweets,
             sentiment_score=sentiment_score,
-            sentiment=sentiment,
             bullish_pct=bullish_pct,
             bearish_pct=bearish_pct,
             total_upvotes=total_upvotes,
-            upvotes=upvotes,
         )
 
         compare_stock_item.additional_properties = d

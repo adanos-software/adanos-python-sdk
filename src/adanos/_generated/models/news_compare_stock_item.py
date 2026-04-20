@@ -23,7 +23,6 @@ class NewsCompareStockItem:
     company_name: None | str | Unset = UNSET
     trend: None | str | Unset = UNSET
     sentiment_score: float | None | Unset = UNSET
-    sentiment: float | None | Unset = UNSET
     bullish_pct: int | None | Unset = UNSET
     bearish_pct: int | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
@@ -46,8 +45,6 @@ class NewsCompareStockItem:
             field_dict["trend"] = self.trend
         if self.sentiment_score is not UNSET:
             field_dict["sentiment_score"] = self.sentiment_score
-        if self.sentiment is not UNSET:
-            field_dict["sentiment"] = self.sentiment
         if self.bullish_pct is not UNSET:
             field_dict["bullish_pct"] = self.bullish_pct
         if self.bearish_pct is not UNSET:
@@ -95,7 +92,6 @@ class NewsCompareStockItem:
             company_name=_parse_company_name(d.pop("company_name", UNSET)),
             trend=_parse_string(d.pop("trend", UNSET)),
             sentiment_score=_parse_float(d.pop("sentiment_score", UNSET)),
-            sentiment=_parse_float(d.pop("sentiment", UNSET)),
             bullish_pct=_parse_int(d.pop("bullish_pct", UNSET)),
             bearish_pct=_parse_int(d.pop("bearish_pct", UNSET)),
         )
