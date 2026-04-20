@@ -885,7 +885,7 @@ class _RedditCryptoNamespace:
                 days=days,
             )
         except KeyError as exc:
-            if str(exc).strip("'") not in {"found", "mentions", "upvotes"}:
+            if str(exc).strip("'") not in {"found", "mentions", "trend_history"}:
                 raise
             response = await self._client.get_async_httpx_client().request(
                 "get",
