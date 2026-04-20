@@ -18,7 +18,6 @@ class CryptoTokenSentimentDailyTrendType0Item:
     date: str
     mentions: int
     sentiment_score: float | None | Unset = UNSET
-    sentiment: float | None | Unset = UNSET
     buzz_score: float | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
@@ -28,8 +27,6 @@ class CryptoTokenSentimentDailyTrendType0Item:
         field_dict.update({"date": self.date, "mentions": self.mentions})
         if self.sentiment_score is not UNSET:
             field_dict["sentiment_score"] = self.sentiment_score
-        if self.sentiment is not UNSET:
-            field_dict["sentiment"] = self.sentiment
         if self.buzz_score is not UNSET:
             field_dict["buzz_score"] = self.buzz_score
         return field_dict
@@ -49,7 +46,6 @@ class CryptoTokenSentimentDailyTrendType0Item:
             date=d.pop("date"),
             mentions=d.pop("mentions"),
             sentiment_score=_parse_float(d.pop("sentiment_score", UNSET)),
-            sentiment=_parse_float(d.pop("sentiment", UNSET)),
             buzz_score=_parse_float(d.pop("buzz_score", UNSET)),
         )
         item.additional_properties = d

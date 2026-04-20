@@ -25,7 +25,6 @@ class PolymarketCompareStockItem:
     trend: None | str | Unset = UNSET
     unique_traders: int | None | Unset = UNSET
     sentiment_score: float | None | Unset = UNSET
-    sentiment: float | None | Unset = UNSET
     bullish_pct: int | None | Unset = UNSET
     bearish_pct: int | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
@@ -51,8 +50,6 @@ class PolymarketCompareStockItem:
             field_dict["unique_traders"] = self.unique_traders
         if self.sentiment_score is not UNSET:
             field_dict["sentiment_score"] = self.sentiment_score
-        if self.sentiment is not UNSET:
-            field_dict["sentiment"] = self.sentiment
         if self.bullish_pct is not UNSET:
             field_dict["bullish_pct"] = self.bullish_pct
         if self.bearish_pct is not UNSET:
@@ -102,7 +99,6 @@ class PolymarketCompareStockItem:
             trend=_parse_string(d.pop("trend", UNSET)),
             unique_traders=_parse_int(d.pop("unique_traders", UNSET)),
             sentiment_score=_parse_float(d.pop("sentiment_score", UNSET)),
-            sentiment=_parse_float(d.pop("sentiment", UNSET)),
             bullish_pct=_parse_int(d.pop("bullish_pct", UNSET)),
             bearish_pct=_parse_int(d.pop("bearish_pct", UNSET)),
         )

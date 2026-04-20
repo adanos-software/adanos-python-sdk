@@ -24,11 +24,9 @@ class CryptoCompareTokenItem:
     unique_posts: int | None | Unset = UNSET
     subreddit_count: int | None | Unset = UNSET
     sentiment_score: float | None | Unset = UNSET
-    sentiment: float | None | Unset = UNSET
     bullish_pct: int | None | Unset = UNSET
     bearish_pct: int | None | Unset = UNSET
     total_upvotes: int | None | Unset = UNSET
-    upvotes: int | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -52,16 +50,12 @@ class CryptoCompareTokenItem:
             field_dict["subreddit_count"] = self.subreddit_count
         if self.sentiment_score is not UNSET:
             field_dict["sentiment_score"] = self.sentiment_score
-        if self.sentiment is not UNSET:
-            field_dict["sentiment"] = self.sentiment
         if self.bullish_pct is not UNSET:
             field_dict["bullish_pct"] = self.bullish_pct
         if self.bearish_pct is not UNSET:
             field_dict["bearish_pct"] = self.bearish_pct
         if self.total_upvotes is not UNSET:
             field_dict["total_upvotes"] = self.total_upvotes
-        if self.upvotes is not UNSET:
-            field_dict["upvotes"] = self.upvotes
         return field_dict
 
     @classmethod
@@ -106,11 +100,9 @@ class CryptoCompareTokenItem:
             unique_posts=_parse_int(d.pop("unique_posts", UNSET)),
             subreddit_count=_parse_int(d.pop("subreddit_count", UNSET)),
             sentiment_score=_parse_float(d.pop("sentiment_score", UNSET)),
-            sentiment=_parse_float(d.pop("sentiment", UNSET)),
             bullish_pct=_parse_int(d.pop("bullish_pct", UNSET)),
             bearish_pct=_parse_int(d.pop("bearish_pct", UNSET)),
             total_upvotes=_parse_int(d.pop("total_upvotes", UNSET)),
-            upvotes=_parse_int(d.pop("upvotes", UNSET)),
         )
 
         crypto_compare_token_item.additional_properties = d

@@ -19,14 +19,12 @@ class PolymarketDailyTrendItem:
         date (str): Date in YYYY-MM-DD format
         trade_count (int): Trade count on this date
         sentiment_score (float | None | Unset): Canonical implied sentiment on this date
-        sentiment (float | None | Unset): Deprecated alias for ``sentiment_score``
         buzz_score (float | None | Unset): Buzz score on this date
     """
 
     date: str
     trade_count: int
     sentiment_score: float | None | Unset = UNSET
-    sentiment: float | None | Unset = UNSET
     buzz_score: float | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
@@ -40,12 +38,6 @@ class PolymarketDailyTrendItem:
             sentiment_score = UNSET
         else:
             sentiment_score = self.sentiment_score
-
-        sentiment: float | None | Unset
-        if isinstance(self.sentiment, Unset):
-            sentiment = UNSET
-        else:
-            sentiment = self.sentiment
 
         buzz_score: float | None | Unset
         if isinstance(self.buzz_score, Unset):
@@ -63,8 +55,6 @@ class PolymarketDailyTrendItem:
         )
         if sentiment_score is not UNSET:
             field_dict["sentiment_score"] = sentiment_score
-        if sentiment is not UNSET:
-            field_dict["sentiment"] = sentiment
         if buzz_score is not UNSET:
             field_dict["buzz_score"] = buzz_score
 
@@ -86,15 +76,6 @@ class PolymarketDailyTrendItem:
 
         sentiment_score = _parse_sentiment_score(d.pop("sentiment_score", UNSET))
 
-        def _parse_sentiment(data: object) -> float | None | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(float | None | Unset, data)
-
-        sentiment = _parse_sentiment(d.pop("sentiment", UNSET))
-
         def _parse_buzz_score(data: object) -> float | None | Unset:
             if data is None:
                 return data
@@ -108,7 +89,6 @@ class PolymarketDailyTrendItem:
             date=date,
             trade_count=trade_count,
             sentiment_score=sentiment_score,
-            sentiment=sentiment,
             buzz_score=buzz_score,
         )
 

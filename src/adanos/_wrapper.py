@@ -862,9 +862,9 @@ class _RedditCryptoNamespace:
                 days=days,
             )
         except KeyError as exc:
-            # Compare schema has changed over time (e.g. `found` vs `mentions`/`upvotes`).
+            # Compare schema has changed over time (e.g. raw detail-shaped rows vs generated compare rows).
             # Fall back to raw JSON when generated parsing fails on known drift keys.
-            if str(exc).strip("'") not in {"found", "mentions", "upvotes"}:
+            if str(exc).strip("'") not in {"found", "mentions", "trend_history"}:
                 raise
             response = self._client.get_httpx_client().request(
                 "get",
@@ -885,7 +885,7 @@ class _RedditCryptoNamespace:
                 days=days,
             )
         except KeyError as exc:
-            if str(exc).strip("'") not in {"found", "mentions", "upvotes"}:
+            if str(exc).strip("'") not in {"found", "mentions", "trend_history"}:
                 raise
             response = await self._client.get_async_httpx_client().request(
                 "get",
