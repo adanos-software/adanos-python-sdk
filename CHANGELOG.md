@@ -5,6 +5,12 @@ All notable changes to the Adanos Python SDK will be documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
+## [2.1.0] - 2026-04-29
+
+### Added
+- Added raw `mentions()` and `mentions_async()` helpers for Reddit Stocks, News Stocks, X/Twitter Stocks, Polymarket Stocks, and Reddit Crypto.
+- Added test coverage for synchronous and asynchronous raw mention wrapper methods.
+
 ## [2.0.0] - 2026-04-20
 
 ### Breaking
