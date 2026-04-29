@@ -160,6 +160,36 @@ class _RedditNamespace:
         from ._generated.api.reddit_stocks import get_stock_sentiment
         return await get_stock_sentiment.asyncio(ticker, client=self._client, days=days)
 
+    def mentions(self, ticker: str, *, days: int = 7, limit: int = 100, include_inherited: bool = False) -> Any:
+        """Get raw Reddit mention rows for a stock ticker.
+
+        Args:
+            ticker: Stock symbol (e.g. ``"TSLA"``).
+            days: Time period (1-90). Free tier limited to 30.
+            limit: Max results (1-100).
+            include_inherited: Whether to include inherited thread context mentions.
+        """
+        return _request_json(
+            self._client,
+            f"/reddit/stocks/v1/stock/{quote(str(ticker), safe='')}/mentions",
+            params={"days": days, "limit": limit, "include_inherited": include_inherited},
+        )
+
+    async def mentions_async(
+        self,
+        ticker: str,
+        *,
+        days: int = 7,
+        limit: int = 100,
+        include_inherited: bool = False,
+    ) -> Any:
+        """Async variant of :meth:`mentions`."""
+        return await _request_json_async(
+            self._client,
+            f"/reddit/stocks/v1/stock/{quote(str(ticker), safe='')}/mentions",
+            params={"days": days, "limit": limit, "include_inherited": include_inherited},
+        )
+
     def explain(self, ticker: str) -> Any:
         """Get AI-generated explanation for a stock's trend.
 
@@ -374,6 +404,28 @@ class _NewsNamespace:
             days=days,
         )
 
+    def mentions(self, ticker: str, *, days: int = 7, limit: int = 100) -> Any:
+        """Get raw news mention rows for a stock ticker.
+
+        Args:
+            ticker: Stock symbol (e.g. ``"TSLA"``).
+            days: Time period (1-90). Free tier limited to 30.
+            limit: Max results (1-100).
+        """
+        return _request_json(
+            self._client,
+            f"/news/stocks/v1/stock/{quote(str(ticker), safe='')}/mentions",
+            params={"days": days, "limit": limit},
+        )
+
+    async def mentions_async(self, ticker: str, *, days: int = 7, limit: int = 100) -> Any:
+        """Async variant of :meth:`mentions`."""
+        return await _request_json_async(
+            self._client,
+            f"/news/stocks/v1/stock/{quote(str(ticker), safe='')}/mentions",
+            params={"days": days, "limit": limit},
+        )
+
     def explain(self, ticker: str) -> Any:
         """Get AI explanation for a stock trend in news."""
         from ._generated.api.news_stocks import get_news_stock_explanation
@@ -536,6 +588,28 @@ class _XNamespace:
         """Async variant of :meth:`stock`."""
         from ._generated.api.x_twitter_stocks import get_x_stock_sentiment
         return await get_x_stock_sentiment.asyncio(ticker, client=self._client, days=days)
+
+    def mentions(self, ticker: str, *, days: int = 7, limit: int = 100) -> Any:
+        """Get raw X/Twitter mention rows for a stock ticker.
+
+        Args:
+            ticker: Stock symbol (e.g. ``"TSLA"``).
+            days: Time period (1-90). Free tier limited to 30.
+            limit: Max results (1-100).
+        """
+        return _request_json(
+            self._client,
+            f"/x/stocks/v1/stock/{quote(str(ticker), safe='')}/mentions",
+            params={"days": days, "limit": limit},
+        )
+
+    async def mentions_async(self, ticker: str, *, days: int = 7, limit: int = 100) -> Any:
+        """Async variant of :meth:`mentions`."""
+        return await _request_json_async(
+            self._client,
+            f"/x/stocks/v1/stock/{quote(str(ticker), safe='')}/mentions",
+            params={"days": days, "limit": limit},
+        )
 
     def explain(self, ticker: str) -> Any:
         """Get AI explanation for a stock trend on X/Twitter."""
@@ -727,6 +801,28 @@ class _PolymarketNamespace:
 
         return await get_polymarket_stock.asyncio(ticker, client=self._client, days=days)
 
+    def mentions(self, ticker: str, *, days: int = 7, limit: int = 100) -> Any:
+        """Get raw Polymarket mention rows for a stock ticker.
+
+        Args:
+            ticker: Stock symbol (e.g. ``"TSLA"``).
+            days: Time period (1-90). Free tier limited to 30.
+            limit: Max results (1-100).
+        """
+        return _request_json(
+            self._client,
+            f"/polymarket/stocks/v1/stock/{quote(str(ticker), safe='')}/mentions",
+            params={"days": days, "limit": limit},
+        )
+
+    async def mentions_async(self, ticker: str, *, days: int = 7, limit: int = 100) -> Any:
+        """Async variant of :meth:`mentions`."""
+        return await _request_json_async(
+            self._client,
+            f"/polymarket/stocks/v1/stock/{quote(str(ticker), safe='')}/mentions",
+            params={"days": days, "limit": limit},
+        )
+
     def search(self, query: str, *, days: int = 7, limit: int = 20) -> Any:
         """Search for stocks by name or ticker on Polymarket.
 
@@ -839,6 +935,36 @@ class _RedditCryptoNamespace:
             symbol=symbol,
             client=self._client,
             days=days,
+        )
+
+    def mentions(self, symbol: str, *, days: int = 7, limit: int = 100, include_inherited: bool = False) -> Any:
+        """Get raw Reddit mention rows for a crypto token.
+
+        Args:
+            symbol: Crypto symbol (e.g. ``"BTC"``).
+            days: Time period (1-90). Free tier limited to 30.
+            limit: Max results (1-100).
+            include_inherited: Whether to include inherited thread context mentions.
+        """
+        return _request_json(
+            self._client,
+            f"/reddit/crypto/v1/token/{quote(str(symbol), safe='')}/mentions",
+            params={"days": days, "limit": limit, "include_inherited": include_inherited},
+        )
+
+    async def mentions_async(
+        self,
+        symbol: str,
+        *,
+        days: int = 7,
+        limit: int = 100,
+        include_inherited: bool = False,
+    ) -> Any:
+        """Async variant of :meth:`mentions`."""
+        return await _request_json_async(
+            self._client,
+            f"/reddit/crypto/v1/token/{quote(str(symbol), safe='')}/mentions",
+            params={"days": days, "limit": limit, "include_inherited": include_inherited},
         )
 
     def search(self, query: str, *, days: int = 7, limit: int = 20) -> Any:
