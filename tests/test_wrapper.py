@@ -406,6 +406,24 @@ class TestRedditStock:
         client.reddit.stock("AAPL", days=14)
         assert request_params(route)["days"] == "14"
 
+    @respx.mock
+    def test_mentions(self, client):
+        route = respx.get(f"{BASE_URL}/reddit/stocks/v1/stock/TSLA/mentions").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "ticker": "TSLA",
+                    "period_days": 7,
+                    "count": 1,
+                    "results": [{"text_snippet": "TSLA looks strong", "created_utc": "2026-03-20T18:42:10Z", "upvotes": 8, "is_inherited": False}],
+                },
+            )
+        )
+        result = client.reddit.mentions("TSLA", days=7, limit=10, include_inherited=True)
+        assert route.called
+        assert request_params(route) == {"days": "7", "limit": "10", "include_inherited": "true"}
+        assert result["results"][0]["text_snippet"] == "TSLA looks strong"
+
 
 class TestRedditExplain:
     @respx.mock
@@ -520,6 +538,24 @@ class TestNews:
         assert result.mentions == 342
         assert "total_mentions" not in result.to_dict()
         assert request_params(route) == {"days": "7"}
+
+    @respx.mock
+    def test_news_mentions(self, client):
+        route = respx.get(f"{BASE_URL}/news/stocks/v1/stock/TSLA/mentions").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "ticker": "TSLA",
+                    "period_days": 7,
+                    "count": 1,
+                    "results": [{"source": "reuters", "text_snippet": "Tesla demand update"}],
+                },
+            )
+        )
+        result = client.news.mentions("TSLA", days=7, limit=5)
+        assert route.called
+        assert request_params(route) == {"days": "7", "limit": "5"}
+        assert result["results"][0]["source"] == "reuters"
 
     @respx.mock
     def test_news_health(self, client):
@@ -638,6 +674,26 @@ class TestAsync:
 
     @respx.mock
     @pytest.mark.asyncio
+    async def test_reddit_mentions_async(self):
+        route = respx.get(f"{BASE_URL}/reddit/stocks/v1/stock/TSLA/mentions").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "ticker": "TSLA",
+                    "period_days": 7,
+                    "count": 1,
+                    "results": [{"text_snippet": "TSLA looks strong", "created_utc": "2026-03-20T18:42:10Z", "upvotes": 8, "is_inherited": False}],
+                },
+            )
+        )
+        async with AdanosClient(api_key=API_KEY, base_url=BASE_URL) as client:
+            result = await client.reddit.mentions_async("TSLA", days=7, limit=10, include_inherited=True)
+        assert route.called
+        assert request_params(route) == {"days": "7", "limit": "10", "include_inherited": "true"}
+        assert result["results"][0]["text_snippet"] == "TSLA looks strong"
+
+    @respx.mock
+    @pytest.mark.asyncio
     async def test_x_trending_async(self):
         route = respx.get(f"{BASE_URL}/x/stocks/v1/trending").mock(
             return_value=httpx.Response(200, json=[X_TRENDING_STOCK])
@@ -646,6 +702,26 @@ class TestAsync:
             result = await client.x.trending_async()
         assert route.called
         assert result[0].ticker == "NVDA"
+
+    @respx.mock
+    @pytest.mark.asyncio
+    async def test_x_mentions_async(self):
+        route = respx.get(f"{BASE_URL}/x/stocks/v1/stock/NVDA/mentions").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "ticker": "NVDA",
+                    "period_days": 7,
+                    "count": 1,
+                    "results": [{"tweet_id": "1", "text_snippet": "$NVDA", "likes": 9, "retweets": 1, "is_reply": False}],
+                },
+            )
+        )
+        async with AdanosClient(api_key=API_KEY, base_url=BASE_URL) as client:
+            result = await client.x.mentions_async("NVDA", days=7, limit=5)
+        assert route.called
+        assert request_params(route) == {"days": "7", "limit": "5"}
+        assert result["results"][0]["tweet_id"] == "1"
 
     @respx.mock
     @pytest.mark.asyncio
@@ -683,6 +759,39 @@ class TestAsync:
 
     @respx.mock
     @pytest.mark.asyncio
+    async def test_polymarket_mentions_async(self):
+        route = respx.get(f"{BASE_URL}/polymarket/stocks/v1/stock/AAPL/mentions").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "ticker": "AAPL",
+                    "period_days": 7,
+                    "count": 1,
+                    "results": [{
+                        "condition_id": "0xabc",
+                        "event_id": "123",
+                        "question": "AAPL up?",
+                        "market_type": "up_down",
+                        "liquidity": 100.0,
+                        "volume_24h": 20.0,
+                        "trade_count": 2,
+                        "buy_trades": 1,
+                        "sell_trades": 1,
+                        "unique_traders": 2,
+                        "active": True,
+                        "fetched_at": "2026-04-20T15:00:00Z",
+                    }],
+                },
+            )
+        )
+        async with AdanosClient(api_key=API_KEY, base_url=BASE_URL) as client:
+            result = await client.polymarket.mentions_async("AAPL", days=7, limit=5)
+        assert route.called
+        assert request_params(route) == {"days": "7", "limit": "5"}
+        assert result["results"][0]["condition_id"] == "0xabc"
+
+    @respx.mock
+    @pytest.mark.asyncio
     async def test_reddit_compare_async(self):
         route = respx.get(f"{BASE_URL}/reddit/stocks/v1/compare").mock(
             return_value=httpx.Response(200, json=COMPARE_RESPONSE)
@@ -714,6 +823,46 @@ class TestAsync:
         assert route.called
         assert request_params(route)["days"] == "5"
         assert result["buzz_score"] == 57.4
+
+    @respx.mock
+    @pytest.mark.asyncio
+    async def test_news_mentions_async(self):
+        route = respx.get(f"{BASE_URL}/news/stocks/v1/stock/TSLA/mentions").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "ticker": "TSLA",
+                    "period_days": 7,
+                    "count": 1,
+                    "results": [{"source": "reuters", "text_snippet": "Tesla demand update"}],
+                },
+            )
+        )
+        async with AdanosClient(api_key=API_KEY, base_url=BASE_URL) as client:
+            result = await client.news.mentions_async("TSLA", days=7, limit=5)
+        assert route.called
+        assert request_params(route) == {"days": "7", "limit": "5"}
+        assert result["results"][0]["source"] == "reuters"
+
+    @respx.mock
+    @pytest.mark.asyncio
+    async def test_crypto_mentions_async(self):
+        route = respx.get(f"{BASE_URL}/reddit/crypto/v1/token/BTC/mentions").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "symbol": "BTC",
+                    "period_days": 7,
+                    "count": 1,
+                    "results": [{"text_snippet": "BTC range", "created_utc": "2026-03-20T18:42:10Z", "upvotes": 4, "is_inherited": False}],
+                },
+            )
+        )
+        async with AdanosClient(api_key=API_KEY, base_url=BASE_URL) as client:
+            result = await client.crypto.mentions_async("BTC", days=7, limit=10, include_inherited=True)
+        assert route.called
+        assert request_params(route) == {"days": "7", "limit": "10", "include_inherited": "true"}
+        assert result["results"][0]["text_snippet"] == "BTC range"
 
 
 # --- X namespace ---
@@ -750,6 +899,24 @@ class TestXStock:
         assert result.mentions == 156
         assert "total_mentions" not in result.to_dict()
         assert result.daily_trend[0].sentiment_score == 0.244
+
+    @respx.mock
+    def test_mentions(self, client):
+        route = respx.get(f"{BASE_URL}/x/stocks/v1/stock/NVDA/mentions").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "ticker": "NVDA",
+                    "period_days": 7,
+                    "count": 1,
+                    "results": [{"tweet_id": "1", "text_snippet": "$NVDA", "likes": 9, "retweets": 1, "is_reply": False}],
+                },
+            )
+        )
+        result = client.x.mentions("NVDA", days=7, limit=5)
+        assert route.called
+        assert request_params(route) == {"days": "7", "limit": "5"}
+        assert result["results"][0]["tweet_id"] == "1"
 
 
 class TestXExplain:
@@ -856,6 +1023,37 @@ class TestPolymarketStock:
         assert result.found is True
         assert result.daily_trend[0].sentiment_score == 0.114
         assert "sentiment" not in result.daily_trend[0].to_dict()
+
+    @respx.mock
+    def test_mentions(self, client):
+        route = respx.get(f"{BASE_URL}/polymarket/stocks/v1/stock/AAPL/mentions").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "ticker": "AAPL",
+                    "period_days": 7,
+                    "count": 1,
+                    "results": [{
+                        "condition_id": "0xabc",
+                        "event_id": "123",
+                        "question": "AAPL up?",
+                        "market_type": "up_down",
+                        "liquidity": 100.0,
+                        "volume_24h": 20.0,
+                        "trade_count": 2,
+                        "buy_trades": 1,
+                        "sell_trades": 1,
+                        "unique_traders": 2,
+                        "active": True,
+                        "fetched_at": "2026-04-20T15:00:00Z",
+                    }],
+                },
+            )
+        )
+        result = client.polymarket.mentions("AAPL", days=7, limit=5)
+        assert route.called
+        assert request_params(route) == {"days": "7", "limit": "5"}
+        assert result["results"][0]["condition_id"] == "0xabc"
 
 
 class TestPolymarketSearch:
@@ -1092,6 +1290,24 @@ class TestCryptoNamespace:
         assert result.found is True
         assert result.mentions == 321
         assert "total_mentions" not in result.to_dict()
+
+    @respx.mock
+    def test_crypto_mentions(self, client):
+        route = respx.get(f"{BASE_URL}/reddit/crypto/v1/token/BTC/mentions").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "symbol": "BTC",
+                    "period_days": 7,
+                    "count": 1,
+                    "results": [{"text_snippet": "BTC range", "created_utc": "2026-03-20T18:42:10Z", "upvotes": 4, "is_inherited": False}],
+                },
+            )
+        )
+        result = client.crypto.mentions("BTC", days=7, limit=10, include_inherited=True)
+        assert route.called
+        assert request_params(route) == {"days": "7", "limit": "10", "include_inherited": "true"}
+        assert result["results"][0]["text_snippet"] == "BTC range"
 
     @respx.mock
     def test_crypto_market_sentiment(self, client):
