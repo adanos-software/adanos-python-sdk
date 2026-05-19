@@ -5,6 +5,15 @@ All notable changes to the Adanos Python SDK will be documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
+## [2.2.0] - 2026-05-19
+
+### Added
+- Synced generated client and wrapper coverage with Adanos Market Sentiment API `1.34.0`.
+- Added root `health()` / `health_async()` helpers.
+- Added generated market-sentiment, raw mention, X/Twitter explain, and root health endpoint modules.
+- Added typed raw mention, market sentiment, platform-specific search/compare, rate-limit, validation detail, and Polymarket `current_market_count` models.
+- Added raw mention `offset` support across Reddit Stocks, News Stocks, X/Twitter Stocks, Polymarket Stocks, and Reddit Crypto.
+
 ## [2.1.0] - 2026-04-29
 
 ### Added
