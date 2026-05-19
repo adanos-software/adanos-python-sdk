@@ -3,13 +3,9 @@
 from __future__ import annotations
 
 from typing import Any, Optional
-from urllib.parse import quote
 
 from ._generated.client import AuthenticatedClient
 from ._generated.types import UNSET
-
-_EXPECTED_JSON_STATUS_CODES = {400, 401, 403, 404, 409, 422, 429, 503}
-
 
 def _resolve_reddit_type(type: Optional[str]) -> Any:
     if type is None:
@@ -40,48 +36,6 @@ def _resolve_polymarket_type(type: Optional[str]) -> Any:
     )
 
     return GetPolymarketTrendingStocksTypeType0(type)
-
-
-def _request_json(client: AuthenticatedClient, path: str, *, params: Optional[dict[str, Any]] = None) -> Any:
-    """Perform a raw GET request for wrapper helpers not yet covered by generated code."""
-    response = client.get_httpx_client().request(
-        "get",
-        path,
-        params={key: value for key, value in (params or {}).items() if value is not None},
-    )
-    if response.status_code not in _EXPECTED_JSON_STATUS_CODES:
-        response.raise_for_status()
-    if not response.content:
-        return None
-    return response.json()
-
-
-def _parse_stock_explanation_payload(payload: Any) -> Any:
-    required_keys = {"ticker", "explanation", "cached", "generated_at"}
-    if isinstance(payload, dict) and required_keys.issubset(payload):
-        from ._generated.models.stock_explanation_response import StockExplanationResponse
-
-        return StockExplanationResponse.from_dict(payload)
-    return payload
-
-
-async def _request_json_async(
-    client: AuthenticatedClient,
-    path: str,
-    *,
-    params: Optional[dict[str, Any]] = None,
-) -> Any:
-    """Async companion to :func:`_request_json`."""
-    response = await client.get_async_httpx_client().request(
-        "get",
-        path,
-        params={key: value for key, value in (params or {}).items() if value is not None},
-    )
-    if response.status_code not in _EXPECTED_JSON_STATUS_CODES:
-        response.raise_for_status()
-    if not response.content:
-        return None
-    return response.json()
 
 
 class _RedditNamespace:
@@ -160,19 +114,33 @@ class _RedditNamespace:
         from ._generated.api.reddit_stocks import get_stock_sentiment
         return await get_stock_sentiment.asyncio(ticker, client=self._client, days=days)
 
-    def mentions(self, ticker: str, *, days: int = 7, limit: int = 100, include_inherited: bool = False) -> Any:
+    def mentions(
+        self,
+        ticker: str,
+        *,
+        days: int = 7,
+        limit: int = 50,
+        offset: int = 0,
+        include_inherited: bool = False,
+    ) -> Any:
         """Get raw Reddit mention rows for a stock ticker.
 
         Args:
             ticker: Stock symbol (e.g. ``"TSLA"``).
             days: Time period (1-90). Free tier limited to 30.
             limit: Max results (1-100).
+            offset: Pagination offset.
             include_inherited: Whether to include inherited thread context mentions.
         """
-        return _request_json(
-            self._client,
-            f"/reddit/stocks/v1/stock/{quote(str(ticker), safe='')}/mentions",
-            params={"days": days, "limit": limit, "include_inherited": include_inherited},
+        from ._generated.api.reddit_stocks import get_stock_raw_mentions
+
+        return get_stock_raw_mentions.sync(
+            ticker,
+            client=self._client,
+            days=days,
+            limit=limit,
+            offset=offset,
+            include_inherited=include_inherited,
         )
 
     async def mentions_async(
@@ -180,14 +148,20 @@ class _RedditNamespace:
         ticker: str,
         *,
         days: int = 7,
-        limit: int = 100,
+        limit: int = 50,
+        offset: int = 0,
         include_inherited: bool = False,
     ) -> Any:
         """Async variant of :meth:`mentions`."""
-        return await _request_json_async(
-            self._client,
-            f"/reddit/stocks/v1/stock/{quote(str(ticker), safe='')}/mentions",
-            params={"days": days, "limit": limit, "include_inherited": include_inherited},
+        from ._generated.api.reddit_stocks import get_stock_raw_mentions
+
+        return await get_stock_raw_mentions.asyncio(
+            ticker,
+            client=self._client,
+            days=days,
+            limit=limit,
+            offset=offset,
+            include_inherited=include_inherited,
         )
 
     def explain(self, ticker: str) -> Any:
@@ -237,15 +211,15 @@ class _RedditNamespace:
 
     def market_sentiment(self, *, days: int = 1) -> Any:
         """Get the service-level Reddit market sentiment snapshot."""
-        return _request_json(self._client, "/reddit/stocks/v1/market-sentiment", params={"days": days})
+        from ._generated.api.reddit_stocks import get_reddit_market_sentiment
+
+        return get_reddit_market_sentiment.sync(client=self._client, days=days)
 
     async def market_sentiment_async(self, *, days: int = 1) -> Any:
         """Async variant of :meth:`market_sentiment`."""
-        return await _request_json_async(
-            self._client,
-            "/reddit/stocks/v1/market-sentiment",
-            params={"days": days},
-        )
+        from ._generated.api.reddit_stocks import get_reddit_market_sentiment
+
+        return await get_reddit_market_sentiment.asyncio(client=self._client, days=days)
 
     def stats(self) -> Any:
         """Get Reddit stock dataset statistics."""
@@ -404,27 +378,24 @@ class _NewsNamespace:
             days=days,
         )
 
-    def mentions(self, ticker: str, *, days: int = 7, limit: int = 100) -> Any:
+    def mentions(self, ticker: str, *, days: int = 7, limit: int = 50, offset: int = 0) -> Any:
         """Get raw news mention rows for a stock ticker.
 
         Args:
             ticker: Stock symbol (e.g. ``"TSLA"``).
             days: Time period (1-90). Free tier limited to 30.
             limit: Max results (1-100).
+            offset: Pagination offset.
         """
-        return _request_json(
-            self._client,
-            f"/news/stocks/v1/stock/{quote(str(ticker), safe='')}/mentions",
-            params={"days": days, "limit": limit},
-        )
+        from ._generated.api.news_stocks import get_news_stock_mentions
 
-    async def mentions_async(self, ticker: str, *, days: int = 7, limit: int = 100) -> Any:
+        return get_news_stock_mentions.sync(ticker, client=self._client, days=days, limit=limit, offset=offset)
+
+    async def mentions_async(self, ticker: str, *, days: int = 7, limit: int = 50, offset: int = 0) -> Any:
         """Async variant of :meth:`mentions`."""
-        return await _request_json_async(
-            self._client,
-            f"/news/stocks/v1/stock/{quote(str(ticker), safe='')}/mentions",
-            params={"days": days, "limit": limit},
-        )
+        from ._generated.api.news_stocks import get_news_stock_mentions
+
+        return await get_news_stock_mentions.asyncio(ticker, client=self._client, days=days, limit=limit, offset=offset)
 
     def explain(self, ticker: str) -> Any:
         """Get AI explanation for a stock trend in news."""
@@ -482,15 +453,15 @@ class _NewsNamespace:
 
     def market_sentiment(self, *, days: int = 1) -> Any:
         """Get the service-level News market sentiment snapshot."""
-        return _request_json(self._client, "/news/stocks/v1/market-sentiment", params={"days": days})
+        from ._generated.api.news_stocks import get_news_market_sentiment
+
+        return get_news_market_sentiment.sync(client=self._client, days=days)
 
     async def market_sentiment_async(self, *, days: int = 1) -> Any:
         """Async variant of :meth:`market_sentiment`."""
-        return await _request_json_async(
-            self._client,
-            "/news/stocks/v1/market-sentiment",
-            params={"days": days},
-        )
+        from ._generated.api.news_stocks import get_news_market_sentiment
+
+        return await get_news_market_sentiment.asyncio(client=self._client, days=days)
 
     def stats(self) -> Any:
         """Get News stock dataset statistics."""
@@ -589,43 +560,36 @@ class _XNamespace:
         from ._generated.api.x_twitter_stocks import get_x_stock_sentiment
         return await get_x_stock_sentiment.asyncio(ticker, client=self._client, days=days)
 
-    def mentions(self, ticker: str, *, days: int = 7, limit: int = 100) -> Any:
+    def mentions(self, ticker: str, *, days: int = 7, limit: int = 50, offset: int = 0) -> Any:
         """Get raw X/Twitter mention rows for a stock ticker.
 
         Args:
             ticker: Stock symbol (e.g. ``"TSLA"``).
             days: Time period (1-90). Free tier limited to 30.
             limit: Max results (1-100).
+            offset: Pagination offset.
         """
-        return _request_json(
-            self._client,
-            f"/x/stocks/v1/stock/{quote(str(ticker), safe='')}/mentions",
-            params={"days": days, "limit": limit},
-        )
+        from ._generated.api.x_twitter_stocks import get_x_stock_raw_mentions
 
-    async def mentions_async(self, ticker: str, *, days: int = 7, limit: int = 100) -> Any:
+        return get_x_stock_raw_mentions.sync(ticker, client=self._client, days=days, limit=limit, offset=offset)
+
+    async def mentions_async(self, ticker: str, *, days: int = 7, limit: int = 50, offset: int = 0) -> Any:
         """Async variant of :meth:`mentions`."""
-        return await _request_json_async(
-            self._client,
-            f"/x/stocks/v1/stock/{quote(str(ticker), safe='')}/mentions",
-            params={"days": days, "limit": limit},
-        )
+        from ._generated.api.x_twitter_stocks import get_x_stock_raw_mentions
+
+        return await get_x_stock_raw_mentions.asyncio(ticker, client=self._client, days=days, limit=limit, offset=offset)
 
     def explain(self, ticker: str) -> Any:
         """Get AI explanation for a stock trend on X/Twitter."""
-        payload = _request_json(
-            self._client,
-            f"/x/stocks/v1/stock/{quote(str(ticker), safe='')}/explain",
-        )
-        return _parse_stock_explanation_payload(payload)
+        from ._generated.api.x_twitter_stocks import get_x_stock_explanation
+
+        return get_x_stock_explanation.sync(ticker, client=self._client)
 
     async def explain_async(self, ticker: str) -> Any:
         """Async variant of :meth:`explain`."""
-        payload = await _request_json_async(
-            self._client,
-            f"/x/stocks/v1/stock/{quote(str(ticker), safe='')}/explain",
-        )
-        return _parse_stock_explanation_payload(payload)
+        from ._generated.api.x_twitter_stocks import get_x_stock_explanation
+
+        return await get_x_stock_explanation.asyncio(ticker, client=self._client)
 
     def search(self, query: str, *, days: int = 7, limit: int = 20) -> Any:
         """Search for stocks by name or ticker on X/Twitter.
@@ -658,15 +622,15 @@ class _XNamespace:
 
     def market_sentiment(self, *, days: int = 1) -> Any:
         """Get the service-level X/Twitter market sentiment snapshot."""
-        return _request_json(self._client, "/x/stocks/v1/market-sentiment", params={"days": days})
+        from ._generated.api.x_twitter_stocks import get_x_market_sentiment
+
+        return get_x_market_sentiment.sync(client=self._client, days=days)
 
     async def market_sentiment_async(self, *, days: int = 1) -> Any:
         """Async variant of :meth:`market_sentiment`."""
-        return await _request_json_async(
-            self._client,
-            "/x/stocks/v1/market-sentiment",
-            params={"days": days},
-        )
+        from ._generated.api.x_twitter_stocks import get_x_market_sentiment
+
+        return await get_x_market_sentiment.asyncio(client=self._client, days=days)
 
     def stats(self) -> Any:
         """Get X/Twitter dataset statistics."""
@@ -801,26 +765,35 @@ class _PolymarketNamespace:
 
         return await get_polymarket_stock.asyncio(ticker, client=self._client, days=days)
 
-    def mentions(self, ticker: str, *, days: int = 7, limit: int = 100) -> Any:
+    def mentions(self, ticker: str, *, days: int = 7, limit: int = 50, offset: int = 0) -> Any:
         """Get raw Polymarket mention rows for a stock ticker.
 
         Args:
             ticker: Stock symbol (e.g. ``"TSLA"``).
             days: Time period (1-90). Free tier limited to 30.
             limit: Max results (1-100).
+            offset: Pagination offset.
         """
-        return _request_json(
-            self._client,
-            f"/polymarket/stocks/v1/stock/{quote(str(ticker), safe='')}/mentions",
-            params={"days": days, "limit": limit},
+        from ._generated.api.polymarket_stocks import get_polymarket_stock_raw_mentions
+
+        return get_polymarket_stock_raw_mentions.sync(
+            ticker,
+            client=self._client,
+            days=days,
+            limit=limit,
+            offset=offset,
         )
 
-    async def mentions_async(self, ticker: str, *, days: int = 7, limit: int = 100) -> Any:
+    async def mentions_async(self, ticker: str, *, days: int = 7, limit: int = 50, offset: int = 0) -> Any:
         """Async variant of :meth:`mentions`."""
-        return await _request_json_async(
-            self._client,
-            f"/polymarket/stocks/v1/stock/{quote(str(ticker), safe='')}/mentions",
-            params={"days": days, "limit": limit},
+        from ._generated.api.polymarket_stocks import get_polymarket_stock_raw_mentions
+
+        return await get_polymarket_stock_raw_mentions.asyncio(
+            ticker,
+            client=self._client,
+            days=days,
+            limit=limit,
+            offset=offset,
         )
 
     def search(self, query: str, *, days: int = 7, limit: int = 20) -> Any:
@@ -862,15 +835,15 @@ class _PolymarketNamespace:
 
     def market_sentiment(self, *, days: int = 1) -> Any:
         """Get the service-level Polymarket market sentiment snapshot."""
-        return _request_json(self._client, "/polymarket/stocks/v1/market-sentiment", params={"days": days})
+        from ._generated.api.polymarket_stocks import get_polymarket_market_sentiment
+
+        return get_polymarket_market_sentiment.sync(client=self._client, days=days)
 
     async def market_sentiment_async(self, *, days: int = 1) -> Any:
         """Async variant of :meth:`market_sentiment`."""
-        return await _request_json_async(
-            self._client,
-            "/polymarket/stocks/v1/market-sentiment",
-            params={"days": days},
-        )
+        from ._generated.api.polymarket_stocks import get_polymarket_market_sentiment
+
+        return await get_polymarket_market_sentiment.asyncio(client=self._client, days=days)
 
     def stats(self) -> Any:
         """Get Polymarket dataset statistics."""
@@ -937,19 +910,33 @@ class _RedditCryptoNamespace:
             days=days,
         )
 
-    def mentions(self, symbol: str, *, days: int = 7, limit: int = 100, include_inherited: bool = False) -> Any:
+    def mentions(
+        self,
+        symbol: str,
+        *,
+        days: int = 7,
+        limit: int = 50,
+        offset: int = 0,
+        include_inherited: bool = False,
+    ) -> Any:
         """Get raw Reddit mention rows for a crypto token.
 
         Args:
             symbol: Crypto symbol (e.g. ``"BTC"``).
             days: Time period (1-90). Free tier limited to 30.
             limit: Max results (1-100).
+            offset: Pagination offset.
             include_inherited: Whether to include inherited thread context mentions.
         """
-        return _request_json(
-            self._client,
-            f"/reddit/crypto/v1/token/{quote(str(symbol), safe='')}/mentions",
-            params={"days": days, "limit": limit, "include_inherited": include_inherited},
+        from ._generated.api.reddit_crypto import get_reddit_crypto_token_mentions
+
+        return get_reddit_crypto_token_mentions.sync(
+            symbol,
+            client=self._client,
+            days=days,
+            limit=limit,
+            offset=offset,
+            include_inherited=include_inherited,
         )
 
     async def mentions_async(
@@ -957,14 +944,20 @@ class _RedditCryptoNamespace:
         symbol: str,
         *,
         days: int = 7,
-        limit: int = 100,
+        limit: int = 50,
+        offset: int = 0,
         include_inherited: bool = False,
     ) -> Any:
         """Async variant of :meth:`mentions`."""
-        return await _request_json_async(
-            self._client,
-            f"/reddit/crypto/v1/token/{quote(str(symbol), safe='')}/mentions",
-            params={"days": days, "limit": limit, "include_inherited": include_inherited},
+        from ._generated.api.reddit_crypto import get_reddit_crypto_token_mentions
+
+        return await get_reddit_crypto_token_mentions.asyncio(
+            symbol,
+            client=self._client,
+            days=days,
+            limit=limit,
+            offset=offset,
+            include_inherited=include_inherited,
         )
 
     def search(self, query: str, *, days: int = 7, limit: int = 20) -> Any:
@@ -1023,15 +1016,15 @@ class _RedditCryptoNamespace:
 
     def market_sentiment(self, *, days: int = 1) -> Any:
         """Get the service-level Reddit Crypto market sentiment snapshot."""
-        return _request_json(self._client, "/reddit/crypto/v1/market-sentiment", params={"days": days})
+        from ._generated.api.reddit_crypto import get_reddit_crypto_market_sentiment
+
+        return get_reddit_crypto_market_sentiment.sync(client=self._client, days=days)
 
     async def market_sentiment_async(self, *, days: int = 1) -> Any:
         """Async variant of :meth:`market_sentiment`."""
-        return await _request_json_async(
-            self._client,
-            "/reddit/crypto/v1/market-sentiment",
-            params={"days": days},
-        )
+        from ._generated.api.reddit_crypto import get_reddit_crypto_market_sentiment
+
+        return await get_reddit_crypto_market_sentiment.asyncio(client=self._client, days=days)
 
     def stats(self) -> Any:
         """Get Reddit crypto dataset statistics."""
@@ -1092,6 +1085,18 @@ class AdanosClient:
         self.reddit_crypto = self.crypto
         self.x = _XNamespace(self._client)
         self.polymarket = _PolymarketNamespace(self._client)
+
+    def health(self) -> Any:
+        """Get root API health aggregated across all services."""
+        from ._generated.api.status import get_root_health
+
+        return get_root_health.sync(client=self._client)
+
+    async def health_async(self) -> Any:
+        """Async variant of :meth:`health`."""
+        from ._generated.api.status import get_root_health
+
+        return await get_root_health.asyncio(client=self._client)
 
     def close(self) -> None:
         """Close underlying HTTP connections."""

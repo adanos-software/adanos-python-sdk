@@ -32,6 +32,7 @@ class PolymarketStockDetailResponse:
         period_days (int | None | Unset): Analysis period in days
         trade_count (int | None | Unset): Trade count in period
         market_count (int | None | Unset): Number of active markets for ticker
+        current_market_count (int | None | Unset): Number of currently active markets in the latest UTC-day snapshot
         unique_traders (int | None | Unset): Sum of per-market day unique trader counters (can overcount across markets)
         sentiment_score (float | None | Unset): Implied sentiment
         positive_count (int | None | Unset): Markets with YES > 0.5
@@ -52,6 +53,7 @@ class PolymarketStockDetailResponse:
     period_days: int | None | Unset = UNSET
     trade_count: int | None | Unset = UNSET
     market_count: int | None | Unset = UNSET
+    current_market_count: int | None | Unset = UNSET
     unique_traders: int | None | Unset = UNSET
     sentiment_score: float | None | Unset = UNSET
     positive_count: int | None | Unset = UNSET
@@ -106,6 +108,12 @@ class PolymarketStockDetailResponse:
             market_count = UNSET
         else:
             market_count = self.market_count
+
+        current_market_count: int | None | Unset
+        if isinstance(self.current_market_count, Unset):
+            current_market_count = UNSET
+        else:
+            current_market_count = self.current_market_count
 
         unique_traders: int | None | Unset
         if isinstance(self.unique_traders, Unset):
@@ -199,6 +207,8 @@ class PolymarketStockDetailResponse:
             field_dict["trade_count"] = trade_count
         if market_count is not UNSET:
             field_dict["market_count"] = market_count
+        if current_market_count is not UNSET:
+            field_dict["current_market_count"] = current_market_count
         if unique_traders is not UNSET:
             field_dict["unique_traders"] = unique_traders
         if sentiment_score is not UNSET:
@@ -295,6 +305,15 @@ class PolymarketStockDetailResponse:
             return cast(int | None | Unset, data)
 
         market_count = _parse_market_count(d.pop("market_count", UNSET))
+
+        def _parse_current_market_count(data: object) -> int | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(int | None | Unset, data)
+
+        current_market_count = _parse_current_market_count(d.pop("current_market_count", UNSET))
 
         def _parse_unique_traders(data: object) -> int | None | Unset:
             if data is None:
@@ -429,6 +448,7 @@ class PolymarketStockDetailResponse:
             period_days=period_days,
             trade_count=trade_count,
             market_count=market_count,
+            current_market_count=current_market_count,
             unique_traders=unique_traders,
             sentiment_score=sentiment_score,
             positive_count=positive_count,

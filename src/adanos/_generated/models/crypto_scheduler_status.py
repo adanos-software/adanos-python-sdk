@@ -21,6 +21,8 @@ class CryptoSchedulerStatus:
         scrape_count (int | Unset): Total scrapes Default: 0.
         error_count (int | Unset): Total failed scrapes Default: 0.
         success_rate (float | None | Unset): Success ratio
+        timed_out_scrape_threads (int | Unset): Timed-out Tor scrape attempts observed since the last successful reset.
+            Default: 0.
         note (None | str | Unset): Additional status information
     """
 
@@ -29,6 +31,7 @@ class CryptoSchedulerStatus:
     scrape_count: int | Unset = 0
     error_count: int | Unset = 0
     success_rate: float | None | Unset = UNSET
+    timed_out_scrape_threads: int | Unset = 0
     note: None | str | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
@@ -51,6 +54,8 @@ class CryptoSchedulerStatus:
         else:
             success_rate = self.success_rate
 
+        timed_out_scrape_threads = self.timed_out_scrape_threads
+
         note: None | str | Unset
         if isinstance(self.note, Unset):
             note = UNSET
@@ -72,6 +77,8 @@ class CryptoSchedulerStatus:
             field_dict["error_count"] = error_count
         if success_rate is not UNSET:
             field_dict["success_rate"] = success_rate
+        if timed_out_scrape_threads is not UNSET:
+            field_dict["timed_out_scrape_threads"] = timed_out_scrape_threads
         if note is not UNSET:
             field_dict["note"] = note
 
@@ -104,6 +111,8 @@ class CryptoSchedulerStatus:
 
         success_rate = _parse_success_rate(d.pop("success_rate", UNSET))
 
+        timed_out_scrape_threads = d.pop("timed_out_scrape_threads", UNSET)
+
         def _parse_note(data: object) -> None | str | Unset:
             if data is None:
                 return data
@@ -119,6 +128,7 @@ class CryptoSchedulerStatus:
             scrape_count=scrape_count,
             error_count=error_count,
             success_rate=success_rate,
+            timed_out_scrape_threads=timed_out_scrape_threads,
             note=note,
         )
 

@@ -22,6 +22,7 @@ class PolymarketTrendingStock:
         trend (PolymarketTrendingStockTrend): UTC-day activity trend vs previous UTC day
         trade_count (int): Trade count in selected period
         market_count (int): Number of active markets for ticker
+        current_market_count (int): Number of currently active markets in the latest UTC-day snapshot for ticker
         bullish_pct (int): Share of markets with YES > 0.5
         bearish_pct (int): Share of markets with YES < 0.5
         total_liquidity (float): Total liquidity (USD)
@@ -36,6 +37,7 @@ class PolymarketTrendingStock:
     trend: PolymarketTrendingStockTrend
     trade_count: int
     market_count: int
+    current_market_count: int
     bullish_pct: int
     bearish_pct: int
     total_liquidity: float
@@ -55,6 +57,8 @@ class PolymarketTrendingStock:
         trade_count = self.trade_count
 
         market_count = self.market_count
+
+        current_market_count = self.current_market_count
 
         bullish_pct = self.bullish_pct
 
@@ -93,6 +97,7 @@ class PolymarketTrendingStock:
                 "trend": trend,
                 "trade_count": trade_count,
                 "market_count": market_count,
+                "current_market_count": current_market_count,
                 "bullish_pct": bullish_pct,
                 "bearish_pct": bearish_pct,
                 "total_liquidity": total_liquidity,
@@ -121,6 +126,8 @@ class PolymarketTrendingStock:
         trade_count = d.pop("trade_count")
 
         market_count = d.pop("market_count")
+
+        current_market_count = d.pop("current_market_count")
 
         bullish_pct = d.pop("bullish_pct")
 
@@ -163,6 +170,7 @@ class PolymarketTrendingStock:
             trend=trend,
             trade_count=trade_count,
             market_count=market_count,
+            current_market_count=current_market_count,
             bullish_pct=bullish_pct,
             bearish_pct=bearish_pct,
             total_liquidity=total_liquidity,

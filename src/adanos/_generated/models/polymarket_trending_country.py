@@ -21,6 +21,7 @@ class PolymarketTrendingCountry:
         trend (PolymarketTrendingCountryTrend): Aggregated UTC-day trend vs previous UTC day
         trade_count (int): Total trade count in period
         market_count (int): Total distinct active markets in dimension
+        current_market_count (int): Sum of ticker-level currently active markets in the latest UTC-day snapshot
         unique_tickers (int): Unique tickers in dimension
         bullish_pct (int): Bullish market share
         bearish_pct (int): Bearish market share
@@ -36,6 +37,7 @@ class PolymarketTrendingCountry:
     trend: PolymarketTrendingCountryTrend
     trade_count: int
     market_count: int
+    current_market_count: int
     unique_tickers: int
     bullish_pct: int
     bearish_pct: int
@@ -54,6 +56,8 @@ class PolymarketTrendingCountry:
         trade_count = self.trade_count
 
         market_count = self.market_count
+
+        current_market_count = self.current_market_count
 
         unique_tickers = self.unique_tickers
 
@@ -87,6 +91,7 @@ class PolymarketTrendingCountry:
                 "trend": trend,
                 "trade_count": trade_count,
                 "market_count": market_count,
+                "current_market_count": current_market_count,
                 "unique_tickers": unique_tickers,
                 "bullish_pct": bullish_pct,
                 "bearish_pct": bearish_pct,
@@ -112,6 +117,8 @@ class PolymarketTrendingCountry:
         trade_count = d.pop("trade_count")
 
         market_count = d.pop("market_count")
+
+        current_market_count = d.pop("current_market_count")
 
         unique_tickers = d.pop("unique_tickers")
 
@@ -148,6 +155,7 @@ class PolymarketTrendingCountry:
             trend=trend,
             trade_count=trade_count,
             market_count=market_count,
+            current_market_count=current_market_count,
             unique_tickers=unique_tickers,
             bullish_pct=bullish_pct,
             bearish_pct=bearish_pct,

@@ -18,26 +18,32 @@ class XStatsResponse:
     """X/Twitter service statistics.
 
     Attributes:
-        total_appearances (int | Unset): Total appearances across all X trending fetches (all time) Default: 0.
-        unique_tickers (int | Unset): Number of unique tickers in latest fetch Default: 0.
-        tickers (list[str] | Unset): List of trending ticker symbols (first 100)
+        total_appearances (int | Unset): Total X mention rows in the database Default: 0.
+        unique_tickers (int | Unset): Number of unique tickers with X mentions in the database Default: 0.
+        mentions_today (int | Unset): X mention rows created since today's UTC midnight Default: 0.
+        unique_tickers_today (int | Unset): Unique tickers with X mentions since today's UTC midnight Default: 0.
+        tickers (list[str] | Unset): List of ticker symbols with X mentions (first 50, sorted by symbol)
         supported_tickers (int | Unset): Total tickers in ticker_reference table Default: 0.
-        last_fetch (datetime.datetime | None | Unset): Timestamp of last Grok fetch
-        validation_rate (float | Unset): Percentage of tickers also on Reddit Default: 0.0.
+        last_fetch (datetime.datetime | None | Unset): Timestamp of latest scraped X mention
     """
 
     total_appearances: int | Unset = 0
     unique_tickers: int | Unset = 0
+    mentions_today: int | Unset = 0
+    unique_tickers_today: int | Unset = 0
     tickers: list[str] | Unset = UNSET
     supported_tickers: int | Unset = 0
     last_fetch: datetime.datetime | None | Unset = UNSET
-    validation_rate: float | Unset = 0.0
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         total_appearances = self.total_appearances
 
         unique_tickers = self.unique_tickers
+
+        mentions_today = self.mentions_today
+
+        unique_tickers_today = self.unique_tickers_today
 
         tickers: list[str] | Unset = UNSET
         if not isinstance(self.tickers, Unset):
@@ -53,8 +59,6 @@ class XStatsResponse:
         else:
             last_fetch = self.last_fetch
 
-        validation_rate = self.validation_rate
-
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update({})
@@ -62,14 +66,16 @@ class XStatsResponse:
             field_dict["total_appearances"] = total_appearances
         if unique_tickers is not UNSET:
             field_dict["unique_tickers"] = unique_tickers
+        if mentions_today is not UNSET:
+            field_dict["mentions_today"] = mentions_today
+        if unique_tickers_today is not UNSET:
+            field_dict["unique_tickers_today"] = unique_tickers_today
         if tickers is not UNSET:
             field_dict["tickers"] = tickers
         if supported_tickers is not UNSET:
             field_dict["supported_tickers"] = supported_tickers
         if last_fetch is not UNSET:
             field_dict["last_fetch"] = last_fetch
-        if validation_rate is not UNSET:
-            field_dict["validation_rate"] = validation_rate
 
         return field_dict
 
@@ -79,6 +85,10 @@ class XStatsResponse:
         total_appearances = d.pop("total_appearances", UNSET)
 
         unique_tickers = d.pop("unique_tickers", UNSET)
+
+        mentions_today = d.pop("mentions_today", UNSET)
+
+        unique_tickers_today = d.pop("unique_tickers_today", UNSET)
 
         tickers = cast(list[str], d.pop("tickers", UNSET))
 
@@ -101,15 +111,14 @@ class XStatsResponse:
 
         last_fetch = _parse_last_fetch(d.pop("last_fetch", UNSET))
 
-        validation_rate = d.pop("validation_rate", UNSET)
-
         x_stats_response = cls(
             total_appearances=total_appearances,
             unique_tickers=unique_tickers,
+            mentions_today=mentions_today,
+            unique_tickers_today=unique_tickers_today,
             tickers=tickers,
             supported_tickers=supported_tickers,
             last_fetch=last_fetch,
-            validation_rate=validation_rate,
         )
 
         x_stats_response.additional_properties = d
