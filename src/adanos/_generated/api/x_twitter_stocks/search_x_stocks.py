@@ -8,20 +8,24 @@ from ...client import AuthenticatedClient, Client
 from ...models.error_response import ErrorResponse
 from ...models.historical_limit_error import HistoricalLimitError
 from ...models.http_validation_error import HTTPValidationError
-from ...models.search_response import SearchResponse
-from ...types import UNSET, Response
+from ...models.rate_limit_error import RateLimitError
+from ...models.x_search_response import XSearchResponse
+from ...types import UNSET, Response, Unset
 
 
 def _get_kwargs(
     *,
     q: str,
-    days: int | Any = UNSET,
-    limit: int | Any = UNSET,
+    days: int | Unset = 7,
+    limit: int | Unset = 20,
 ) -> dict[str, Any]:
+
     params: dict[str, Any] = {}
 
     params["q"] = q
+
     params["days"] = days
+
     params["limit"] = limit
 
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
@@ -37,9 +41,9 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> ErrorResponse | HTTPValidationError | HistoricalLimitError | SearchResponse | None:
+) -> ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError | XSearchResponse | None:
     if response.status_code == 200:
-        response_200 = SearchResponse.from_dict(response.json())
+        response_200 = XSearchResponse.from_dict(response.json())
 
         return response_200
 
@@ -59,7 +63,7 @@ def _parse_response(
         return response_422
 
     if response.status_code == 429:
-        response_429 = ErrorResponse.from_dict(response.json())
+        response_429 = RateLimitError.from_dict(response.json())
 
         return response_429
 
@@ -71,9 +75,7 @@ def _parse_response(
 
 def _build_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Response[
-    ErrorResponse | HTTPValidationError | HistoricalLimitError | SearchResponse
-]:
+) -> Response[ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError | XSearchResponse]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -86,27 +88,29 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     q: str,
-    days: int | Any = UNSET,
-    limit: int | Any = UNSET,
-) -> Response[
-    ErrorResponse | HTTPValidationError | HistoricalLimitError | SearchResponse
-]:
-    """Search for stocks
+    days: int | Unset = 7,
+    limit: int | Unset = 20,
+) -> Response[ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError | XSearchResponse]:
+    """Search stocks
 
-     Search for stocks by ticker symbol or company name. Results include a platform-specific `summary`
-    block for the selected lookback window and are ranked by match relevance before recent activity.
+     Search for stocks by ticker symbol, company name, or alias in the X/Twitter universe.
+
+    Results prioritize match relevance first (exact ticker matches, then prefixes, then name/alias
+    matches)
+    and include a compact period-scoped `summary` block for the selected UTC calendar-day period.
 
     Args:
-        q (str): Search query (ticker or company name)
-        days (int | Any): Lookback window for the summary block.
-        limit (int | Any): Maximum number of search results to return.
+        q (str): Search query (minimum 2 non-$ characters after trimming)
+        days (int | Unset): UTC calendar-day period for each result summary including the current
+            UTC day so far (1-30 free, 1-90 hobby, 1-365 professional) Default: 7.
+        limit (int | Unset): Maximum number of results to return Default: 20.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[ErrorResponse | HTTPValidationError | HistoricalLimitError | SearchResponse]
+        Response[ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError | XSearchResponse]
     """
 
     kwargs = _get_kwargs(
@@ -126,25 +130,29 @@ def sync(
     *,
     client: AuthenticatedClient,
     q: str,
-    days: int | Any = UNSET,
-    limit: int | Any = UNSET,
-) -> ErrorResponse | HTTPValidationError | HistoricalLimitError | SearchResponse | None:
-    """Search for stocks
+    days: int | Unset = 7,
+    limit: int | Unset = 20,
+) -> ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError | XSearchResponse | None:
+    """Search stocks
 
-     Search for stocks by ticker symbol or company name. Results include a platform-specific `summary`
-    block for the selected lookback window and are ranked by match relevance before recent activity.
+     Search for stocks by ticker symbol, company name, or alias in the X/Twitter universe.
+
+    Results prioritize match relevance first (exact ticker matches, then prefixes, then name/alias
+    matches)
+    and include a compact period-scoped `summary` block for the selected UTC calendar-day period.
 
     Args:
-        q (str): Search query (ticker or company name)
-        days (int | Any): Lookback window for the summary block.
-        limit (int | Any): Maximum number of search results to return.
+        q (str): Search query (minimum 2 non-$ characters after trimming)
+        days (int | Unset): UTC calendar-day period for each result summary including the current
+            UTC day so far (1-30 free, 1-90 hobby, 1-365 professional) Default: 7.
+        limit (int | Unset): Maximum number of results to return Default: 20.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        ErrorResponse | HTTPValidationError | HistoricalLimitError | SearchResponse
+        ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError | XSearchResponse
     """
 
     return sync_detailed(
@@ -159,27 +167,29 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     q: str,
-    days: int | Any = UNSET,
-    limit: int | Any = UNSET,
-) -> Response[
-    ErrorResponse | HTTPValidationError | HistoricalLimitError | SearchResponse
-]:
-    """Search for stocks
+    days: int | Unset = 7,
+    limit: int | Unset = 20,
+) -> Response[ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError | XSearchResponse]:
+    """Search stocks
 
-     Search for stocks by ticker symbol or company name. Results include a platform-specific `summary`
-    block for the selected lookback window and are ranked by match relevance before recent activity.
+     Search for stocks by ticker symbol, company name, or alias in the X/Twitter universe.
+
+    Results prioritize match relevance first (exact ticker matches, then prefixes, then name/alias
+    matches)
+    and include a compact period-scoped `summary` block for the selected UTC calendar-day period.
 
     Args:
-        q (str): Search query (ticker or company name)
-        days (int | Any): Lookback window for the summary block.
-        limit (int | Any): Maximum number of search results to return.
+        q (str): Search query (minimum 2 non-$ characters after trimming)
+        days (int | Unset): UTC calendar-day period for each result summary including the current
+            UTC day so far (1-30 free, 1-90 hobby, 1-365 professional) Default: 7.
+        limit (int | Unset): Maximum number of results to return Default: 20.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[ErrorResponse | HTTPValidationError | HistoricalLimitError | SearchResponse]
+        Response[ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError | XSearchResponse]
     """
 
     kwargs = _get_kwargs(
@@ -197,25 +207,29 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     q: str,
-    days: int | Any = UNSET,
-    limit: int | Any = UNSET,
-) -> ErrorResponse | HTTPValidationError | HistoricalLimitError | SearchResponse | None:
-    """Search for stocks
+    days: int | Unset = 7,
+    limit: int | Unset = 20,
+) -> ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError | XSearchResponse | None:
+    """Search stocks
 
-     Search for stocks by ticker symbol or company name. Results include a platform-specific `summary`
-    block for the selected lookback window and are ranked by match relevance before recent activity.
+     Search for stocks by ticker symbol, company name, or alias in the X/Twitter universe.
+
+    Results prioritize match relevance first (exact ticker matches, then prefixes, then name/alias
+    matches)
+    and include a compact period-scoped `summary` block for the selected UTC calendar-day period.
 
     Args:
-        q (str): Search query (ticker or company name)
-        days (int | Any): Lookback window for the summary block.
-        limit (int | Any): Maximum number of search results to return.
+        q (str): Search query (minimum 2 non-$ characters after trimming)
+        days (int | Unset): UTC calendar-day period for each result summary including the current
+            UTC day so far (1-30 free, 1-90 hobby, 1-365 professional) Default: 7.
+        limit (int | Unset): Maximum number of results to return Default: 20.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        ErrorResponse | HTTPValidationError | HistoricalLimitError | SearchResponse
+        ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError | XSearchResponse
     """
 
     return (

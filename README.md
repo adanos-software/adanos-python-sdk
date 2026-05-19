@@ -61,6 +61,7 @@ print(explanation.explanation)
 - `client.polymarket.*` for Polymarket Stocks
 - `client.crypto.*` for Reddit Crypto
 - `client.reddit_crypto.*` is an alias for `client.crypto.*`
+- `client.health()` for root API health aggregated across services
 
 ## Examples
 
@@ -71,6 +72,7 @@ from adanos import AdanosClient
 
 client = AdanosClient(api_key="sk_live_...")
 
+root_health = client.health()
 trending = client.reddit.trending(days=7, limit=10)
 sectors = client.reddit.trending_sectors(days=7, limit=10)
 countries = client.reddit.trending_countries(days=7, limit=10)
@@ -140,6 +142,7 @@ health = client.polymarket.health()
 Polymarket semantics:
 - `buzz_score` is activity-first and optimized for current market attention
 - `total_liquidity` is a windowed signal over the selected `days`
+- `current_market_count` is the live-only active-market breadth; `market_count` remains the selected-window breadth
 - `top_mentions` on `stock()` are relevance-sorted by trading activity first
 
 ### Reddit Crypto
@@ -160,6 +163,12 @@ health = client.crypto.health()
 
 ## Available Methods
 
+### `client.*`
+
+| Method | Description |
+|--------|-------------|
+| `health()` | Root API health aggregated across services |
+
 ### `client.reddit.*`
 
 | Method | Description |
@@ -168,6 +177,7 @@ health = client.crypto.health()
 | `trending_sectors(days, limit, offset)` | Trending sectors |
 | `trending_countries(days, limit, offset)` | Trending countries |
 | `stock(ticker, days)` | Detailed sentiment for a ticker |
+| `mentions(ticker, days, limit, offset, include_inherited)` | Raw Reddit mention rows |
 | `explain(ticker)` | AI-generated trend explanation |
 | `search(query, days, limit)` | Search stocks by name or ticker with a summary block |
 | `compare(tickers, days)` | Compare up to 10 stocks |
@@ -183,6 +193,7 @@ health = client.crypto.health()
 | `trending_sectors(days, limit, offset, source)` | Trending sectors from news |
 | `trending_countries(days, limit, offset, source)` | Trending countries from news |
 | `stock(ticker, days)` | Detailed news sentiment for a ticker |
+| `mentions(ticker, days, limit, offset)` | Raw news mention rows |
 | `explain(ticker)` | AI-generated explanation from news context |
 | `search(query, days, limit)` | Search stocks in the news dataset with a summary block |
 | `compare(tickers, days)` | Compare up to 10 stocks in news |
@@ -198,6 +209,7 @@ health = client.crypto.health()
 | `trending_sectors(days, limit, offset)` | Trending sectors |
 | `trending_countries(days, limit, offset)` | Trending countries |
 | `stock(ticker, days)` | Detailed X/Twitter sentiment |
+| `mentions(ticker, days, limit, offset)` | Raw X/Twitter mention rows |
 | `explain(ticker)` | AI-generated explanation from X/Twitter context |
 | `search(query, days, limit)` | Search stocks with a summary block |
 | `compare(tickers, days)` | Compare stocks |
@@ -213,6 +225,7 @@ health = client.crypto.health()
 | `trending_sectors(days, limit, offset)` | Trending sectors |
 | `trending_countries(days, limit, offset)` | Trending countries |
 | `stock(ticker, days)` | Detailed Polymarket activity, sentiment, and relevance-sorted market questions |
+| `mentions(ticker, days, limit, offset)` | Raw Polymarket market snapshots |
 | `search(query, days, limit)` | Search stocks with a summary block |
 | `compare(tickers, days)` | Compare stocks with windowed Polymarket activity signals |
 | `market_sentiment(days)` | Service-level Polymarket market sentiment snapshot |
@@ -225,6 +238,7 @@ health = client.crypto.health()
 |--------|-------------|
 | `trending(days, limit, offset)` | Trending Reddit crypto tokens |
 | `token(symbol, days)` | Detailed token sentiment and buzz |
+| `mentions(symbol, days, limit, offset, include_inherited)` | Raw Reddit crypto mention rows |
 | `search(query, days, limit)` | Search tokens by symbol or name with a summary block |
 | `compare(symbols, days)` | Compare multiple tokens |
 | `market_sentiment(days)` | Service-level Reddit Crypto market sentiment snapshot |

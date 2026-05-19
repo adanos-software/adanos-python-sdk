@@ -19,6 +19,7 @@ class PolymarketCompareStockItem:
     buzz_score: float
     trade_count: int
     market_count: int
+    current_market_count: int
     total_liquidity: float
     trend_history: list[float]
     company_name: None | str | Unset = UNSET
@@ -38,6 +39,7 @@ class PolymarketCompareStockItem:
                 "buzz_score": self.buzz_score,
                 "trade_count": self.trade_count,
                 "market_count": self.market_count,
+                "current_market_count": self.current_market_count,
                 "total_liquidity": self.total_liquidity,
                 "trend_history": self.trend_history,
             }
@@ -93,6 +95,7 @@ class PolymarketCompareStockItem:
             buzz_score=d.pop("buzz_score"),
             trade_count=d.pop("trade_count"),
             market_count=d.pop("market_count"),
+            current_market_count=d.pop("current_market_count"),
             total_liquidity=d.pop("total_liquidity"),
             trend_history=cast(list[float], d.pop("trend_history")),
             company_name=_parse_company_name(d.pop("company_name", UNSET)),

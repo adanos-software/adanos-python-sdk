@@ -5,10 +5,11 @@ import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
-from ...models.compare_response import CompareResponse
 from ...models.error_response import ErrorResponse
 from ...models.historical_limit_error import HistoricalLimitError
 from ...models.http_validation_error import HTTPValidationError
+from ...models.rate_limit_error import RateLimitError
+from ...models.x_compare_response import XCompareResponse
 from ...types import UNSET, Response, Unset
 
 
@@ -17,6 +18,7 @@ def _get_kwargs(
     tickers: str,
     days: int | Unset = 7,
 ) -> dict[str, Any]:
+
     params: dict[str, Any] = {}
 
     params["tickers"] = tickers
@@ -36,16 +38,9 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> (
-    Any
-    | CompareResponse
-    | ErrorResponse
-    | HTTPValidationError
-    | HistoricalLimitError
-    | None
-):
+) -> Any | ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError | XCompareResponse | None:
     if response.status_code == 200:
-        response_200 = CompareResponse.from_dict(response.json())
+        response_200 = XCompareResponse.from_dict(response.json())
 
         return response_200
 
@@ -69,7 +64,7 @@ def _parse_response(
         return response_422
 
     if response.status_code == 429:
-        response_429 = ErrorResponse.from_dict(response.json())
+        response_429 = RateLimitError.from_dict(response.json())
 
         return response_429
 
@@ -81,9 +76,7 @@ def _parse_response(
 
 def _build_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Response[
-    Any | CompareResponse | ErrorResponse | HTTPValidationError | HistoricalLimitError
-]:
+) -> Response[Any | ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError | XCompareResponse]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -97,23 +90,27 @@ def sync_detailed(
     client: AuthenticatedClient,
     tickers: str,
     days: int | Unset = 7,
-) -> Response[
-    Any | CompareResponse | ErrorResponse | HTTPValidationError | HistoricalLimitError
-]:
-    """Compare multiple stocks on X/Twitter
+) -> Response[Any | ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError | XCompareResponse]:
+    """Compare stocks
 
-     Compare sentiment metrics for up to 10 stocks side by side using X/Twitter data.
+     Compare up to 10 stocks side by side using X/Twitter metrics over the same UTC calendar-day period.
+
+    Results are sorted by `buzz_score` descending and return the same core watchlist metrics as
+    `/trending`: `trend`, `trend_history`, `mentions`, `unique_tweets`,
+    `sentiment_score`, `bullish_pct`, `bearish_pct`, and `total_upvotes`.
+    Use `/stock/{ticker}` when you need daily trend and top-tweet context for one symbol.
 
     Args:
         tickers (str): Comma-separated list of ticker symbols (e.g., TSLA,NVDA,AMD)
-        days (int | Unset): Time period in days to analyze (1-30 free, 1-90 paid) Default: 7.
+        days (int | Unset): UTC calendar days including the current UTC day so far (1-30 free,
+            1-90 hobby, 1-365 professional) Default: 7.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Any | CompareResponse | ErrorResponse | HTTPValidationError | HistoricalLimitError]
+        Response[Any | ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError | XCompareResponse]
     """
 
     kwargs = _get_kwargs(
@@ -133,28 +130,27 @@ def sync(
     client: AuthenticatedClient,
     tickers: str,
     days: int | Unset = 7,
-) -> (
-    Any
-    | CompareResponse
-    | ErrorResponse
-    | HTTPValidationError
-    | HistoricalLimitError
-    | None
-):
-    """Compare multiple stocks on X/Twitter
+) -> Any | ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError | XCompareResponse | None:
+    """Compare stocks
 
-     Compare sentiment metrics for up to 10 stocks side by side using X/Twitter data.
+     Compare up to 10 stocks side by side using X/Twitter metrics over the same UTC calendar-day period.
+
+    Results are sorted by `buzz_score` descending and return the same core watchlist metrics as
+    `/trending`: `trend`, `trend_history`, `mentions`, `unique_tweets`,
+    `sentiment_score`, `bullish_pct`, `bearish_pct`, and `total_upvotes`.
+    Use `/stock/{ticker}` when you need daily trend and top-tweet context for one symbol.
 
     Args:
         tickers (str): Comma-separated list of ticker symbols (e.g., TSLA,NVDA,AMD)
-        days (int | Unset): Time period in days to analyze (1-30 free, 1-90 paid) Default: 7.
+        days (int | Unset): UTC calendar days including the current UTC day so far (1-30 free,
+            1-90 hobby, 1-365 professional) Default: 7.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Any | CompareResponse | ErrorResponse | HTTPValidationError | HistoricalLimitError
+        Any | ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError | XCompareResponse
     """
 
     return sync_detailed(
@@ -169,23 +165,27 @@ async def asyncio_detailed(
     client: AuthenticatedClient,
     tickers: str,
     days: int | Unset = 7,
-) -> Response[
-    Any | CompareResponse | ErrorResponse | HTTPValidationError | HistoricalLimitError
-]:
-    """Compare multiple stocks on X/Twitter
+) -> Response[Any | ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError | XCompareResponse]:
+    """Compare stocks
 
-     Compare sentiment metrics for up to 10 stocks side by side using X/Twitter data.
+     Compare up to 10 stocks side by side using X/Twitter metrics over the same UTC calendar-day period.
+
+    Results are sorted by `buzz_score` descending and return the same core watchlist metrics as
+    `/trending`: `trend`, `trend_history`, `mentions`, `unique_tweets`,
+    `sentiment_score`, `bullish_pct`, `bearish_pct`, and `total_upvotes`.
+    Use `/stock/{ticker}` when you need daily trend and top-tweet context for one symbol.
 
     Args:
         tickers (str): Comma-separated list of ticker symbols (e.g., TSLA,NVDA,AMD)
-        days (int | Unset): Time period in days to analyze (1-30 free, 1-90 paid) Default: 7.
+        days (int | Unset): UTC calendar days including the current UTC day so far (1-30 free,
+            1-90 hobby, 1-365 professional) Default: 7.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Any | CompareResponse | ErrorResponse | HTTPValidationError | HistoricalLimitError]
+        Response[Any | ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError | XCompareResponse]
     """
 
     kwargs = _get_kwargs(
@@ -203,28 +203,27 @@ async def asyncio(
     client: AuthenticatedClient,
     tickers: str,
     days: int | Unset = 7,
-) -> (
-    Any
-    | CompareResponse
-    | ErrorResponse
-    | HTTPValidationError
-    | HistoricalLimitError
-    | None
-):
-    """Compare multiple stocks on X/Twitter
+) -> Any | ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError | XCompareResponse | None:
+    """Compare stocks
 
-     Compare sentiment metrics for up to 10 stocks side by side using X/Twitter data.
+     Compare up to 10 stocks side by side using X/Twitter metrics over the same UTC calendar-day period.
+
+    Results are sorted by `buzz_score` descending and return the same core watchlist metrics as
+    `/trending`: `trend`, `trend_history`, `mentions`, `unique_tweets`,
+    `sentiment_score`, `bullish_pct`, `bearish_pct`, and `total_upvotes`.
+    Use `/stock/{ticker}` when you need daily trend and top-tweet context for one symbol.
 
     Args:
         tickers (str): Comma-separated list of ticker symbols (e.g., TSLA,NVDA,AMD)
-        days (int | Unset): Time period in days to analyze (1-30 free, 1-90 paid) Default: 7.
+        days (int | Unset): UTC calendar days including the current UTC day so far (1-30 free,
+            1-90 hobby, 1-365 professional) Default: 7.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Any | CompareResponse | ErrorResponse | HTTPValidationError | HistoricalLimitError
+        Any | ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError | XCompareResponse
     """
 
     return (
