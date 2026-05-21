@@ -5,6 +5,12 @@ All notable changes to the Adanos Python SDK will be documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
+## [2.3.1] - 2026-05-21
+
+### Fixed
+- Handle API 422 validation envelopes where `detail` is a custom object instead of a Pydantic validation list.
+- Preserve unexpected 422 detail payloads without raising parser errors.
+
 ## [2.3.0] - 2026-05-21
 
 ### Added
