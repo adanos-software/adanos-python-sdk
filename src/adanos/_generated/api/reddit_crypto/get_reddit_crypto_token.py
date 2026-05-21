@@ -16,7 +16,7 @@ from ...types import UNSET, Response, Unset
 def _get_kwargs(
     symbol: str,
     *,
-    days: int | Unset = 7,
+    days: int | Unset = UNSET,
     from_: str | Unset = UNSET,
     to: str | Unset = UNSET,
 ) -> dict[str, Any]:
@@ -107,7 +107,7 @@ def sync_detailed(
     symbol: str,
     *,
     client: AuthenticatedClient,
-    days: int | Unset = 7,
+    days: int | Unset = UNSET,
     from_: str | Unset = UNSET,
     to: str | Unset = UNSET,
 ) -> Response[
@@ -153,7 +153,7 @@ def sync(
     symbol: str,
     *,
     client: AuthenticatedClient,
-    days: int | Unset = 7,
+    days: int | Unset = UNSET,
     from_: str | Unset = UNSET,
     to: str | Unset = UNSET,
 ) -> (
@@ -195,7 +195,7 @@ async def asyncio_detailed(
     symbol: str,
     *,
     client: AuthenticatedClient,
-    days: int | Unset = 7,
+    days: int | Unset = UNSET,
     from_: str | Unset = UNSET,
     to: str | Unset = UNSET,
 ) -> Response[
@@ -239,7 +239,7 @@ async def asyncio(
     symbol: str,
     *,
     client: AuthenticatedClient,
-    days: int | Unset = 7,
+    days: int | Unset = UNSET,
     from_: str | Unset = UNSET,
     to: str | Unset = UNSET,
 ) -> (

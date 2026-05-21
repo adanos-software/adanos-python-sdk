@@ -13,6 +13,7 @@ if str(SDK_SRC) not in sys.path:
     sys.path.insert(0, str(SDK_SRC))
 
 from adanos import AdanosClient, StockSentimentClient  # noqa: E402
+from adanos._generated.api.reddit_stocks import get_stock_sentiment as generated_get_stock_sentiment  # noqa: E402
 from adanos._generated.errors import UnexpectedStatus  # noqa: E402
 
 BASE_URL = "https://api.adanos.org"
@@ -1223,6 +1224,21 @@ class TestPeriodParams:
         assert request_params(crypto_route)["from"] == "2026-05-01"
         assert request_params(crypto_route)["to"] == "2026-05-07"
         assert request_params(crypto_route)["symbols"] == "BTC,ETH"
+
+    @respx.mock
+    def test_generated_from_to_does_not_send_default_days(self, client):
+        route = respx.get(f"{BASE_URL}/reddit/stocks/v1/stock/TSLA").mock(
+            return_value=httpx.Response(200, json=STOCK_SENTIMENT)
+        )
+
+        generated_get_stock_sentiment.sync(
+            "TSLA",
+            client=client._client,
+            from_="2026-05-01",
+            to="2026-05-07",
+        )
+
+        assert request_params(route) == {"from": "2026-05-01", "to": "2026-05-07"}
 
 
 # --- Context manager ---

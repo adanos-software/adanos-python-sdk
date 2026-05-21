@@ -15,7 +15,7 @@ from ...types import UNSET, Response, Unset
 
 def _get_kwargs(
     *,
-    days: int | Unset = 1,
+    days: int | Unset = UNSET,
     from_: str | Unset = UNSET,
     to: str | Unset = UNSET,
     limit: int | Unset = 20,
@@ -115,7 +115,7 @@ def _build_response(
 def sync_detailed(
     *,
     client: AuthenticatedClient,
-    days: int | Unset = 1,
+    days: int | Unset = UNSET,
     from_: str | Unset = UNSET,
     to: str | Unset = UNSET,
     limit: int | Unset = 20,
@@ -184,7 +184,7 @@ def sync_detailed(
 def sync(
     *,
     client: AuthenticatedClient,
-    days: int | Unset = 1,
+    days: int | Unset = UNSET,
     from_: str | Unset = UNSET,
     to: str | Unset = UNSET,
     limit: int | Unset = 20,
@@ -252,7 +252,7 @@ def sync(
 async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
-    days: int | Unset = 1,
+    days: int | Unset = UNSET,
     from_: str | Unset = UNSET,
     to: str | Unset = UNSET,
     limit: int | Unset = 20,
@@ -319,7 +319,7 @@ async def asyncio_detailed(
 async def asyncio(
     *,
     client: AuthenticatedClient,
-    days: int | Unset = 1,
+    days: int | Unset = UNSET,
     from_: str | Unset = UNSET,
     to: str | Unset = UNSET,
     limit: int | Unset = 20,
