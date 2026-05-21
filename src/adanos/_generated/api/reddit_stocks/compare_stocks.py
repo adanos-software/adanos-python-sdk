@@ -16,12 +16,18 @@ def _get_kwargs(
     *,
     tickers: str,
     days: int | Unset = 7,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
 ) -> dict[str, Any]:
     params: dict[str, Any] = {}
 
     params["tickers"] = tickers
 
     params["days"] = days
+
+    params["from"] = from_
+
+    params["to"] = to
 
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
@@ -97,6 +103,8 @@ def sync_detailed(
     client: AuthenticatedClient,
     tickers: str,
     days: int | Unset = 7,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
 ) -> Response[
     Any | CompareResponse | ErrorResponse | HTTPValidationError | HistoricalLimitError
 ]:
@@ -106,6 +114,8 @@ def sync_detailed(
 
     Args:
         tickers (str): Comma-separated list of ticker symbols (e.g., TSLA,NVDA,AMD)
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Time period in days to analyze (1-30 free, 1-90 paid) Default: 7.
 
     Raises:
@@ -119,6 +129,8 @@ def sync_detailed(
     kwargs = _get_kwargs(
         tickers=tickers,
         days=days,
+        from_=from_,
+        to=to,
     )
 
     response = client.get_httpx_client().request(
@@ -133,6 +145,8 @@ def sync(
     client: AuthenticatedClient,
     tickers: str,
     days: int | Unset = 7,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
 ) -> (
     Any
     | CompareResponse
@@ -147,6 +161,8 @@ def sync(
 
     Args:
         tickers (str): Comma-separated list of ticker symbols (e.g., TSLA,NVDA,AMD)
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Time period in days to analyze (1-30 free, 1-90 paid) Default: 7.
 
     Raises:
@@ -161,6 +177,8 @@ def sync(
         client=client,
         tickers=tickers,
         days=days,
+        from_=from_,
+        to=to,
     ).parsed
 
 
@@ -169,6 +187,8 @@ async def asyncio_detailed(
     client: AuthenticatedClient,
     tickers: str,
     days: int | Unset = 7,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
 ) -> Response[
     Any | CompareResponse | ErrorResponse | HTTPValidationError | HistoricalLimitError
 ]:
@@ -178,6 +198,8 @@ async def asyncio_detailed(
 
     Args:
         tickers (str): Comma-separated list of ticker symbols (e.g., TSLA,NVDA,AMD)
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Time period in days to analyze (1-30 free, 1-90 paid) Default: 7.
 
     Raises:
@@ -191,6 +213,8 @@ async def asyncio_detailed(
     kwargs = _get_kwargs(
         tickers=tickers,
         days=days,
+        from_=from_,
+        to=to,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -203,6 +227,8 @@ async def asyncio(
     client: AuthenticatedClient,
     tickers: str,
     days: int | Unset = 7,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
 ) -> (
     Any
     | CompareResponse
@@ -217,6 +243,8 @@ async def asyncio(
 
     Args:
         tickers (str): Comma-separated list of ticker symbols (e.g., TSLA,NVDA,AMD)
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Time period in days to analyze (1-30 free, 1-90 paid) Default: 7.
 
     Raises:
@@ -232,5 +260,7 @@ async def asyncio(
             client=client,
             tickers=tickers,
             days=days,
+        from_=from_,
+        to=to,
         )
     ).parsed

@@ -221,10 +221,9 @@ NEWS_TRENDING_COUNTRY = {
 NEWS_STATS = {
     "total_mentions": 1855,
     "unique_tickers": 766,
-    "tickers": ["NVDA", "AAPL", "MSFT"],
+    "mentions_today": 91,
+    "unique_tickers_today": 34,
     "supported_tickers": 11800,
-    "days_covered": 30,
-    "last_updated": "2026-03-07T08:36:07Z",
 }
 
 EXPLAIN_RESPONSE = {
@@ -489,6 +488,14 @@ class TestRedditStock:
         assert request_params(route)["days"] == "14"
 
     @respx.mock
+    def test_stock_with_from_to(self, client):
+        route = respx.get(f"{BASE_URL}/reddit/stocks/v1/stock/TSLA").mock(
+            return_value=httpx.Response(200, json=STOCK_SENTIMENT)
+        )
+        client.reddit.stock("TSLA", from_="2026-05-01", to="2026-05-07")
+        assert request_params(route) == {"from": "2026-05-01", "to": "2026-05-07"}
+
+    @respx.mock
     def test_mentions(self, client):
         route = respx.get(f"{BASE_URL}/reddit/stocks/v1/stock/TSLA/mentions").mock(
             return_value=httpx.Response(
@@ -619,7 +626,7 @@ class TestNews:
         assert result.ticker == "TSLA"
         assert result.mentions == 342
         assert "total_mentions" not in result.to_dict()
-        assert request_params(route) == {"days": "7"}
+        assert request_params(route) == {}
 
     @respx.mock
     def test_news_mentions(self, client):
@@ -1064,7 +1071,7 @@ class TestXMarketSentiment:
         )
         result = client.x.market_sentiment()
         assert route.called
-        assert request_params(route)["days"] == "1"
+        assert request_params(route) == {}
         assert result.unique_authors == 604
 
 
@@ -1184,6 +1191,38 @@ class TestPolymarketMarketSentiment:
         assert request_params(route)["days"] == "2"
         assert result.current_market_count == 64
         assert result.drivers[0].trade_count == 52
+
+
+class TestPeriodParams:
+    @respx.mock
+    def test_from_to_serializes_across_services(self, client):
+        news_route = respx.get(f"{BASE_URL}/news/stocks/v1/trending").mock(
+            return_value=httpx.Response(200, json=[TRENDING_STOCK])
+        )
+        x_route = respx.get(f"{BASE_URL}/x/stocks/v1/search").mock(
+            return_value=httpx.Response(200, json=X_SEARCH_RESPONSE)
+        )
+        polymarket_route = respx.get(f"{BASE_URL}/polymarket/stocks/v1/market-sentiment").mock(
+            return_value=httpx.Response(200, json=POLYMARKET_MARKET_SENTIMENT)
+        )
+        crypto_route = respx.get(f"{BASE_URL}/reddit/crypto/v1/compare").mock(
+            return_value=httpx.Response(200, json=CRYPTO_COMPARE)
+        )
+
+        client.news.trending(from_="2026-05-01", to="2026-05-07", limit=3)
+        client.x.search("NVDA", from_="2026-05-01", to="2026-05-07")
+        client.polymarket.market_sentiment(from_="2026-05-01", to="2026-05-07")
+        client.crypto.compare(["BTC", "ETH"], from_="2026-05-01", to="2026-05-07")
+
+        assert request_params(news_route)["from"] == "2026-05-01"
+        assert request_params(news_route)["to"] == "2026-05-07"
+        assert "days" not in request_params(news_route)
+        assert request_params(x_route)["from"] == "2026-05-01"
+        assert request_params(x_route)["to"] == "2026-05-07"
+        assert request_params(polymarket_route) == {"from": "2026-05-01", "to": "2026-05-07"}
+        assert request_params(crypto_route)["from"] == "2026-05-01"
+        assert request_params(crypto_route)["to"] == "2026-05-07"
+        assert request_params(crypto_route)["symbols"] == "BTC,ETH"
 
 
 # --- Context manager ---
@@ -1329,7 +1368,8 @@ CRYPTO_SEARCH = {
 CRYPTO_STATS = {
     "total_mentions": 18352,
     "unique_tokens": 142,
-    "tokens": ["BTC", "ETH", "SOL"],
+    "mentions_today": 11,
+    "unique_tokens_today": 4,
     "supported_tokens": 500,
 }
 
@@ -1343,9 +1383,9 @@ POLYMARKET_HEALTH = {
     "total_mentions": 400,
     "tickers_tracked": 50,
 }
-X_STATS = {"total_appearances": 935, "unique_tickers": 100, "tickers": ["TSLA"], "supported_tickers": 11800, "validation_rate": 37.5}
-POLYMARKET_STATS = {"total_trades": 15420, "total_markets": 713, "unique_tickers": 119, "tickers": ["AAPL"], "supported_tickers": 11800}
-REDDIT_STATS = {"total_mentions": 12833, "unique_tickers": 65, "tickers": ["AAPL"], "supported_tickers": 11800}
+X_STATS = {"total_mentions": 935, "unique_tickers": 100, "mentions_today": 25, "unique_tickers_today": 8, "supported_tickers": 11800}
+POLYMARKET_STATS = {"total_trades": 15420, "total_markets": 713, "unique_tickers": 119, "trades_today": 55, "unique_tickers_today": 12, "supported_tickers": 11800}
+REDDIT_STATS = {"total_mentions": 12833, "unique_tickers": 65, "mentions_today": 342, "unique_tickers_today": 21, "supported_tickers": 11800}
 CRYPTO_MARKET_SENTIMENT = {
     "buzz_score": 52.4,
     "trend": "rising",
@@ -1471,6 +1511,7 @@ class TestCryptoNamespace:
         result = client.crypto.stats()
         assert route.called
         assert result.unique_tokens == 142
+        assert "tokens" not in result.to_dict()
 
 
 class TestStatsAndHealth:
@@ -1491,6 +1532,8 @@ class TestStatsAndHealth:
         result = client.x.stats()
         assert route.called
         assert result.unique_tickers == 100
+        assert result.total_mentions == 935
+        assert "total_appearances" not in result.to_dict()
 
     @respx.mock
     def test_polymarket_stats(self, client):
@@ -1500,6 +1543,8 @@ class TestStatsAndHealth:
         result = client.polymarket.stats()
         assert route.called
         assert result.total_markets == 713
+        assert result.trades_today == 55
+        assert "tickers" not in result.to_dict()
 
     @respx.mock
     def test_all_health_endpoints(self, client):

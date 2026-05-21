@@ -16,11 +16,17 @@ from ...types import UNSET, Response, Unset
 def _get_kwargs(
     *,
     days: int | Unset = 1,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
 ) -> dict[str, Any]:
 
     params: dict[str, Any] = {}
 
     params["days"] = days
+
+    params["from"] = from_
+
+    params["to"] = to
 
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
@@ -84,6 +90,8 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     days: int | Unset = 1,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
 ) -> Response[
     CryptoMarketSentimentResponse | ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError
 ]:
@@ -110,6 +118,8 @@ def sync_detailed(
     Use `sentiment_score`, `bullish_pct`, and `bearish_pct` for direction.
 
     Args:
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): UTC calendar days including the current UTC day so far (1-30 free,
             1-90 hobby, 1-365 professional) Default: 1.
 
@@ -123,6 +133,8 @@ def sync_detailed(
 
     kwargs = _get_kwargs(
         days=days,
+        from_=from_,
+        to=to,
     )
 
     response = client.get_httpx_client().request(
@@ -136,6 +148,8 @@ def sync(
     *,
     client: AuthenticatedClient,
     days: int | Unset = 1,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
 ) -> CryptoMarketSentimentResponse | ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError | None:
     """Market Sentiment
 
@@ -160,6 +174,8 @@ def sync(
     Use `sentiment_score`, `bullish_pct`, and `bearish_pct` for direction.
 
     Args:
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): UTC calendar days including the current UTC day so far (1-30 free,
             1-90 hobby, 1-365 professional) Default: 1.
 
@@ -174,6 +190,8 @@ def sync(
     return sync_detailed(
         client=client,
         days=days,
+        from_=from_,
+        to=to,
     ).parsed
 
 
@@ -181,6 +199,8 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     days: int | Unset = 1,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
 ) -> Response[
     CryptoMarketSentimentResponse | ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError
 ]:
@@ -207,6 +227,8 @@ async def asyncio_detailed(
     Use `sentiment_score`, `bullish_pct`, and `bearish_pct` for direction.
 
     Args:
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): UTC calendar days including the current UTC day so far (1-30 free,
             1-90 hobby, 1-365 professional) Default: 1.
 
@@ -220,6 +242,8 @@ async def asyncio_detailed(
 
     kwargs = _get_kwargs(
         days=days,
+        from_=from_,
+        to=to,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -231,6 +255,8 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     days: int | Unset = 1,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
 ) -> CryptoMarketSentimentResponse | ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError | None:
     """Market Sentiment
 
@@ -255,6 +281,8 @@ async def asyncio(
     Use `sentiment_score`, `bullish_pct`, and `bearish_pct` for direction.
 
     Args:
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): UTC calendar days including the current UTC day so far (1-30 free,
             1-90 hobby, 1-365 professional) Default: 1.
 
@@ -270,5 +298,7 @@ async def asyncio(
         await asyncio_detailed(
             client=client,
             days=days,
+        from_=from_,
+        to=to,
         )
     ).parsed

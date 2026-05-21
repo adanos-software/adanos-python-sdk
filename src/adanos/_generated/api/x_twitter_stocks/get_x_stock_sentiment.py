@@ -17,10 +17,16 @@ def _get_kwargs(
     ticker: str,
     *,
     days: int | Unset = 7,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
 ) -> dict[str, Any]:
     params: dict[str, Any] = {}
 
     params["days"] = days
+
+    params["from"] = from_
+
+    params["to"] = to
 
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
@@ -102,6 +108,8 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     days: int | Unset = 7,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
 ) -> Response[
     Any
     | ErrorResponse
@@ -126,6 +134,8 @@ def sync_detailed(
 
     Args:
         ticker (str): Stock ticker symbol (e.g., TSLA, $AAPL)
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Days of history to analyze (1-30 free, 1-90 paid) Default: 7.
 
     Raises:
@@ -139,6 +149,8 @@ def sync_detailed(
     kwargs = _get_kwargs(
         ticker=ticker,
         days=days,
+        from_=from_,
+        to=to,
     )
 
     response = client.get_httpx_client().request(
@@ -153,6 +165,8 @@ def sync(
     *,
     client: AuthenticatedClient,
     days: int | Unset = 7,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
 ) -> (
     Any
     | ErrorResponse
@@ -178,6 +192,8 @@ def sync(
 
     Args:
         ticker (str): Stock ticker symbol (e.g., TSLA, $AAPL)
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Days of history to analyze (1-30 free, 1-90 paid) Default: 7.
 
     Raises:
@@ -192,6 +208,8 @@ def sync(
         ticker=ticker,
         client=client,
         days=days,
+        from_=from_,
+        to=to,
     ).parsed
 
 
@@ -200,6 +218,8 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     days: int | Unset = 7,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
 ) -> Response[
     Any
     | ErrorResponse
@@ -224,6 +244,8 @@ async def asyncio_detailed(
 
     Args:
         ticker (str): Stock ticker symbol (e.g., TSLA, $AAPL)
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Days of history to analyze (1-30 free, 1-90 paid) Default: 7.
 
     Raises:
@@ -237,6 +259,8 @@ async def asyncio_detailed(
     kwargs = _get_kwargs(
         ticker=ticker,
         days=days,
+        from_=from_,
+        to=to,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -249,6 +273,8 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     days: int | Unset = 7,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
 ) -> (
     Any
     | ErrorResponse
@@ -274,6 +300,8 @@ async def asyncio(
 
     Args:
         ticker (str): Stock ticker symbol (e.g., TSLA, $AAPL)
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Days of history to analyze (1-30 free, 1-90 paid) Default: 7.
 
     Raises:
@@ -289,5 +317,7 @@ async def asyncio(
             ticker=ticker,
             client=client,
             days=days,
+        from_=from_,
+        to=to,
         )
     ).parsed

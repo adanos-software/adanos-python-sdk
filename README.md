@@ -34,8 +34,8 @@ from adanos import AdanosClient
 
 client = AdanosClient(api_key="sk_live_...")
 
-trending = client.reddit.trending(days=7, limit=10)
-tsla = client.reddit.stock("TSLA", days=14)
+trending = client.reddit.trending(limit=10)
+tsla = client.reddit.stock("TSLA")
 explanation = client.reddit.explain("TSLA")
 
 print(trending[0].ticker)
@@ -73,14 +73,14 @@ from adanos import AdanosClient
 client = AdanosClient(api_key="sk_live_...")
 
 root_health = client.health()
-trending = client.reddit.trending(days=7, limit=10)
-sectors = client.reddit.trending_sectors(days=7, limit=10)
-countries = client.reddit.trending_countries(days=7, limit=10)
-tsla = client.reddit.stock("TSLA", days=14)
+trending = client.reddit.trending(limit=10)
+sectors = client.reddit.trending_sectors(limit=10)
+countries = client.reddit.trending_countries(limit=10)
+tsla = client.reddit.stock("TSLA")
 explanation = client.reddit.explain("TSLA")
-results = client.reddit.search("Tesla", days=7, limit=10)
-comparison = client.reddit.compare(["TSLA", "AAPL", "MSFT"], days=7)
-market = client.reddit.market_sentiment(days=7)
+results = client.reddit.search("Tesla", limit=10)
+comparison = client.reddit.compare(["TSLA", "AAPL", "MSFT"])
+market = client.reddit.market_sentiment()
 ```
 
 ### News
@@ -90,14 +90,14 @@ from adanos import AdanosClient
 
 client = AdanosClient(api_key="sk_live_...")
 
-news_trending = client.news.trending(days=7, source="reuters")
-sectors = client.news.trending_sectors(days=7, source="reuters")
-countries = client.news.trending_countries(days=7, source="reuters")
-nvda = client.news.stock("NVDA", days=7)
+news_trending = client.news.trending(source="reuters")
+sectors = client.news.trending_sectors(source="reuters")
+countries = client.news.trending_countries(source="reuters")
+nvda = client.news.stock("NVDA")
 explanation = client.news.explain("NVDA")
-results = client.news.search("Nvidia", days=7, limit=10)
-comparison = client.news.compare(["NVDA", "AAPL"], days=7)
-market = client.news.market_sentiment(days=7)
+results = client.news.search("Nvidia", limit=10)
+comparison = client.news.compare(["NVDA", "AAPL"])
+market = client.news.market_sentiment()
 stats = client.news.stats()
 health = client.news.health()
 ```
@@ -109,14 +109,14 @@ from adanos import AdanosClient
 
 client = AdanosClient(api_key="sk_live_...")
 
-x_trending = client.x.trending(days=1, limit=20)
-sectors = client.x.trending_sectors(days=1, limit=10)
-countries = client.x.trending_countries(days=1, limit=10)
+x_trending = client.x.trending(limit=20)
+sectors = client.x.trending_sectors(limit=10)
+countries = client.x.trending_countries(limit=10)
 nvda = client.x.stock("NVDA")
 explanation = client.x.explain("NVDA")
-results = client.x.search("Nvidia", days=7, limit=10)
-comparison = client.x.compare(["NVDA", "AMD"], days=7)
-market = client.x.market_sentiment(days=7)
+results = client.x.search("Nvidia", limit=10)
+comparison = client.x.compare(["NVDA", "AMD"])
+market = client.x.market_sentiment()
 stats = client.x.stats()
 health = client.x.health()
 ```
@@ -128,20 +128,20 @@ from adanos import AdanosClient
 
 client = AdanosClient(api_key="sk_live_...")
 
-pm_trending = client.polymarket.trending(days=7, limit=20, type="stock")
-sectors = client.polymarket.trending_sectors(days=7, limit=10)
-countries = client.polymarket.trending_countries(days=7, limit=10)
+pm_trending = client.polymarket.trending(limit=20, type="stock")
+sectors = client.polymarket.trending_sectors(limit=10)
+countries = client.polymarket.trending_countries(limit=10)
 aapl = client.polymarket.stock("AAPL")
-results = client.polymarket.search("Apple", days=7, limit=10)
-comparison = client.polymarket.compare(["AAPL", "TSLA"], days=7)
-market = client.polymarket.market_sentiment(days=7)
+results = client.polymarket.search("Apple", limit=10)
+comparison = client.polymarket.compare(["AAPL", "TSLA"])
+market = client.polymarket.market_sentiment()
 stats = client.polymarket.stats()
 health = client.polymarket.health()
 ```
 
 Polymarket semantics:
 - `buzz_score` is activity-first and optimized for current market attention
-- `total_liquidity` is a windowed signal over the selected `days`
+- `total_liquidity` is a windowed signal over the selected period
 - `current_market_count` is the live-only active-market breadth; `market_count` remains the selected-window breadth
 - `top_mentions` on `stock()` are relevance-sorted by trading activity first
 
@@ -152,11 +152,12 @@ from adanos import AdanosClient
 
 client = AdanosClient(api_key="sk_live_...")
 
-trending = client.crypto.trending(days=7, limit=20)
-btc = client.crypto.token("BTC", days=14)
-results = client.crypto.search("bitcoin", days=7, limit=10)
-comparison = client.crypto.compare(["BTC", "ETH"], days=7)
-market = client.crypto.market_sentiment(days=7)
+trending = client.crypto.trending(limit=20)
+btc = client.crypto.token("BTC")
+mentions = client.crypto.mentions("BTC", from_="2026-05-01", to="2026-05-07", limit=10, offset=10)
+results = client.crypto.search("bitcoin", limit=10)
+comparison = client.crypto.compare(["BTC", "ETH"])
+market = client.crypto.market_sentiment()
 stats = client.crypto.stats()
 health = client.crypto.health()
 ```
@@ -173,31 +174,33 @@ health = client.crypto.health()
 
 | Method | Description |
 |--------|-------------|
-| `trending(days, limit, offset, type)` | Trending stocks by buzz score |
-| `trending_sectors(days, limit, offset)` | Trending sectors |
-| `trending_countries(days, limit, offset)` | Trending countries |
-| `stock(ticker, days)` | Detailed sentiment for a ticker |
-| `mentions(ticker, days, limit, offset, include_inherited)` | Raw Reddit mention rows |
+| `trending(from_, to, days, limit, offset, type)` | Trending stocks by buzz score |
+| `trending_sectors(from_, to, days, limit, offset)` | Trending sectors |
+| `trending_countries(from_, to, days, limit, offset)` | Trending countries |
+| `stock(ticker, from_, to, days)` | Detailed sentiment for a ticker |
+| `mentions(ticker, from_, to, days, limit, offset, include_inherited)` | Raw Reddit mention rows |
 | `explain(ticker)` | AI-generated trend explanation |
-| `search(query, days, limit)` | Search stocks by name or ticker with a summary block |
-| `compare(tickers, days)` | Compare up to 10 stocks |
-| `market_sentiment(days)` | Service-level Reddit market sentiment snapshot |
+| `search(query, from_, to, days, limit)` | Search stocks by name or ticker with a summary block |
+| `compare(tickers, from_, to, days)` | Compare up to 10 stocks |
+| `market_sentiment(from_, to, days)` | Service-level Reddit market sentiment snapshot |
 | `stats()` | Dataset statistics |
 | `health()` | Public service health |
+
+Period options: use `from_` and `to` as `YYYY-MM-DD` inclusive UTC dates for reproducible windows. The SDK serializes `from_` as query parameter `from`. `days` remains available as a legacy v1-compatible shorthand. The API returns `422` if `from`, `to`, and `days` are all sent together. Responses keep `period_days`; retain requested dates client-side if you need them later.
 
 ### `client.news.*`
 
 | Method | Description |
 |--------|-------------|
-| `trending(days, limit, offset, type, source)` | Trending stocks from news |
-| `trending_sectors(days, limit, offset, source)` | Trending sectors from news |
-| `trending_countries(days, limit, offset, source)` | Trending countries from news |
-| `stock(ticker, days)` | Detailed news sentiment for a ticker |
-| `mentions(ticker, days, limit, offset)` | Raw news mention rows |
+| `trending(from_, to, days, limit, offset, type, source)` | Trending stocks from news |
+| `trending_sectors(from_, to, days, limit, offset, source)` | Trending sectors from news |
+| `trending_countries(from_, to, days, limit, offset, source)` | Trending countries from news |
+| `stock(ticker, from_, to, days)` | Detailed news sentiment for a ticker |
+| `mentions(ticker, from_, to, days, limit, offset)` | Raw news mention rows |
 | `explain(ticker)` | AI-generated explanation from news context |
-| `search(query, days, limit)` | Search stocks in the news dataset with a summary block |
-| `compare(tickers, days)` | Compare up to 10 stocks in news |
-| `market_sentiment(days)` | Service-level News market sentiment snapshot |
+| `search(query, from_, to, days, limit)` | Search stocks in the news dataset with a summary block |
+| `compare(tickers, from_, to, days)` | Compare up to 10 stocks in news |
+| `market_sentiment(from_, to, days)` | Service-level News market sentiment snapshot |
 | `stats()` | News dataset statistics |
 | `health()` | Public news service health |
 
@@ -205,15 +208,15 @@ health = client.crypto.health()
 
 | Method | Description |
 |--------|-------------|
-| `trending(days, limit, offset, type)` | Trending stocks on X/Twitter |
-| `trending_sectors(days, limit, offset)` | Trending sectors |
-| `trending_countries(days, limit, offset)` | Trending countries |
-| `stock(ticker, days)` | Detailed X/Twitter sentiment |
-| `mentions(ticker, days, limit, offset)` | Raw X/Twitter mention rows |
+| `trending(from_, to, days, limit, offset, type)` | Trending stocks on X/Twitter |
+| `trending_sectors(from_, to, days, limit, offset)` | Trending sectors |
+| `trending_countries(from_, to, days, limit, offset)` | Trending countries |
+| `stock(ticker, from_, to, days)` | Detailed X/Twitter sentiment |
+| `mentions(ticker, from_, to, days, limit, offset)` | Raw X/Twitter mention rows |
 | `explain(ticker)` | AI-generated explanation from X/Twitter context |
-| `search(query, days, limit)` | Search stocks with a summary block |
-| `compare(tickers, days)` | Compare stocks |
-| `market_sentiment(days)` | Service-level X/Twitter market sentiment snapshot |
+| `search(query, from_, to, days, limit)` | Search stocks with a summary block |
+| `compare(tickers, from_, to, days)` | Compare stocks |
+| `market_sentiment(from_, to, days)` | Service-level X/Twitter market sentiment snapshot |
 | `stats()` | Dataset statistics |
 | `health()` | Public service health |
 
@@ -221,14 +224,14 @@ health = client.crypto.health()
 
 | Method | Description |
 |--------|-------------|
-| `trending(days, limit, offset, type)` | Trending stocks on Polymarket with activity-first buzz and windowed liquidity |
-| `trending_sectors(days, limit, offset)` | Trending sectors |
-| `trending_countries(days, limit, offset)` | Trending countries |
-| `stock(ticker, days)` | Detailed Polymarket activity, sentiment, and relevance-sorted market questions |
-| `mentions(ticker, days, limit, offset)` | Raw Polymarket market snapshots |
-| `search(query, days, limit)` | Search stocks with a summary block |
-| `compare(tickers, days)` | Compare stocks with windowed Polymarket activity signals |
-| `market_sentiment(days)` | Service-level Polymarket market sentiment snapshot |
+| `trending(from_, to, days, limit, offset, type)` | Trending stocks on Polymarket with activity-first buzz and windowed liquidity |
+| `trending_sectors(from_, to, days, limit, offset)` | Trending sectors |
+| `trending_countries(from_, to, days, limit, offset)` | Trending countries |
+| `stock(ticker, from_, to, days)` | Detailed Polymarket activity, sentiment, and relevance-sorted market questions |
+| `mentions(ticker, from_, to, days, limit, offset)` | Raw Polymarket market snapshots |
+| `search(query, from_, to, days, limit)` | Search stocks with a summary block |
+| `compare(tickers, from_, to, days)` | Compare stocks with windowed Polymarket activity signals |
+| `market_sentiment(from_, to, days)` | Service-level Polymarket market sentiment snapshot |
 | `stats()` | Dataset statistics |
 | `health()` | Public service health |
 
@@ -236,12 +239,12 @@ health = client.crypto.health()
 
 | Method | Description |
 |--------|-------------|
-| `trending(days, limit, offset)` | Trending Reddit crypto tokens |
-| `token(symbol, days)` | Detailed token sentiment and buzz |
-| `mentions(symbol, days, limit, offset, include_inherited)` | Raw Reddit crypto mention rows |
-| `search(query, days, limit)` | Search tokens by symbol or name with a summary block |
-| `compare(symbols, days)` | Compare multiple tokens |
-| `market_sentiment(days)` | Service-level Reddit Crypto market sentiment snapshot |
+| `trending(from_, to, days, limit, offset)` | Trending Reddit crypto tokens |
+| `token(symbol, from_, to, days)` | Detailed token sentiment and buzz |
+| `mentions(symbol, from_, to, days, limit, offset, include_inherited)` | Raw Reddit crypto mention rows |
+| `search(query, from_, to, days, limit)` | Search tokens by symbol or name with a summary block |
+| `compare(symbols, from_, to, days)` | Compare multiple tokens |
+| `market_sentiment(from_, to, days)` | Service-level Reddit Crypto market sentiment snapshot |
 | `stats()` | Dataset statistics |
 | `health()` | Public service health |
 
@@ -257,7 +260,7 @@ from adanos import AdanosClient
 
 async def main() -> None:
     async with AdanosClient(api_key="sk_live_...") as client:
-        trending = await client.reddit.trending_async(days=7)
+        trending = await client.reddit.trending_async(limit=10)
         tsla = await client.reddit.stock_async("TSLA")
         explanation = await client.news.explain_async("NVDA")
         print(trending[0].ticker)

@@ -18,6 +18,8 @@ from ...types import UNSET, Response, Unset
 def _get_kwargs(
     *,
     days: int | Unset = 1,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
     limit: int | Unset = 20,
     offset: int | Unset = 0,
     type_: GetPolymarketTrendingStocksTypeType0 | None | Unset = UNSET,
@@ -25,6 +27,10 @@ def _get_kwargs(
     params: dict[str, Any] = {}
 
     params["days"] = days
+
+    params["from"] = from_
+
+    params["to"] = to
 
     params["limit"] = limit
 
@@ -117,6 +123,8 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     days: int | Unset = 1,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
     limit: int | Unset = 20,
     offset: int | Unset = 0,
     type_: GetPolymarketTrendingStocksTypeType0 | None | Unset = UNSET,
@@ -131,6 +139,8 @@ def sync_detailed(
      Get trending stocks based on Polymarket market activity.
 
     Args:
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Time period in days (1-30 free, 1-90 paid) Default: 1.
         limit (int | Unset): Maximum stocks to return Default: 20.
         offset (int | Unset): Number of items to skip Default: 0.
@@ -147,6 +157,8 @@ def sync_detailed(
 
     kwargs = _get_kwargs(
         days=days,
+        from_=from_,
+        to=to,
         limit=limit,
         offset=offset,
         type_=type_,
@@ -163,6 +175,8 @@ def sync(
     *,
     client: AuthenticatedClient,
     days: int | Unset = 1,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
     limit: int | Unset = 20,
     offset: int | Unset = 0,
     type_: GetPolymarketTrendingStocksTypeType0 | None | Unset = UNSET,
@@ -178,6 +192,8 @@ def sync(
      Get trending stocks based on Polymarket market activity.
 
     Args:
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Time period in days (1-30 free, 1-90 paid) Default: 1.
         limit (int | Unset): Maximum stocks to return Default: 20.
         offset (int | Unset): Number of items to skip Default: 0.
@@ -195,6 +211,8 @@ def sync(
     return sync_detailed(
         client=client,
         days=days,
+        from_=from_,
+        to=to,
         limit=limit,
         offset=offset,
         type_=type_,
@@ -205,6 +223,8 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     days: int | Unset = 1,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
     limit: int | Unset = 20,
     offset: int | Unset = 0,
     type_: GetPolymarketTrendingStocksTypeType0 | None | Unset = UNSET,
@@ -219,6 +239,8 @@ async def asyncio_detailed(
      Get trending stocks based on Polymarket market activity.
 
     Args:
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Time period in days (1-30 free, 1-90 paid) Default: 1.
         limit (int | Unset): Maximum stocks to return Default: 20.
         offset (int | Unset): Number of items to skip Default: 0.
@@ -235,6 +257,8 @@ async def asyncio_detailed(
 
     kwargs = _get_kwargs(
         days=days,
+        from_=from_,
+        to=to,
         limit=limit,
         offset=offset,
         type_=type_,
@@ -249,6 +273,8 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     days: int | Unset = 1,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
     limit: int | Unset = 20,
     offset: int | Unset = 0,
     type_: GetPolymarketTrendingStocksTypeType0 | None | Unset = UNSET,
@@ -264,6 +290,8 @@ async def asyncio(
      Get trending stocks based on Polymarket market activity.
 
     Args:
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Time period in days (1-30 free, 1-90 paid) Default: 1.
         limit (int | Unset): Maximum stocks to return Default: 20.
         offset (int | Unset): Number of items to skip Default: 0.
@@ -282,6 +310,8 @@ async def asyncio(
         await asyncio_detailed(
             client=client,
             days=days,
+        from_=from_,
+        to=to,
             limit=limit,
             offset=offset,
             type_=type_,

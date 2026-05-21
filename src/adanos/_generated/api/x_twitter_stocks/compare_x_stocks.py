@@ -17,6 +17,8 @@ def _get_kwargs(
     *,
     tickers: str,
     days: int | Unset = 7,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
 ) -> dict[str, Any]:
 
     params: dict[str, Any] = {}
@@ -24,6 +26,10 @@ def _get_kwargs(
     params["tickers"] = tickers
 
     params["days"] = days
+
+    params["from"] = from_
+
+    params["to"] = to
 
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
@@ -90,6 +96,8 @@ def sync_detailed(
     client: AuthenticatedClient,
     tickers: str,
     days: int | Unset = 7,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
 ) -> Response[Any | ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError | XCompareResponse]:
     """Compare stocks
 
@@ -102,6 +110,8 @@ def sync_detailed(
 
     Args:
         tickers (str): Comma-separated list of ticker symbols (e.g., TSLA,NVDA,AMD)
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): UTC calendar days including the current UTC day so far (1-30 free,
             1-90 hobby, 1-365 professional) Default: 7.
 
@@ -116,6 +126,8 @@ def sync_detailed(
     kwargs = _get_kwargs(
         tickers=tickers,
         days=days,
+        from_=from_,
+        to=to,
     )
 
     response = client.get_httpx_client().request(
@@ -130,6 +142,8 @@ def sync(
     client: AuthenticatedClient,
     tickers: str,
     days: int | Unset = 7,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
 ) -> Any | ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError | XCompareResponse | None:
     """Compare stocks
 
@@ -142,6 +156,8 @@ def sync(
 
     Args:
         tickers (str): Comma-separated list of ticker symbols (e.g., TSLA,NVDA,AMD)
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): UTC calendar days including the current UTC day so far (1-30 free,
             1-90 hobby, 1-365 professional) Default: 7.
 
@@ -157,6 +173,8 @@ def sync(
         client=client,
         tickers=tickers,
         days=days,
+        from_=from_,
+        to=to,
     ).parsed
 
 
@@ -165,6 +183,8 @@ async def asyncio_detailed(
     client: AuthenticatedClient,
     tickers: str,
     days: int | Unset = 7,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
 ) -> Response[Any | ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError | XCompareResponse]:
     """Compare stocks
 
@@ -177,6 +197,8 @@ async def asyncio_detailed(
 
     Args:
         tickers (str): Comma-separated list of ticker symbols (e.g., TSLA,NVDA,AMD)
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): UTC calendar days including the current UTC day so far (1-30 free,
             1-90 hobby, 1-365 professional) Default: 7.
 
@@ -191,6 +213,8 @@ async def asyncio_detailed(
     kwargs = _get_kwargs(
         tickers=tickers,
         days=days,
+        from_=from_,
+        to=to,
     )
 
     response = await client.get_async_httpx_client().request(**kwargs)
@@ -203,6 +227,8 @@ async def asyncio(
     client: AuthenticatedClient,
     tickers: str,
     days: int | Unset = 7,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
 ) -> Any | ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError | XCompareResponse | None:
     """Compare stocks
 
@@ -215,6 +241,8 @@ async def asyncio(
 
     Args:
         tickers (str): Comma-separated list of ticker symbols (e.g., TSLA,NVDA,AMD)
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): UTC calendar days including the current UTC day so far (1-30 free,
             1-90 hobby, 1-365 professional) Default: 7.
 
@@ -231,5 +259,7 @@ async def asyncio(
             client=client,
             tickers=tickers,
             days=days,
+        from_=from_,
+        to=to,
         )
     ).parsed

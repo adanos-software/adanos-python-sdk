@@ -15,6 +15,8 @@ from ...types import UNSET, Response, Unset
 def _get_kwargs(
     *,
     days: int | Unset = 1,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
     limit: int | Unset = 20,
     offset: int | Unset = 0,
     source: None | str | Unset = UNSET,
@@ -22,6 +24,10 @@ def _get_kwargs(
     params: dict[str, Any] = {}
 
     params["days"] = days
+
+    params["from"] = from_
+
+    params["to"] = to
 
     params["limit"] = limit
 
@@ -116,6 +122,8 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     days: int | Unset = 1,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
     limit: int | Unset = 20,
     offset: int | Unset = 0,
     source: None | str | Unset = UNSET,
@@ -131,6 +139,8 @@ def sync_detailed(
      List trending sectors in the news dataset ranked by aggregated news buzz and sentiment.
 
     Args:
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Time period in days to analyze (1-30 free, 1-90 paid). Default: 1.
         limit (int | Unset): Maximum number of results Default: 20.
         offset (int | Unset): Number of items to skip for pagination Default: 0.
@@ -147,6 +157,8 @@ def sync_detailed(
 
     kwargs = _get_kwargs(
         days=days,
+        from_=from_,
+        to=to,
         limit=limit,
         offset=offset,
         source=source,
@@ -163,6 +175,8 @@ def sync(
     *,
     client: AuthenticatedClient,
     days: int | Unset = 1,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
     limit: int | Unset = 20,
     offset: int | Unset = 0,
     source: None | str | Unset = UNSET,
@@ -179,6 +193,8 @@ def sync(
      List trending sectors in the news dataset ranked by aggregated news buzz and sentiment.
 
     Args:
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Time period in days to analyze (1-30 free, 1-90 paid). Default: 1.
         limit (int | Unset): Maximum number of results Default: 20.
         offset (int | Unset): Number of items to skip for pagination Default: 0.
@@ -196,6 +212,8 @@ def sync(
     return sync_detailed(
         client=client,
         days=days,
+        from_=from_,
+        to=to,
         limit=limit,
         offset=offset,
         source=source,
@@ -206,6 +224,8 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     days: int | Unset = 1,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
     limit: int | Unset = 20,
     offset: int | Unset = 0,
     source: None | str | Unset = UNSET,
@@ -221,6 +241,8 @@ async def asyncio_detailed(
      List trending sectors in the news dataset ranked by aggregated news buzz and sentiment.
 
     Args:
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Time period in days to analyze (1-30 free, 1-90 paid). Default: 1.
         limit (int | Unset): Maximum number of results Default: 20.
         offset (int | Unset): Number of items to skip for pagination Default: 0.
@@ -237,6 +259,8 @@ async def asyncio_detailed(
 
     kwargs = _get_kwargs(
         days=days,
+        from_=from_,
+        to=to,
         limit=limit,
         offset=offset,
         source=source,
@@ -251,6 +275,8 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     days: int | Unset = 1,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
     limit: int | Unset = 20,
     offset: int | Unset = 0,
     source: None | str | Unset = UNSET,
@@ -267,6 +293,8 @@ async def asyncio(
      List trending sectors in the news dataset ranked by aggregated news buzz and sentiment.
 
     Args:
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Time period in days to analyze (1-30 free, 1-90 paid). Default: 1.
         limit (int | Unset): Maximum number of results Default: 20.
         offset (int | Unset): Number of items to skip for pagination Default: 0.
@@ -285,6 +313,8 @@ async def asyncio(
         await asyncio_detailed(
             client=client,
             days=days,
+        from_=from_,
+        to=to,
             limit=limit,
             offset=offset,
             source=source,
