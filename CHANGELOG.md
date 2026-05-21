@@ -5,16 +5,14 @@ All notable changes to the Adanos Python SDK will be documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
-## [3.0.0] - 2026-05-21
-
-### Breaking
-- Updated `/stats` response models for API `1.36.0` compact standardized stats payloads. Removed legacy service-specific stats fields that are no longer returned by the API.
+## [2.3.0] - 2026-05-21
 
 ### Added
 - Synced generated client and wrapper coverage with Adanos Market Sentiment API `1.37.0`.
 - Added `from_` / `to` period options across Reddit Stocks, Reddit Crypto, X/Twitter Stocks, News Stocks, Polymarket Stocks, and raw mention helpers.
 
 ### Changed
+- Updated `/stats` response models for API `1.36.0` compact standardized stats payloads.
 - Documented `days` as a legacy v1-compatible shorthand while keeping it supported.
 
 ## [2.2.0] - 2026-05-19
