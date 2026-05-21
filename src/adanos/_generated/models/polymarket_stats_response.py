@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, cast
+from typing import Any, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -18,10 +18,9 @@ class PolymarketStatsResponse:
     Attributes:
         total_trades (int): Total aggregated trade_count (all time)
         total_markets (int): Distinct Polymarket condition_id count (all time)
-        unique_tickers (int): Distinct tickers in latest snapshot
-        tickers (list[str]): Top 50 ticker symbols from latest snapshot
+        unique_tickers (int): Distinct tickers with indexed market rows
         supported_tickers (int): Ticker count in ticker_reference
-        mentions_today (int | Unset): Polymarket snapshot rows fetched since today's UTC midnight Default: 0.
+        trades_today (int | Unset): Polymarket trades observed since today's UTC midnight Default: 0.
         unique_tickers_today (int | Unset): Unique tickers in Polymarket snapshot rows fetched since today's UTC
             midnight Default: 0.
     """
@@ -29,9 +28,8 @@ class PolymarketStatsResponse:
     total_trades: int
     total_markets: int
     unique_tickers: int
-    tickers: list[str]
     supported_tickers: int
-    mentions_today: int | Unset = 0
+    trades_today: int | Unset = 0
     unique_tickers_today: int | Unset = 0
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
@@ -42,11 +40,9 @@ class PolymarketStatsResponse:
 
         unique_tickers = self.unique_tickers
 
-        tickers = self.tickers
-
         supported_tickers = self.supported_tickers
 
-        mentions_today = self.mentions_today
+        trades_today = self.trades_today
 
         unique_tickers_today = self.unique_tickers_today
 
@@ -57,12 +53,11 @@ class PolymarketStatsResponse:
                 "total_trades": total_trades,
                 "total_markets": total_markets,
                 "unique_tickers": unique_tickers,
-                "tickers": tickers,
                 "supported_tickers": supported_tickers,
             }
         )
-        if mentions_today is not UNSET:
-            field_dict["mentions_today"] = mentions_today
+        if trades_today is not UNSET:
+            field_dict["trades_today"] = trades_today
         if unique_tickers_today is not UNSET:
             field_dict["unique_tickers_today"] = unique_tickers_today
 
@@ -77,11 +72,9 @@ class PolymarketStatsResponse:
 
         unique_tickers = d.pop("unique_tickers")
 
-        tickers = cast(list[str], d.pop("tickers"))
-
         supported_tickers = d.pop("supported_tickers")
 
-        mentions_today = d.pop("mentions_today", UNSET)
+        trades_today = d.pop("trades_today", UNSET)
 
         unique_tickers_today = d.pop("unique_tickers_today", UNSET)
 
@@ -89,9 +82,8 @@ class PolymarketStatsResponse:
             total_trades=total_trades,
             total_markets=total_markets,
             unique_tickers=unique_tickers,
-            tickers=tickers,
             supported_tickers=supported_tickers,
-            mentions_today=mentions_today,
+            trades_today=trades_today,
             unique_tickers_today=unique_tickers_today,
         )
 

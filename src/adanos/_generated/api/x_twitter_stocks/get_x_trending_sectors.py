@@ -14,13 +14,19 @@ from ...types import UNSET, Response, Unset
 
 def _get_kwargs(
     *,
-    days: int | Unset = 1,
+    days: int | Unset = UNSET,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
     limit: int | Unset = 20,
     offset: int | Unset = 0,
 ) -> dict[str, Any]:
     params: dict[str, Any] = {}
 
     params["days"] = days
+
+    params["from"] = from_
+
+    params["to"] = to
 
     params["limit"] = limit
 
@@ -98,7 +104,9 @@ def _build_response(
 def sync_detailed(
     *,
     client: AuthenticatedClient,
-    days: int | Unset = 1,
+    days: int | Unset = UNSET,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
     limit: int | Unset = 20,
     offset: int | Unset = 0,
 ) -> Response[
@@ -122,6 +130,8 @@ def sync_detailed(
     **Pagination**: Use `offset` and `limit` to paginate through results.
 
     Args:
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Time period in days to analyze (1-30 free, 1-90 paid). Default: 1.
         limit (int | Unset): Maximum number of results Default: 20.
         offset (int | Unset): Number of items to skip for pagination Default: 0.
@@ -136,6 +146,8 @@ def sync_detailed(
 
     kwargs = _get_kwargs(
         days=days,
+        from_=from_,
+        to=to,
         limit=limit,
         offset=offset,
     )
@@ -150,7 +162,9 @@ def sync_detailed(
 def sync(
     *,
     client: AuthenticatedClient,
-    days: int | Unset = 1,
+    days: int | Unset = UNSET,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
     limit: int | Unset = 20,
     offset: int | Unset = 0,
 ) -> (
@@ -178,6 +192,8 @@ def sync(
     **Pagination**: Use `offset` and `limit` to paginate through results.
 
     Args:
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Time period in days to analyze (1-30 free, 1-90 paid). Default: 1.
         limit (int | Unset): Maximum number of results Default: 20.
         offset (int | Unset): Number of items to skip for pagination Default: 0.
@@ -193,6 +209,8 @@ def sync(
     return sync_detailed(
         client=client,
         days=days,
+        from_=from_,
+        to=to,
         limit=limit,
         offset=offset,
     ).parsed
@@ -201,7 +219,9 @@ def sync(
 async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
-    days: int | Unset = 1,
+    days: int | Unset = UNSET,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
     limit: int | Unset = 20,
     offset: int | Unset = 0,
 ) -> Response[
@@ -225,6 +245,8 @@ async def asyncio_detailed(
     **Pagination**: Use `offset` and `limit` to paginate through results.
 
     Args:
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Time period in days to analyze (1-30 free, 1-90 paid). Default: 1.
         limit (int | Unset): Maximum number of results Default: 20.
         offset (int | Unset): Number of items to skip for pagination Default: 0.
@@ -239,6 +261,8 @@ async def asyncio_detailed(
 
     kwargs = _get_kwargs(
         days=days,
+        from_=from_,
+        to=to,
         limit=limit,
         offset=offset,
     )
@@ -251,7 +275,9 @@ async def asyncio_detailed(
 async def asyncio(
     *,
     client: AuthenticatedClient,
-    days: int | Unset = 1,
+    days: int | Unset = UNSET,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
     limit: int | Unset = 20,
     offset: int | Unset = 0,
 ) -> (
@@ -279,6 +305,8 @@ async def asyncio(
     **Pagination**: Use `offset` and `limit` to paginate through results.
 
     Args:
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Time period in days to analyze (1-30 free, 1-90 paid). Default: 1.
         limit (int | Unset): Maximum number of results Default: 20.
         offset (int | Unset): Number of items to skip for pagination Default: 0.
@@ -295,6 +323,8 @@ async def asyncio(
         await asyncio_detailed(
             client=client,
             days=days,
+        from_=from_,
+        to=to,
             limit=limit,
             offset=offset,
         )

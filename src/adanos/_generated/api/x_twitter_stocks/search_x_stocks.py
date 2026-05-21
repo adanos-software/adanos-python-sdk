@@ -16,7 +16,9 @@ from ...types import UNSET, Response, Unset
 def _get_kwargs(
     *,
     q: str,
-    days: int | Unset = 7,
+    days: int | Unset = UNSET,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
     limit: int | Unset = 20,
 ) -> dict[str, Any]:
 
@@ -25,6 +27,10 @@ def _get_kwargs(
     params["q"] = q
 
     params["days"] = days
+
+    params["from"] = from_
+
+    params["to"] = to
 
     params["limit"] = limit
 
@@ -88,7 +94,9 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     q: str,
-    days: int | Unset = 7,
+    days: int | Unset = UNSET,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
     limit: int | Unset = 20,
 ) -> Response[ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError | XSearchResponse]:
     """Search stocks
@@ -101,6 +109,8 @@ def sync_detailed(
 
     Args:
         q (str): Search query (minimum 2 non-$ characters after trimming)
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): UTC calendar-day period for each result summary including the current
             UTC day so far (1-30 free, 1-90 hobby, 1-365 professional) Default: 7.
         limit (int | Unset): Maximum number of results to return Default: 20.
@@ -116,6 +126,8 @@ def sync_detailed(
     kwargs = _get_kwargs(
         q=q,
         days=days,
+        from_=from_,
+        to=to,
         limit=limit,
     )
 
@@ -130,7 +142,9 @@ def sync(
     *,
     client: AuthenticatedClient,
     q: str,
-    days: int | Unset = 7,
+    days: int | Unset = UNSET,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
     limit: int | Unset = 20,
 ) -> ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError | XSearchResponse | None:
     """Search stocks
@@ -143,6 +157,8 @@ def sync(
 
     Args:
         q (str): Search query (minimum 2 non-$ characters after trimming)
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): UTC calendar-day period for each result summary including the current
             UTC day so far (1-30 free, 1-90 hobby, 1-365 professional) Default: 7.
         limit (int | Unset): Maximum number of results to return Default: 20.
@@ -159,6 +175,8 @@ def sync(
         client=client,
         q=q,
         days=days,
+        from_=from_,
+        to=to,
         limit=limit,
     ).parsed
 
@@ -167,7 +185,9 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     q: str,
-    days: int | Unset = 7,
+    days: int | Unset = UNSET,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
     limit: int | Unset = 20,
 ) -> Response[ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError | XSearchResponse]:
     """Search stocks
@@ -180,6 +200,8 @@ async def asyncio_detailed(
 
     Args:
         q (str): Search query (minimum 2 non-$ characters after trimming)
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): UTC calendar-day period for each result summary including the current
             UTC day so far (1-30 free, 1-90 hobby, 1-365 professional) Default: 7.
         limit (int | Unset): Maximum number of results to return Default: 20.
@@ -195,6 +217,8 @@ async def asyncio_detailed(
     kwargs = _get_kwargs(
         q=q,
         days=days,
+        from_=from_,
+        to=to,
         limit=limit,
     )
 
@@ -207,7 +231,9 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     q: str,
-    days: int | Unset = 7,
+    days: int | Unset = UNSET,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
     limit: int | Unset = 20,
 ) -> ErrorResponse | HTTPValidationError | HistoricalLimitError | RateLimitError | XSearchResponse | None:
     """Search stocks
@@ -220,6 +246,8 @@ async def asyncio(
 
     Args:
         q (str): Search query (minimum 2 non-$ characters after trimming)
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): UTC calendar-day period for each result summary including the current
             UTC day so far (1-30 free, 1-90 hobby, 1-365 professional) Default: 7.
         limit (int | Unset): Maximum number of results to return Default: 20.
@@ -237,6 +265,8 @@ async def asyncio(
             client=client,
             q=q,
             days=days,
+        from_=from_,
+        to=to,
             limit=limit,
         )
     ).parsed

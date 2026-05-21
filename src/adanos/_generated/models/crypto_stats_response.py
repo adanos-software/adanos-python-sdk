@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, cast
+from typing import Any, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -18,7 +18,6 @@ class CryptoStatsResponse:
     Attributes:
         total_mentions (int):
         unique_tokens (int):
-        tokens (list[str]): List of symbols (first 50)
         supported_tokens (int):
         mentions_today (int | Unset):  Default: 0.
         unique_tokens_today (int | Unset):  Default: 0.
@@ -26,7 +25,6 @@ class CryptoStatsResponse:
 
     total_mentions: int
     unique_tokens: int
-    tokens: list[str]
     supported_tokens: int
     mentions_today: int | Unset = 0
     unique_tokens_today: int | Unset = 0
@@ -36,8 +34,6 @@ class CryptoStatsResponse:
         total_mentions = self.total_mentions
 
         unique_tokens = self.unique_tokens
-
-        tokens = self.tokens
 
         supported_tokens = self.supported_tokens
 
@@ -51,7 +47,6 @@ class CryptoStatsResponse:
             {
                 "total_mentions": total_mentions,
                 "unique_tokens": unique_tokens,
-                "tokens": tokens,
                 "supported_tokens": supported_tokens,
             }
         )
@@ -69,8 +64,6 @@ class CryptoStatsResponse:
 
         unique_tokens = d.pop("unique_tokens")
 
-        tokens = cast(list[str], d.pop("tokens"))
-
         supported_tokens = d.pop("supported_tokens")
 
         mentions_today = d.pop("mentions_today", UNSET)
@@ -80,7 +73,6 @@ class CryptoStatsResponse:
         crypto_stats_response = cls(
             total_mentions=total_mentions,
             unique_tokens=unique_tokens,
-            tokens=tokens,
             supported_tokens=supported_tokens,
             mentions_today=mentions_today,
             unique_tokens_today=unique_tokens_today,

@@ -17,7 +17,9 @@ from ...types import UNSET, Response, Unset
 def _get_kwargs(
     ticker: str,
     *,
-    days: int | Unset = 7,
+    days: int | Unset = UNSET,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
     limit: int | Unset = 50,
     offset: int | Unset = 0,
     include_inherited: bool | Unset = False,
@@ -26,6 +28,10 @@ def _get_kwargs(
     params: dict[str, Any] = {}
 
     params["days"] = days
+
+    params["from"] = from_
+
+    params["to"] = to
 
     params["limit"] = limit
 
@@ -95,7 +101,9 @@ def sync_detailed(
     ticker: str,
     *,
     client: AuthenticatedClient,
-    days: int | Unset = 7,
+    days: int | Unset = UNSET,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
     limit: int | Unset = 50,
     offset: int | Unset = 0,
     include_inherited: bool | Unset = False,
@@ -120,6 +128,8 @@ def sync_detailed(
 
     Args:
         ticker (str): Stock ticker symbol (e.g., TSLA, aapl, BRK.A, $GME)
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Raw mention lookback window in days within the live raw-data retention
             window. Uses a rolling lookback from request time, not UTC calendar-day windows.
             Professional-only endpoint; maximum 365 days. Default: 7.
@@ -139,6 +149,8 @@ def sync_detailed(
     kwargs = _get_kwargs(
         ticker=ticker,
         days=days,
+        from_=from_,
+        to=to,
         limit=limit,
         offset=offset,
         include_inherited=include_inherited,
@@ -155,7 +167,9 @@ def sync(
     ticker: str,
     *,
     client: AuthenticatedClient,
-    days: int | Unset = 7,
+    days: int | Unset = UNSET,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
     limit: int | Unset = 50,
     offset: int | Unset = 0,
     include_inherited: bool | Unset = False,
@@ -180,6 +194,8 @@ def sync(
 
     Args:
         ticker (str): Stock ticker symbol (e.g., TSLA, aapl, BRK.A, $GME)
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Raw mention lookback window in days within the live raw-data retention
             window. Uses a rolling lookback from request time, not UTC calendar-day windows.
             Professional-only endpoint; maximum 365 days. Default: 7.
@@ -200,6 +216,8 @@ def sync(
         ticker=ticker,
         client=client,
         days=days,
+        from_=from_,
+        to=to,
         limit=limit,
         offset=offset,
         include_inherited=include_inherited,
@@ -210,7 +228,9 @@ async def asyncio_detailed(
     ticker: str,
     *,
     client: AuthenticatedClient,
-    days: int | Unset = 7,
+    days: int | Unset = UNSET,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
     limit: int | Unset = 50,
     offset: int | Unset = 0,
     include_inherited: bool | Unset = False,
@@ -235,6 +255,8 @@ async def asyncio_detailed(
 
     Args:
         ticker (str): Stock ticker symbol (e.g., TSLA, aapl, BRK.A, $GME)
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Raw mention lookback window in days within the live raw-data retention
             window. Uses a rolling lookback from request time, not UTC calendar-day windows.
             Professional-only endpoint; maximum 365 days. Default: 7.
@@ -254,6 +276,8 @@ async def asyncio_detailed(
     kwargs = _get_kwargs(
         ticker=ticker,
         days=days,
+        from_=from_,
+        to=to,
         limit=limit,
         offset=offset,
         include_inherited=include_inherited,
@@ -268,7 +292,9 @@ async def asyncio(
     ticker: str,
     *,
     client: AuthenticatedClient,
-    days: int | Unset = 7,
+    days: int | Unset = UNSET,
+    from_: str | Unset = UNSET,
+    to: str | Unset = UNSET,
     limit: int | Unset = 50,
     offset: int | Unset = 0,
     include_inherited: bool | Unset = False,
@@ -293,6 +319,8 @@ async def asyncio(
 
     Args:
         ticker (str): Stock ticker symbol (e.g., TSLA, aapl, BRK.A, $GME)
+        from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
+        to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Raw mention lookback window in days within the live raw-data retention
             window. Uses a rolling lookback from request time, not UTC calendar-day windows.
             Professional-only endpoint; maximum 365 days. Default: 7.
@@ -314,6 +342,8 @@ async def asyncio(
             ticker=ticker,
             client=client,
             days=days,
+        from_=from_,
+        to=to,
             limit=limit,
             offset=offset,
             include_inherited=include_inherited,
