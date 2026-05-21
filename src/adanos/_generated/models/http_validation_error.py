@@ -50,7 +50,7 @@ class HTTPValidationError:
         d = dict(src_dict)
         _detail = d.pop("detail", UNSET)
         detail: list[ValidationError] | Unset = UNSET
-        if isinstance(_detail, list):
+        if isinstance(_detail, list) and all(isinstance(item, Mapping) for item in _detail):
             detail = []
             for detail_item_data in _detail:
                 detail_item = ValidationError.from_dict(detail_item_data)

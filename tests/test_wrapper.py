@@ -1299,6 +1299,17 @@ class TestErrors:
         assert result.to_dict() == payload
         assert result["detail"] == payload["detail"]
 
+    @respx.mock
+    def test_422_non_validation_list_detail_is_preserved(self, client):
+        """Unexpected 422 list envelopes should be preserved instead of parsed as validation errors."""
+        payload = {"detail": ["Invalid period", "Use either from or days, not both."]}
+        respx.get(f"{BASE_URL}/reddit/stocks/v1/trending").mock(
+            return_value=httpx.Response(422, json=payload)
+        )
+        result = client.reddit.trending(from_="2026-05-01", to="2026-05-07", days=7)
+        assert result.to_dict() == payload
+        assert result["detail"] == payload["detail"]
+
 
 # --- Extended coverage: crypto + stats + health ---
 
