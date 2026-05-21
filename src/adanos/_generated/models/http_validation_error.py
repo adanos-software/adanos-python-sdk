@@ -21,6 +21,7 @@ class HTTPValidationError:
 
     Attributes:
         detail (list[ValidationError] | Unset): List of validation errors.
+            Non-Pydantic validation envelopes are preserved in additional_properties["detail"].
     """
 
     detail: list[ValidationError] | Unset = UNSET
@@ -49,12 +50,14 @@ class HTTPValidationError:
         d = dict(src_dict)
         _detail = d.pop("detail", UNSET)
         detail: list[ValidationError] | Unset = UNSET
-        if _detail is not UNSET:
+        if isinstance(_detail, list) and all(isinstance(item, Mapping) for item in _detail):
             detail = []
             for detail_item_data in _detail:
                 detail_item = ValidationError.from_dict(detail_item_data)
 
                 detail.append(detail_item)
+        elif _detail is not UNSET:
+            d["detail"] = _detail
 
         http_validation_error = cls(
             detail=detail,
