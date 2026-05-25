@@ -15,19 +15,11 @@ from ...types import UNSET, Response
 def _get_kwargs(
     *,
     q: str,
-    days: int | Any = UNSET,
-    from_: str | Any = UNSET,
-    to: str | Any = UNSET,
     limit: int | Any = UNSET,
 ) -> dict[str, Any]:
     params: dict[str, Any] = {}
 
     params["q"] = q
-    params["days"] = days
-
-    params["from"] = from_
-
-    params["to"] = to
     params["limit"] = limit
 
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
@@ -101,9 +93,6 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     q: str,
-    days: int | Any = UNSET,
-    from_: str | Any = UNSET,
-    to: str | Any = UNSET,
     limit: int | Any = UNSET,
 ) -> Response[
     ErrorResponse
@@ -117,7 +106,6 @@ def sync_detailed(
 
     Args:
         q (str): Search query
-        days (int | Any): Lookback window for the summary block.
         limit (int | Any): Maximum number of search results to return.
 
     Raises:
@@ -130,9 +118,6 @@ def sync_detailed(
 
     kwargs = _get_kwargs(
         q=q,
-        days=days,
-        from_=from_,
-        to=to,
         limit=limit,
     )
 
@@ -147,9 +132,6 @@ def sync(
     *,
     client: AuthenticatedClient,
     q: str,
-    days: int | Any = UNSET,
-    from_: str | Any = UNSET,
-    to: str | Any = UNSET,
     limit: int | Any = UNSET,
 ) -> (
     ErrorResponse
@@ -164,7 +146,6 @@ def sync(
 
     Args:
         q (str): Search query
-        days (int | Any): Lookback window for the summary block.
         limit (int | Any): Maximum number of search results to return.
 
     Raises:
@@ -178,9 +159,6 @@ def sync(
     return sync_detailed(
         client=client,
         q=q,
-        days=days,
-        from_=from_,
-        to=to,
         limit=limit,
     ).parsed
 
@@ -189,9 +167,6 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     q: str,
-    days: int | Any = UNSET,
-    from_: str | Any = UNSET,
-    to: str | Any = UNSET,
     limit: int | Any = UNSET,
 ) -> Response[
     ErrorResponse
@@ -205,7 +180,6 @@ async def asyncio_detailed(
 
     Args:
         q (str): Search query
-        days (int | Any): Lookback window for the summary block.
         limit (int | Any): Maximum number of search results to return.
 
     Raises:
@@ -218,9 +192,6 @@ async def asyncio_detailed(
 
     kwargs = _get_kwargs(
         q=q,
-        days=days,
-        from_=from_,
-        to=to,
         limit=limit,
     )
 
@@ -233,9 +204,6 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     q: str,
-    days: int | Any = UNSET,
-    from_: str | Any = UNSET,
-    to: str | Any = UNSET,
     limit: int | Any = UNSET,
 ) -> (
     ErrorResponse
@@ -250,7 +218,6 @@ async def asyncio(
 
     Args:
         q (str): Search query
-        days (int | Any): Lookback window for the summary block.
         limit (int | Any): Maximum number of search results to return.
 
     Raises:
@@ -265,9 +232,6 @@ async def asyncio(
         await asyncio_detailed(
             client=client,
             q=q,
-            days=days,
-        from_=from_,
-        to=to,
             limit=limit,
         )
     ).parsed

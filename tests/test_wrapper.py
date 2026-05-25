@@ -62,11 +62,6 @@ SEARCH_RESPONSE = {
                 "buzz_score": 87.5,
                 "trend": "rising",
                 "sentiment_score": 0.231,
-                "bullish_pct": 58,
-                "bearish_pct": 16,
-                "unique_posts": 112,
-                "subreddit_count": 7,
-                "total_upvotes": 9042,
             },
         },
     ],
@@ -82,9 +77,6 @@ NEWS_SEARCH_RESPONSE = {
                 "buzz_score": 87.5,
                 "trend": "rising",
                 "sentiment_score": 0.231,
-                "bullish_pct": 58,
-                "bearish_pct": 16,
-                "source_count": 8,
             },
         }
     ],
@@ -101,10 +93,6 @@ X_SEARCH_RESPONSE = {
                 "buzz_score": 72.5,
                 "trend": "rising",
                 "sentiment_score": 0.35,
-                "bullish_pct": 45,
-                "bearish_pct": 12,
-                "unique_tweets": 42,
-                "total_upvotes": 2847,
             },
         }
     ],
@@ -122,15 +110,9 @@ POLYMARKET_SEARCH_RESPONSE = {
             "aliases": ["Apple"],
             "summary": {
                 "trade_count": 12,
-                "market_count": 3,
-                "current_market_count": 2,
-                "unique_traders": 9,
-                "total_liquidity": 45200.0,
                 "buzz_score": 71.4,
                 "trend": "stable",
                 "sentiment_score": 0.118,
-                "bullish_pct": 55,
-                "bearish_pct": 45,
             },
         },
     ],
@@ -532,11 +514,9 @@ class TestRedditSearch:
         route = respx.get(f"{BASE_URL}/reddit/stocks/v1/search").mock(
             return_value=httpx.Response(200, json=SEARCH_RESPONSE)
         )
-        result = client.reddit.search("Tesla", days=7, limit=5)
+        result = client.reddit.search("Tesla", limit=5)
         assert route.called
-        assert request_params(route)["q"] == "Tesla"
-        assert request_params(route)["days"] == "7"
-        assert request_params(route)["limit"] == "5"
+        assert request_params(route) == {"q": "Tesla", "limit": "5"}
         assert result.count == 1
         assert result.period_days == 7
         assert result.results[0].summary["mentions"] == 342
@@ -705,11 +685,11 @@ class TestNews:
         route = respx.get(f"{BASE_URL}/news/stocks/v1/search").mock(
             return_value=httpx.Response(200, json=NEWS_SEARCH_RESPONSE)
         )
-        result = client.news.search("Tesla", days=7, limit=5)
+        result = client.news.search("Tesla", limit=5)
         assert route.called
         params = request_params(route)
         assert params["q"] == "Tesla"
-        assert params["days"] == "7"
+        assert "days" not in params
         assert params["limit"] == "5"
         assert "source" not in params
         assert result.count == 1
@@ -831,7 +811,7 @@ class TestAsync:
             return_value=httpx.Response(200, json=SEARCH_RESPONSE)
         )
         async with AdanosClient(api_key=API_KEY, base_url=BASE_URL) as client:
-            result = await client.reddit.search_async("Tesla", days=7, limit=5)
+            result = await client.reddit.search_async("Tesla", limit=5)
         assert result.count == 1
         assert result.period_days == 7
 
@@ -967,6 +947,8 @@ class TestXTrending:
         assert route.called
         assert len(result) == 1
         assert result[0].ticker == "NVDA"
+        assert "is_validated" not in result[0].to_dict()
+        assert not hasattr(result[0], "is_validated")
 
     @respx.mock
     def test_trending_with_type(self, client):
@@ -988,6 +970,8 @@ class TestXStock:
         assert result.ticker == "NVDA"
         assert result.mentions == 156
         assert "total_mentions" not in result.to_dict()
+        assert "is_validated" not in result.to_dict()
+        assert not hasattr(result, "is_validated")
         assert result.daily_trend[0].sentiment_score == 0.244
 
     @respx.mock
@@ -1045,10 +1029,9 @@ class TestXSearch:
         route = respx.get(f"{BASE_URL}/x/stocks/v1/search").mock(
             return_value=httpx.Response(200, json=X_SEARCH_RESPONSE)
         )
-        result = client.x.search("NVDA", days=7, limit=5)
+        result = client.x.search("NVDA", limit=5)
         assert route.called
-        assert request_params(route)["days"] == "7"
-        assert request_params(route)["limit"] == "5"
+        assert request_params(route) == {"q": "NVDA", "limit": "5"}
         assert result.period_days == 7
 
 
@@ -1154,16 +1137,15 @@ class TestPolymarketSearch:
         route = respx.get(f"{BASE_URL}/polymarket/stocks/v1/search").mock(
             return_value=httpx.Response(200, json=POLYMARKET_SEARCH_RESPONSE)
         )
-        result = client.polymarket.search("AAPL", days=7, limit=5)
+        result = client.polymarket.search("AAPL", limit=5)
         assert route.called
         assert request_params(route)["q"] == "AAPL"
-        assert request_params(route)["days"] == "7"
+        assert "days" not in request_params(route)
         assert request_params(route)["limit"] == "5"
         assert result.query == "AAPL"
         assert result.count == 1
         assert result.period_days == 7
         assert result.results[0].summary["trade_count"] == 12
-        assert result.results[0].summary["current_market_count"] == 2
 
 
 class TestPolymarketCompare:
@@ -1200,8 +1182,8 @@ class TestPeriodParams:
         news_route = respx.get(f"{BASE_URL}/news/stocks/v1/trending").mock(
             return_value=httpx.Response(200, json=[TRENDING_STOCK])
         )
-        x_route = respx.get(f"{BASE_URL}/x/stocks/v1/search").mock(
-            return_value=httpx.Response(200, json=X_SEARCH_RESPONSE)
+        x_route = respx.get(f"{BASE_URL}/x/stocks/v1/trending").mock(
+            return_value=httpx.Response(200, json=[X_TRENDING_STOCK])
         )
         polymarket_route = respx.get(f"{BASE_URL}/polymarket/stocks/v1/market-sentiment").mock(
             return_value=httpx.Response(200, json=POLYMARKET_MARKET_SENTIMENT)
@@ -1211,7 +1193,7 @@ class TestPeriodParams:
         )
 
         client.news.trending(from_="2026-05-01", to="2026-05-07", limit=3)
-        client.x.search("NVDA", from_="2026-05-01", to="2026-05-07")
+        client.x.trending(from_="2026-05-01", to="2026-05-07")
         client.polymarket.market_sentiment(from_="2026-05-01", to="2026-05-07")
         client.crypto.compare(["BTC", "ETH"], from_="2026-05-01", to="2026-05-07")
 
@@ -1393,11 +1375,6 @@ CRYPTO_SEARCH = {
                 "buzz_score": 90.1,
                 "trend": "rising",
                 "sentiment_score": 0.42,
-                "bullish_pct": 58,
-                "bearish_pct": 14,
-                "unique_posts": 120,
-                "subreddit_count": 15,
-                "total_upvotes": 9900,
             },
         }
     ],
@@ -1498,10 +1475,10 @@ class TestCryptoNamespace:
         route = respx.get(f"{BASE_URL}/reddit/crypto/v1/search").mock(
             return_value=httpx.Response(200, json=CRYPTO_SEARCH)
         )
-        result = client.crypto.search("btc", days=7, limit=5)
+        result = client.crypto.search("btc", limit=5)
         assert route.called
         assert request_params(route)["q"] == "btc"
-        assert request_params(route)["days"] == "7"
+        assert "days" not in request_params(route)
         assert request_params(route)["limit"] == "5"
         assert result.count == 1
         assert result.period_days == 7

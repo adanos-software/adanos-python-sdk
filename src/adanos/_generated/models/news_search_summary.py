@@ -19,29 +19,21 @@ class NewsSearchSummary:
     Attributes:
         mentions (int): News mentions in the selected period
         buzz_score (float): Buzz score in the selected period
-        source_count (int): Distinct source count in the selected period
         trend (NewsSearchSummaryTrendType0 | None | Unset): News activity/attention trend over current 3 UTC days vs
             previous 3 UTC days using mentions/articles and source breadth; not price trend
         sentiment_score (float | None | Unset): Average sentiment score in the selected period
-        bullish_pct (int | None | Unset): Bullish mention percentage
-        bearish_pct (int | None | Unset): Bearish mention percentage
     """
 
     mentions: int
     buzz_score: float
-    source_count: int
     trend: NewsSearchSummaryTrendType0 | None | Unset = UNSET
     sentiment_score: float | None | Unset = UNSET
-    bullish_pct: int | None | Unset = UNSET
-    bearish_pct: int | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         mentions = self.mentions
 
         buzz_score = self.buzz_score
-
-        source_count = self.source_count
 
         trend: None | str | Unset
         if isinstance(self.trend, Unset):
@@ -57,36 +49,18 @@ class NewsSearchSummary:
         else:
             sentiment_score = self.sentiment_score
 
-        bullish_pct: int | None | Unset
-        if isinstance(self.bullish_pct, Unset):
-            bullish_pct = UNSET
-        else:
-            bullish_pct = self.bullish_pct
-
-        bearish_pct: int | None | Unset
-        if isinstance(self.bearish_pct, Unset):
-            bearish_pct = UNSET
-        else:
-            bearish_pct = self.bearish_pct
-
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
                 "mentions": mentions,
                 "buzz_score": buzz_score,
-                "source_count": source_count,
             }
         )
         if trend is not UNSET:
             field_dict["trend"] = trend
         if sentiment_score is not UNSET:
             field_dict["sentiment_score"] = sentiment_score
-        if bullish_pct is not UNSET:
-            field_dict["bullish_pct"] = bullish_pct
-        if bearish_pct is not UNSET:
-            field_dict["bearish_pct"] = bearish_pct
-
         return field_dict
 
     @classmethod
@@ -95,8 +69,6 @@ class NewsSearchSummary:
         mentions = d.pop("mentions")
 
         buzz_score = d.pop("buzz_score")
-
-        source_count = d.pop("source_count")
 
         def _parse_trend(data: object) -> NewsSearchSummaryTrendType0 | None | Unset:
             if data is None:
@@ -124,32 +96,11 @@ class NewsSearchSummary:
 
         sentiment_score = _parse_sentiment_score(d.pop("sentiment_score", UNSET))
 
-        def _parse_bullish_pct(data: object) -> int | None | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(int | None | Unset, data)
-
-        bullish_pct = _parse_bullish_pct(d.pop("bullish_pct", UNSET))
-
-        def _parse_bearish_pct(data: object) -> int | None | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(int | None | Unset, data)
-
-        bearish_pct = _parse_bearish_pct(d.pop("bearish_pct", UNSET))
-
         news_search_summary = cls(
             mentions=mentions,
             buzz_score=buzz_score,
-            source_count=source_count,
             trend=trend,
             sentiment_score=sentiment_score,
-            bullish_pct=bullish_pct,
-            bearish_pct=bearish_pct,
         )
 
         news_search_summary.additional_properties = d
