@@ -625,6 +625,7 @@ class _XNamespace:
 
         Args:
             query: Search term (e.g. ``"Tesla"`` or ``"TSLA"``).
+            limit: Max results.
         """
         from ._generated.api.x_twitter_stocks import search_x_stocks
         return search_x_stocks.sync(client=self._client, q=query, limit=limit)
@@ -834,6 +835,7 @@ class _PolymarketNamespace:
 
         Args:
             query: Search term (e.g. ``"Tesla"`` or ``"TSLA"``).
+            limit: Max results.
         """
         from ._generated.api.polymarket_stocks import search_polymarket_stocks
 
