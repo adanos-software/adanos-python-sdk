@@ -180,13 +180,13 @@ health = client.crypto.health()
 | `stock(ticker, from_, to, days)` | Detailed sentiment for a ticker |
 | `mentions(ticker, from_, to, days, limit, offset, include_inherited)` | Raw Reddit mention rows |
 | `explain(ticker)` | AI-generated trend explanation |
-| `search(query, from_, to, days, limit)` | Search stocks by name or ticker with a summary block |
+| `search(query, limit)` | Search stocks by name or ticker with an API-managed recent summary block |
 | `compare(tickers, from_, to, days)` | Compare up to 10 stocks |
 | `market_sentiment(from_, to, days)` | Service-level Reddit market sentiment snapshot |
 | `stats()` | Dataset statistics |
 | `health()` | Public service health |
 
-Period options: use `from_` and `to` as `YYYY-MM-DD` inclusive UTC dates for reproducible windows. The SDK serializes `from_` as query parameter `from`. `days` remains available as a legacy v1-compatible shorthand. The API returns `422` if `from`, `to`, and `days` are all sent together. Responses keep `period_days`; retain requested dates client-side if you need them later.
+Period options: use `from_` and `to` as `YYYY-MM-DD` inclusive UTC dates for reproducible windows. The SDK serializes `from_` as query parameter `from`. `days` remains available as a legacy v1-compatible shorthand. The API returns `422` if `from`, `to`, and `days` are all sent together. Responses keep `period_days`; retain requested dates client-side if you need them later. Search endpoints are the exception: they accept only `limit` and use the API-managed recent summary window.
 
 ### `client.news.*`
 
@@ -198,7 +198,7 @@ Period options: use `from_` and `to` as `YYYY-MM-DD` inclusive UTC dates for rep
 | `stock(ticker, from_, to, days)` | Detailed news sentiment for a ticker |
 | `mentions(ticker, from_, to, days, limit, offset)` | Raw news mention rows |
 | `explain(ticker)` | AI-generated explanation from news context |
-| `search(query, from_, to, days, limit)` | Search stocks in the news dataset with a summary block |
+| `search(query, limit)` | Search stocks in the news dataset with an API-managed recent summary block |
 | `compare(tickers, from_, to, days)` | Compare up to 10 stocks in news |
 | `market_sentiment(from_, to, days)` | Service-level News market sentiment snapshot |
 | `stats()` | News dataset statistics |
@@ -214,7 +214,7 @@ Period options: use `from_` and `to` as `YYYY-MM-DD` inclusive UTC dates for rep
 | `stock(ticker, from_, to, days)` | Detailed X/Twitter sentiment |
 | `mentions(ticker, from_, to, days, limit, offset)` | Raw X/Twitter mention rows |
 | `explain(ticker)` | AI-generated explanation from X/Twitter context |
-| `search(query, from_, to, days, limit)` | Search stocks with a summary block |
+| `search(query, limit)` | Search stocks with an API-managed recent summary block |
 | `compare(tickers, from_, to, days)` | Compare stocks |
 | `market_sentiment(from_, to, days)` | Service-level X/Twitter market sentiment snapshot |
 | `stats()` | Dataset statistics |
@@ -229,7 +229,7 @@ Period options: use `from_` and `to` as `YYYY-MM-DD` inclusive UTC dates for rep
 | `trending_countries(from_, to, days, limit, offset)` | Trending countries |
 | `stock(ticker, from_, to, days)` | Detailed Polymarket activity, sentiment, and relevance-sorted market questions |
 | `mentions(ticker, from_, to, days, limit, offset)` | Raw Polymarket market snapshots |
-| `search(query, from_, to, days, limit)` | Search stocks with a summary block |
+| `search(query, limit)` | Search stocks with an API-managed recent summary block |
 | `compare(tickers, from_, to, days)` | Compare stocks with windowed Polymarket activity signals |
 | `market_sentiment(from_, to, days)` | Service-level Polymarket market sentiment snapshot |
 | `stats()` | Dataset statistics |
@@ -242,7 +242,7 @@ Period options: use `from_` and `to` as `YYYY-MM-DD` inclusive UTC dates for rep
 | `trending(from_, to, days, limit, offset)` | Trending Reddit crypto tokens |
 | `token(symbol, from_, to, days)` | Detailed token sentiment and buzz |
 | `mentions(symbol, from_, to, days, limit, offset, include_inherited)` | Raw Reddit crypto mention rows |
-| `search(query, from_, to, days, limit)` | Search tokens by symbol or name with a summary block |
+| `search(query, limit)` | Search tokens by symbol or name with an API-managed recent summary block |
 | `compare(symbols, from_, to, days)` | Compare multiple tokens |
 | `market_sentiment(from_, to, days)` | Service-level Reddit Crypto market sentiment snapshot |
 | `stats()` | Dataset statistics |

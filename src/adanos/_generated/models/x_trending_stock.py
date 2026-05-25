@@ -31,7 +31,6 @@ class XTrendingStock:
             bearish_pct (int | None | Unset): Percentage of bearish tweet mentions
             total_upvotes (int | None | Unset): Total likes across all tweet mentions
             unique_tweets (int | None | Unset): Number of unique tweets mentioning this ticker (distinct tweet_id)
-            is_validated (bool | Unset): Also trending on Reddit (cross-platform validation) Default: False.
             trend_history (list[float] | Unset): Daily buzz scores (oldest to newest). Length = max(days, 7). The last
                 element equals the current `buzz_score`.
     """
@@ -46,7 +45,6 @@ class XTrendingStock:
     bearish_pct: int | None | Unset = UNSET
     total_upvotes: int | None | Unset = UNSET
     unique_tweets: int | None | Unset = UNSET
-    is_validated: bool | Unset = False
     trend_history: list[float] | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
@@ -95,8 +93,6 @@ class XTrendingStock:
         else:
             unique_tweets = self.unique_tweets
 
-        is_validated = self.is_validated
-
         trend_history: list[float] | Unset = UNSET
         if not isinstance(self.trend_history, Unset):
             trend_history = self.trend_history
@@ -123,8 +119,6 @@ class XTrendingStock:
             field_dict["total_upvotes"] = total_upvotes
         if unique_tweets is not UNSET:
             field_dict["unique_tweets"] = unique_tweets
-        if is_validated is not UNSET:
-            field_dict["is_validated"] = is_validated
         if trend_history is not UNSET:
             field_dict["trend_history"] = trend_history
 
@@ -195,8 +189,6 @@ class XTrendingStock:
 
         unique_tweets = _parse_unique_tweets(d.pop("unique_tweets", UNSET))
 
-        is_validated = d.pop("is_validated", UNSET)
-
         trend_history = cast(list[float], d.pop("trend_history", UNSET))
 
         x_trending_stock = cls(
@@ -210,7 +202,6 @@ class XTrendingStock:
             bearish_pct=bearish_pct,
             total_upvotes=total_upvotes,
             unique_tweets=unique_tweets,
-            is_validated=is_validated,
             trend_history=trend_history,
         )
 

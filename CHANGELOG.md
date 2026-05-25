@@ -5,6 +5,14 @@ All notable changes to the Adanos Python SDK will be documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
+## [2.4.0] - 2026-05-25
+
+### Changed
+- Synced generated client and wrapper coverage with Adanos Market Sentiment API `1.39.0`.
+- Removed `from_`, `to`, and `days` from all public search wrappers and generated search endpoint functions; search endpoints now accept only `limit` and return API-managed recent summary windows.
+- Removed compacted search summary fields that API `1.38.0` no longer returns.
+- Removed `is_validated` from X/Twitter trending and stock detail models.
+
 ## [2.3.1] - 2026-05-21
 
 ### Fixed

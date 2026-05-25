@@ -43,7 +43,6 @@ class XStockDetailResponse:
             period_days (int | None | Unset): Analysis period in days
             daily_trend (list[XDailyTrendItem] | None | Unset): Daily trend data with avg_rank (X-specific)
             top_tweets (list[XTopTweet] | None | Unset): Top 10 tweets by engagement (likes + retweets)
-            is_validated (bool | Unset): Whether ticker is also trending on Reddit Default: False.
     """
 
     ticker: str
@@ -63,7 +62,6 @@ class XStockDetailResponse:
     period_days: int | None | Unset = UNSET
     daily_trend: list[XDailyTrendItem] | None | Unset = UNSET
     top_tweets: list[XTopTweet] | None | Unset = UNSET
-    is_validated: bool | Unset = False
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -175,8 +173,6 @@ class XStockDetailResponse:
         else:
             top_tweets = self.top_tweets
 
-        is_validated = self.is_validated
-
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -216,9 +212,6 @@ class XStockDetailResponse:
             field_dict["daily_trend"] = daily_trend
         if top_tweets is not UNSET:
             field_dict["top_tweets"] = top_tweets
-        if is_validated is not UNSET:
-            field_dict["is_validated"] = is_validated
-
         return field_dict
 
     @classmethod
@@ -404,8 +397,6 @@ class XStockDetailResponse:
 
         top_tweets = _parse_top_tweets(d.pop("top_tweets", UNSET))
 
-        is_validated = d.pop("is_validated", UNSET)
-
         x_stock_detail_response = cls(
             ticker=ticker,
             company_name=company_name,
@@ -424,7 +415,6 @@ class XStockDetailResponse:
             period_days=period_days,
             daily_trend=daily_trend,
             top_tweets=top_tweets,
-            is_validated=is_validated,
         )
 
         x_stock_detail_response.additional_properties = d

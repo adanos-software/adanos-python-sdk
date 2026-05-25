@@ -128,7 +128,6 @@ def sync_detailed(
     - `positive_count`, `negative_count`, `neutral_count`: Sentiment breakdown
     - `total_upvotes`: Total likes across tweet mentions
     - `daily_trend`: Daily data with mentions, canonical `sentiment_score`, legacy `sentiment`, and avg_rank
-    - `is_validated`: Also trending on Reddit (cross-platform validation)
 
     Returns 404 when ticker data is not available in the requested window.
 
@@ -186,7 +185,6 @@ def sync(
     - `positive_count`, `negative_count`, `neutral_count`: Sentiment breakdown
     - `total_upvotes`: Total likes across tweet mentions
     - `daily_trend`: Daily data with mentions, canonical `sentiment_score`, legacy `sentiment`, and avg_rank
-    - `is_validated`: Also trending on Reddit (cross-platform validation)
 
     Returns 404 when ticker data is not available in the requested window.
 
@@ -238,7 +236,6 @@ async def asyncio_detailed(
     - `positive_count`, `negative_count`, `neutral_count`: Sentiment breakdown
     - `total_upvotes`: Total likes across tweet mentions
     - `daily_trend`: Daily data with mentions, canonical `sentiment_score`, legacy `sentiment`, and avg_rank
-    - `is_validated`: Also trending on Reddit (cross-platform validation)
 
     Returns 404 when ticker data is not available in the requested window.
 
@@ -294,7 +291,6 @@ async def asyncio(
     - `positive_count`, `negative_count`, `neutral_count`: Sentiment breakdown
     - `total_upvotes`: Total likes across tweet mentions
     - `daily_trend`: Daily data with mentions, canonical `sentiment_score`, legacy `sentiment`, and avg_rank
-    - `is_validated`: Also trending on Reddit (cross-platform validation)
 
     Returns 404 when ticker data is not available in the requested window.
 
