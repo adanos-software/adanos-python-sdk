@@ -35,6 +35,8 @@ from .health_response import HealthResponse
 from .historical_limit_error import HistoricalLimitError
 from .historical_limit_error_detail import HistoricalLimitErrorDetail
 from .http_validation_error import HTTPValidationError
+from .invalid_period_error import InvalidPeriodError
+from .invalid_period_error_detail import InvalidPeriodErrorDetail
 from .news_compare_response import NewsCompareResponse
 from .news_compare_stock_item import NewsCompareStockItem
 from .news_compare_stock_item_trend_type_0 import NewsCompareStockItemTrendType0
@@ -132,6 +134,7 @@ from .x_search_summary_trend_type_0 import XSearchSummaryTrendType0
 from .x_stats_response import XStatsResponse
 from .x_stock_detail_response import XStockDetailResponse
 from .x_stock_detail_response_trend_type_0 import XStockDetailResponseTrendType0
+from .x_top_author import XTopAuthor
 from .x_top_tweet import XTopTweet
 from .x_trending_country import XTrendingCountry
 from .x_trending_country_trend import XTrendingCountryTrend
@@ -175,6 +178,8 @@ __all__ = (
     "HistoricalLimitError",
     "HistoricalLimitErrorDetail",
     "HTTPValidationError",
+    "InvalidPeriodError",
+    "InvalidPeriodErrorDetail",
     "NewsCompareResponse",
     "NewsCompareStockItem",
     "NewsCompareStockItemTrendType0",
@@ -272,6 +277,7 @@ __all__ = (
     "XStatsResponse",
     "XStockDetailResponse",
     "XStockDetailResponseTrendType0",
+    "XTopAuthor",
     "XTopTweet",
     "XTrendingCountry",
     "XTrendingCountryTrend",

@@ -5,6 +5,13 @@ All notable changes to the Adanos Python SDK will be documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
+## [2.5.0] - 2026-05-31
+
+### Added
+- Synced generated client and wrapper coverage with Adanos Market Sentiment API `1.40.0`.
+- Added generated `InvalidPeriodError` models for structured 422 period-window errors.
+- Added generated `XTopAuthor` and `XStockDetailResponse.top_authors` for X/Twitter contributor metrics.
+
 ## [2.4.0] - 2026-05-25
 
 ### Changed

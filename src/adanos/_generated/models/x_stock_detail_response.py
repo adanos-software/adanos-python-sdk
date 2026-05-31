@@ -11,6 +11,7 @@ from ..types import UNSET, Unset
 
 if TYPE_CHECKING:
     from ..models.x_daily_trend_item import XDailyTrendItem
+    from ..models.x_top_author import XTopAuthor
     from ..models.x_top_tweet import XTopTweet
 
 
@@ -43,6 +44,7 @@ class XStockDetailResponse:
             period_days (int | None | Unset): Analysis period in days
             daily_trend (list[XDailyTrendItem] | None | Unset): Daily trend data with avg_rank (X-specific)
             top_tweets (list[XTopTweet] | None | Unset): Top 10 tweets by engagement (likes + retweets)
+            top_authors (list[XTopAuthor] | None | Unset): Top X authors in the selected period.
     """
 
     ticker: str
@@ -62,6 +64,7 @@ class XStockDetailResponse:
     period_days: int | None | Unset = UNSET
     daily_trend: list[XDailyTrendItem] | None | Unset = UNSET
     top_tweets: list[XTopTweet] | None | Unset = UNSET
+    top_authors: list[XTopAuthor] | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -173,6 +176,18 @@ class XStockDetailResponse:
         else:
             top_tweets = self.top_tweets
 
+        top_authors: list[dict[str, Any]] | None | Unset
+        if isinstance(self.top_authors, Unset):
+            top_authors = UNSET
+        elif isinstance(self.top_authors, list):
+            top_authors = []
+            for top_authors_type_0_item_data in self.top_authors:
+                top_authors_type_0_item = top_authors_type_0_item_data.to_dict()
+                top_authors.append(top_authors_type_0_item)
+
+        else:
+            top_authors = self.top_authors
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -212,11 +227,14 @@ class XStockDetailResponse:
             field_dict["daily_trend"] = daily_trend
         if top_tweets is not UNSET:
             field_dict["top_tweets"] = top_tweets
+        if top_authors is not UNSET:
+            field_dict["top_authors"] = top_authors
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.x_daily_trend_item import XDailyTrendItem
+        from ..models.x_top_author import XTopAuthor
         from ..models.x_top_tweet import XTopTweet
 
         d = dict(src_dict)
@@ -397,6 +415,28 @@ class XStockDetailResponse:
 
         top_tweets = _parse_top_tweets(d.pop("top_tweets", UNSET))
 
+        def _parse_top_authors(data: object) -> list[XTopAuthor] | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            try:
+                if not isinstance(data, list):
+                    raise TypeError()
+                top_authors_type_0 = []
+                _top_authors_type_0 = data
+                for top_authors_type_0_item_data in _top_authors_type_0:
+                    top_authors_type_0_item = XTopAuthor.from_dict(top_authors_type_0_item_data)
+
+                    top_authors_type_0.append(top_authors_type_0_item)
+
+                return top_authors_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(list[XTopAuthor] | None | Unset, data)
+
+        top_authors = _parse_top_authors(d.pop("top_authors", UNSET))
+
         x_stock_detail_response = cls(
             ticker=ticker,
             company_name=company_name,
@@ -415,6 +455,7 @@ class XStockDetailResponse:
             period_days=period_days,
             daily_trend=daily_trend,
             top_tweets=top_tweets,
+            top_authors=top_authors,
         )
 
         x_stock_detail_response.additional_properties = d

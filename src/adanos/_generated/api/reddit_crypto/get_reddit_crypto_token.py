@@ -10,6 +10,7 @@ from ...models.crypto_token_sentiment import CryptoTokenSentiment
 from ...models.error_response import ErrorResponse
 from ...models.historical_limit_error import HistoricalLimitError
 from ...models.http_validation_error import HTTPValidationError
+from ...models.invalid_period_error import InvalidPeriodError
 from ...types import UNSET, Response, Unset
 
 
@@ -48,6 +49,7 @@ def _parse_response(
     | CryptoTokenSentiment
     | ErrorResponse
     | HTTPValidationError
+    | InvalidPeriodError
     | HistoricalLimitError
     | None
 ):
@@ -71,7 +73,27 @@ def _parse_response(
         return response_404
 
     if response.status_code == 422:
-        response_422 = HTTPValidationError.from_dict(response.json())
+
+        def _parse_response_422(data: object) -> HTTPValidationError | InvalidPeriodError:
+            try:
+                if not isinstance(data, dict):
+                    raise TypeError()
+                detail = data.get("detail")
+                error = str(detail.get("error", "")).lower().replace(" ", "_") if isinstance(detail, dict) else ""
+                if error != "invalid_period":
+                    raise TypeError()
+                response_422_type_0 = InvalidPeriodError.from_dict(data)
+
+                return response_422_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            if not isinstance(data, dict):
+                raise TypeError()
+            response_422_type_1 = HTTPValidationError.from_dict(data)
+
+            return response_422_type_1
+
+        response_422 = _parse_response_422(response.json())
 
         return response_422
 
@@ -93,6 +115,7 @@ def _build_response(
     | CryptoTokenSentiment
     | ErrorResponse
     | HTTPValidationError
+    | InvalidPeriodError
     | HistoricalLimitError
 ]:
     return Response(
@@ -115,6 +138,7 @@ def sync_detailed(
     | CryptoTokenSentiment
     | ErrorResponse
     | HTTPValidationError
+    | InvalidPeriodError
     | HistoricalLimitError
 ]:
     """Get Reddit sentiment for one crypto token
@@ -132,7 +156,7 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Any | CryptoTokenSentiment | ErrorResponse | HTTPValidationError | HistoricalLimitError]
+        Response[Any | CryptoTokenSentiment | ErrorResponse | HTTPValidationError | InvalidPeriodError | HistoricalLimitError]
     """
 
     kwargs = _get_kwargs(
@@ -161,6 +185,7 @@ def sync(
     | CryptoTokenSentiment
     | ErrorResponse
     | HTTPValidationError
+    | InvalidPeriodError
     | HistoricalLimitError
     | None
 ):
@@ -179,7 +204,7 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Any | CryptoTokenSentiment | ErrorResponse | HTTPValidationError | HistoricalLimitError
+        Any | CryptoTokenSentiment | ErrorResponse | HTTPValidationError | InvalidPeriodError | HistoricalLimitError
     """
 
     return sync_detailed(
@@ -203,6 +228,7 @@ async def asyncio_detailed(
     | CryptoTokenSentiment
     | ErrorResponse
     | HTTPValidationError
+    | InvalidPeriodError
     | HistoricalLimitError
 ]:
     """Get Reddit sentiment for one crypto token
@@ -220,7 +246,7 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Any | CryptoTokenSentiment | ErrorResponse | HTTPValidationError | HistoricalLimitError]
+        Response[Any | CryptoTokenSentiment | ErrorResponse | HTTPValidationError | InvalidPeriodError | HistoricalLimitError]
     """
 
     kwargs = _get_kwargs(
@@ -247,6 +273,7 @@ async def asyncio(
     | CryptoTokenSentiment
     | ErrorResponse
     | HTTPValidationError
+    | InvalidPeriodError
     | HistoricalLimitError
     | None
 ):
@@ -265,7 +292,7 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Any | CryptoTokenSentiment | ErrorResponse | HTTPValidationError | HistoricalLimitError
+        Any | CryptoTokenSentiment | ErrorResponse | HTTPValidationError | InvalidPeriodError | HistoricalLimitError
     """
 
     return (
