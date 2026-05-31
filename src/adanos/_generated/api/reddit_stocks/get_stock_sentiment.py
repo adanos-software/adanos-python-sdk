@@ -9,6 +9,7 @@ from ...client import AuthenticatedClient, Client
 from ...models.error_response import ErrorResponse
 from ...models.historical_limit_error import HistoricalLimitError
 from ...models.http_validation_error import HTTPValidationError
+from ...models.invalid_period_error import InvalidPeriodError
 from ...models.stock_sentiment import StockSentiment
 from ...types import UNSET, Response, Unset
 
@@ -47,6 +48,7 @@ def _parse_response(
     Any
     | ErrorResponse
     | HTTPValidationError
+    | InvalidPeriodError
     | HistoricalLimitError
     | StockSentiment
     | None
@@ -71,7 +73,27 @@ def _parse_response(
         return response_404
 
     if response.status_code == 422:
-        response_422 = HTTPValidationError.from_dict(response.json())
+
+        def _parse_response_422(data: object) -> HTTPValidationError | InvalidPeriodError:
+            try:
+                if not isinstance(data, dict):
+                    raise TypeError()
+                detail = data.get("detail")
+                error = str(detail.get("error", "")).lower().replace(" ", "_") if isinstance(detail, dict) else ""
+                if error != "invalid_period":
+                    raise TypeError()
+                response_422_type_0 = InvalidPeriodError.from_dict(data)
+
+                return response_422_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            if not isinstance(data, dict):
+                raise TypeError()
+            response_422_type_1 = HTTPValidationError.from_dict(data)
+
+            return response_422_type_1
+
+        response_422 = _parse_response_422(response.json())
 
         return response_422
 
@@ -89,7 +111,7 @@ def _parse_response(
 def _build_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
 ) -> Response[
-    Any | ErrorResponse | HTTPValidationError | HistoricalLimitError | StockSentiment
+    Any | ErrorResponse | HTTPValidationError | InvalidPeriodError | HistoricalLimitError | StockSentiment
 ]:
     return Response(
         status_code=HTTPStatus(response.status_code),
@@ -107,7 +129,7 @@ def sync_detailed(
     from_: str | Unset = UNSET,
     to: str | Unset = UNSET,
 ) -> Response[
-    Any | ErrorResponse | HTTPValidationError | HistoricalLimitError | StockSentiment
+    Any | ErrorResponse | HTTPValidationError | InvalidPeriodError | HistoricalLimitError | StockSentiment
 ]:
     """Get sentiment for a stock
 
@@ -131,7 +153,7 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Any | ErrorResponse | HTTPValidationError | HistoricalLimitError | StockSentiment]
+        Response[Any | ErrorResponse | HTTPValidationError | InvalidPeriodError | HistoricalLimitError | StockSentiment]
     """
 
     kwargs = _get_kwargs(
@@ -159,6 +181,7 @@ def sync(
     Any
     | ErrorResponse
     | HTTPValidationError
+    | InvalidPeriodError
     | HistoricalLimitError
     | StockSentiment
     | None
@@ -185,7 +208,7 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Any | ErrorResponse | HTTPValidationError | HistoricalLimitError | StockSentiment
+        Any | ErrorResponse | HTTPValidationError | InvalidPeriodError | HistoricalLimitError | StockSentiment
     """
 
     return sync_detailed(
@@ -205,7 +228,7 @@ async def asyncio_detailed(
     from_: str | Unset = UNSET,
     to: str | Unset = UNSET,
 ) -> Response[
-    Any | ErrorResponse | HTTPValidationError | HistoricalLimitError | StockSentiment
+    Any | ErrorResponse | HTTPValidationError | InvalidPeriodError | HistoricalLimitError | StockSentiment
 ]:
     """Get sentiment for a stock
 
@@ -229,7 +252,7 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Any | ErrorResponse | HTTPValidationError | HistoricalLimitError | StockSentiment]
+        Response[Any | ErrorResponse | HTTPValidationError | InvalidPeriodError | HistoricalLimitError | StockSentiment]
     """
 
     kwargs = _get_kwargs(
@@ -255,6 +278,7 @@ async def asyncio(
     Any
     | ErrorResponse
     | HTTPValidationError
+    | InvalidPeriodError
     | HistoricalLimitError
     | StockSentiment
     | None
@@ -281,7 +305,7 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Any | ErrorResponse | HTTPValidationError | HistoricalLimitError | StockSentiment
+        Any | ErrorResponse | HTTPValidationError | InvalidPeriodError | HistoricalLimitError | StockSentiment
     """
 
     return (

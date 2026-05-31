@@ -232,6 +232,15 @@ X_STOCK_DETAIL = {
             "buzz_score": 74.1,
         }
     ],
+    "top_authors": [
+        {
+            "author": "marketwatcher",
+            "mentions": 24,
+            "sentiment_score": 0.41,
+            "buzz_score": 61.8,
+            "count": 24,
+        }
+    ],
 }
 
 POLYMARKET_TRENDING_STOCK = {
@@ -973,6 +982,8 @@ class TestXStock:
         assert "is_validated" not in result.to_dict()
         assert not hasattr(result, "is_validated")
         assert result.daily_trend[0].sentiment_score == 0.244
+        assert result.top_authors[0].author == "marketwatcher"
+        assert result.top_authors[0].mentions == 24
 
     @respx.mock
     def test_mentions(self, client):
@@ -1271,15 +1282,53 @@ class TestErrors:
         assert result.detail == "Rate limit exceeded"
 
     @respx.mock
-    def test_422_dict_detail_returns_validation_response(self, client):
-        """Custom 422 envelopes should not crash the generated validation parser."""
-        payload = {"detail": {"error": "Invalid period", "message": "Use either from or days, not both."}}
+    def test_422_invalid_period_returns_structured_error(self, client):
+        """API 1.40 invalid-period envelopes should parse as InvalidPeriodError."""
+        from adanos._generated.models import InvalidPeriodError
+
+        payload = {
+            "detail": {
+                "error": "Invalid period",
+                "message": "Use either from or days, not both.",
+                "period_from": "2026-01-01",
+                "available_since": "2026-03-01",
+                "platform": "reddit-stocks",
+            }
+        }
         respx.get(f"{BASE_URL}/reddit/stocks/v1/trending").mock(
             return_value=httpx.Response(422, json=payload)
         )
         result = client.reddit.trending(from_="2026-05-01", to="2026-05-07", days=7)
+        assert isinstance(result, InvalidPeriodError)
+        assert result.detail.available_since.isoformat() == "2026-03-01"
+        assert result.to_dict() == payload
+
+    @respx.mock
+    def test_422_non_period_dict_detail_is_preserved(self, client):
+        """Non-period custom 422 envelopes should remain generic validation responses."""
+        payload = {"detail": {"error": "bad_query", "message": "Query is invalid."}}
+        respx.get(f"{BASE_URL}/reddit/stocks/v1/search").mock(
+            return_value=httpx.Response(422, json=payload)
+        )
+        result = client.reddit.search("bad")
         assert result.to_dict() == payload
         assert result["detail"] == payload["detail"]
+
+    def test_invalid_period_error_model_round_trips_dates(self):
+        from adanos._generated.models import InvalidPeriodError
+
+        payload = {
+            "detail": {
+                "error": "invalid_period",
+                "message": "Requested period predates available data.",
+                "period_from": "2026-01-01",
+                "available_since": "2026-03-01",
+                "platform": "x-stocks",
+            }
+        }
+        result = InvalidPeriodError.from_dict(payload)
+        assert result.detail.period_from.isoformat() == "2026-01-01"
+        assert result.to_dict() == payload
 
     @respx.mock
     def test_422_non_validation_list_detail_is_preserved(self, client):

@@ -9,6 +9,7 @@ from ...models.error_response import ErrorResponse
 from ...models.get_trending_stocks_type_type_0 import GetTrendingStocksTypeType0
 from ...models.historical_limit_error import HistoricalLimitError
 from ...models.http_validation_error import HTTPValidationError
+from ...models.invalid_period_error import InvalidPeriodError
 from ...models.trending_stock import TrendingStock
 from ...types import UNSET, Response, Unset
 
@@ -60,6 +61,7 @@ def _parse_response(
     Any
     | ErrorResponse
     | HTTPValidationError
+    | InvalidPeriodError
     | HistoricalLimitError
     | list[TrendingStock]
     | None
@@ -89,7 +91,27 @@ def _parse_response(
         return response_404
 
     if response.status_code == 422:
-        response_422 = HTTPValidationError.from_dict(response.json())
+
+        def _parse_response_422(data: object) -> HTTPValidationError | InvalidPeriodError:
+            try:
+                if not isinstance(data, dict):
+                    raise TypeError()
+                detail = data.get("detail")
+                error = str(detail.get("error", "")).lower().replace(" ", "_") if isinstance(detail, dict) else ""
+                if error != "invalid_period":
+                    raise TypeError()
+                response_422_type_0 = InvalidPeriodError.from_dict(data)
+
+                return response_422_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            if not isinstance(data, dict):
+                raise TypeError()
+            response_422_type_1 = HTTPValidationError.from_dict(data)
+
+            return response_422_type_1
+
+        response_422 = _parse_response_422(response.json())
 
         return response_422
 
@@ -110,6 +132,7 @@ def _build_response(
     Any
     | ErrorResponse
     | HTTPValidationError
+    | InvalidPeriodError
     | HistoricalLimitError
     | list[TrendingStock]
 ]:
@@ -134,6 +157,7 @@ def sync_detailed(
     Any
     | ErrorResponse
     | HTTPValidationError
+    | InvalidPeriodError
     | HistoricalLimitError
     | list[TrendingStock]
 ]:
@@ -174,7 +198,7 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Any | ErrorResponse | HTTPValidationError | HistoricalLimitError | list[TrendingStock]]
+        Response[Any | ErrorResponse | HTTPValidationError | InvalidPeriodError | HistoricalLimitError | list[TrendingStock]]
     """
 
     kwargs = _get_kwargs(
@@ -206,6 +230,7 @@ def sync(
     Any
     | ErrorResponse
     | HTTPValidationError
+    | InvalidPeriodError
     | HistoricalLimitError
     | list[TrendingStock]
     | None
@@ -247,7 +272,7 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Any | ErrorResponse | HTTPValidationError | HistoricalLimitError | list[TrendingStock]
+        Any | ErrorResponse | HTTPValidationError | InvalidPeriodError | HistoricalLimitError | list[TrendingStock]
     """
 
     return sync_detailed(
@@ -274,6 +299,7 @@ async def asyncio_detailed(
     Any
     | ErrorResponse
     | HTTPValidationError
+    | InvalidPeriodError
     | HistoricalLimitError
     | list[TrendingStock]
 ]:
@@ -314,7 +340,7 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Any | ErrorResponse | HTTPValidationError | HistoricalLimitError | list[TrendingStock]]
+        Response[Any | ErrorResponse | HTTPValidationError | InvalidPeriodError | HistoricalLimitError | list[TrendingStock]]
     """
 
     kwargs = _get_kwargs(
@@ -344,6 +370,7 @@ async def asyncio(
     Any
     | ErrorResponse
     | HTTPValidationError
+    | InvalidPeriodError
     | HistoricalLimitError
     | list[TrendingStock]
     | None
@@ -385,7 +412,7 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Any | ErrorResponse | HTTPValidationError | HistoricalLimitError | list[TrendingStock]
+        Any | ErrorResponse | HTTPValidationError | InvalidPeriodError | HistoricalLimitError | list[TrendingStock]
     """
 
     return (

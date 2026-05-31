@@ -9,6 +9,7 @@ from ...client import AuthenticatedClient, Client
 from ...models.error_response import ErrorResponse
 from ...models.historical_limit_error import HistoricalLimitError
 from ...models.http_validation_error import HTTPValidationError
+from ...models.invalid_period_error import InvalidPeriodError
 from ...models.polymarket_raw_mentions_response import PolymarketRawMentionsResponse
 from ...models.rate_limit_error import RateLimitError
 from ...types import UNSET, Response, Unset
@@ -51,7 +52,7 @@ def _get_kwargs(
 
 def _parse_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> ErrorResponse | HTTPValidationError | HistoricalLimitError | PolymarketRawMentionsResponse | RateLimitError | None:
+) -> ErrorResponse | HTTPValidationError | InvalidPeriodError | HistoricalLimitError | PolymarketRawMentionsResponse | RateLimitError | None:
     if response.status_code == 200:
         response_200 = PolymarketRawMentionsResponse.from_dict(response.json())
 
@@ -68,7 +69,27 @@ def _parse_response(
         return response_403
 
     if response.status_code == 422:
-        response_422 = HTTPValidationError.from_dict(response.json())
+
+        def _parse_response_422(data: object) -> HTTPValidationError | InvalidPeriodError:
+            try:
+                if not isinstance(data, dict):
+                    raise TypeError()
+                detail = data.get("detail")
+                error = str(detail.get("error", "")).lower().replace(" ", "_") if isinstance(detail, dict) else ""
+                if error != "invalid_period":
+                    raise TypeError()
+                response_422_type_0 = InvalidPeriodError.from_dict(data)
+
+                return response_422_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            if not isinstance(data, dict):
+                raise TypeError()
+            response_422_type_1 = HTTPValidationError.from_dict(data)
+
+            return response_422_type_1
+
+        response_422 = _parse_response_422(response.json())
 
         return response_422
 
@@ -86,7 +107,7 @@ def _parse_response(
 def _build_response(
     *, client: AuthenticatedClient | Client, response: httpx.Response
 ) -> Response[
-    ErrorResponse | HTTPValidationError | HistoricalLimitError | PolymarketRawMentionsResponse | RateLimitError
+    ErrorResponse | HTTPValidationError | InvalidPeriodError | HistoricalLimitError | PolymarketRawMentionsResponse | RateLimitError
 ]:
     return Response(
         status_code=HTTPStatus(response.status_code),
@@ -106,7 +127,7 @@ def sync_detailed(
     limit: int | Unset = 50,
     offset: int | Unset = 0,
 ) -> Response[
-    ErrorResponse | HTTPValidationError | HistoricalLimitError | PolymarketRawMentionsResponse | RateLimitError
+    ErrorResponse | HTTPValidationError | InvalidPeriodError | HistoricalLimitError | PolymarketRawMentionsResponse | RateLimitError
 ]:
     """Raw Mentions
 
@@ -145,7 +166,7 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[ErrorResponse | HTTPValidationError | HistoricalLimitError | PolymarketRawMentionsResponse | RateLimitError]
+        Response[ErrorResponse | HTTPValidationError | InvalidPeriodError | HistoricalLimitError | PolymarketRawMentionsResponse | RateLimitError]
     """
 
     kwargs = _get_kwargs(
@@ -173,7 +194,7 @@ def sync(
     to: str | Unset = UNSET,
     limit: int | Unset = 50,
     offset: int | Unset = 0,
-) -> ErrorResponse | HTTPValidationError | HistoricalLimitError | PolymarketRawMentionsResponse | RateLimitError | None:
+) -> ErrorResponse | HTTPValidationError | InvalidPeriodError | HistoricalLimitError | PolymarketRawMentionsResponse | RateLimitError | None:
     """Raw Mentions
 
      Returns raw Polymarket market snapshot rows for a specific ticker within the live raw-data retention
@@ -211,7 +232,7 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        ErrorResponse | HTTPValidationError | HistoricalLimitError | PolymarketRawMentionsResponse | RateLimitError
+        ErrorResponse | HTTPValidationError | InvalidPeriodError | HistoricalLimitError | PolymarketRawMentionsResponse | RateLimitError
     """
 
     return sync_detailed(
@@ -235,7 +256,7 @@ async def asyncio_detailed(
     limit: int | Unset = 50,
     offset: int | Unset = 0,
 ) -> Response[
-    ErrorResponse | HTTPValidationError | HistoricalLimitError | PolymarketRawMentionsResponse | RateLimitError
+    ErrorResponse | HTTPValidationError | InvalidPeriodError | HistoricalLimitError | PolymarketRawMentionsResponse | RateLimitError
 ]:
     """Raw Mentions
 
@@ -274,7 +295,7 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[ErrorResponse | HTTPValidationError | HistoricalLimitError | PolymarketRawMentionsResponse | RateLimitError]
+        Response[ErrorResponse | HTTPValidationError | InvalidPeriodError | HistoricalLimitError | PolymarketRawMentionsResponse | RateLimitError]
     """
 
     kwargs = _get_kwargs(
@@ -300,7 +321,7 @@ async def asyncio(
     to: str | Unset = UNSET,
     limit: int | Unset = 50,
     offset: int | Unset = 0,
-) -> ErrorResponse | HTTPValidationError | HistoricalLimitError | PolymarketRawMentionsResponse | RateLimitError | None:
+) -> ErrorResponse | HTTPValidationError | InvalidPeriodError | HistoricalLimitError | PolymarketRawMentionsResponse | RateLimitError | None:
     """Raw Mentions
 
      Returns raw Polymarket market snapshot rows for a specific ticker within the live raw-data retention
@@ -338,7 +359,7 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        ErrorResponse | HTTPValidationError | HistoricalLimitError | PolymarketRawMentionsResponse | RateLimitError
+        ErrorResponse | HTTPValidationError | InvalidPeriodError | HistoricalLimitError | PolymarketRawMentionsResponse | RateLimitError
     """
 
     return (
