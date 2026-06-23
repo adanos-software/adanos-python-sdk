@@ -151,7 +151,7 @@ def sync_detailed(
     - `sentiment_score`: Average sentiment from tweet analysis (-1 to +1)
     - `positive_count`, `negative_count`, `neutral_count`: Sentiment breakdown
     - `total_upvotes`: Total likes across tweet mentions
-    - `daily_trend`: Daily data with mentions, canonical `sentiment_score`, legacy `sentiment`, and avg_rank
+    - `daily_trend`: Daily data with mentions, canonical `sentiment_score` and `buzz_score`
 
     Returns 404 when ticker data is not available in the requested window.
 
@@ -209,7 +209,7 @@ def sync(
     - `sentiment_score`: Average sentiment from tweet analysis (-1 to +1)
     - `positive_count`, `negative_count`, `neutral_count`: Sentiment breakdown
     - `total_upvotes`: Total likes across tweet mentions
-    - `daily_trend`: Daily data with mentions, canonical `sentiment_score`, legacy `sentiment`, and avg_rank
+    - `daily_trend`: Daily data with mentions, canonical `sentiment_score` and `buzz_score`
 
     Returns 404 when ticker data is not available in the requested window.
 
@@ -261,7 +261,7 @@ async def asyncio_detailed(
     - `sentiment_score`: Average sentiment from tweet analysis (-1 to +1)
     - `positive_count`, `negative_count`, `neutral_count`: Sentiment breakdown
     - `total_upvotes`: Total likes across tweet mentions
-    - `daily_trend`: Daily data with mentions, canonical `sentiment_score`, legacy `sentiment`, and avg_rank
+    - `daily_trend`: Daily data with mentions, canonical `sentiment_score` and `buzz_score`
 
     Returns 404 when ticker data is not available in the requested window.
 
@@ -317,7 +317,7 @@ async def asyncio(
     - `sentiment_score`: Average sentiment from tweet analysis (-1 to +1)
     - `positive_count`, `negative_count`, `neutral_count`: Sentiment breakdown
     - `total_upvotes`: Total likes across tweet mentions
-    - `daily_trend`: Daily data with mentions, canonical `sentiment_score`, legacy `sentiment`, and avg_rank
+    - `daily_trend`: Daily data with mentions, canonical `sentiment_score` and `buzz_score`
 
     Returns 404 when ticker data is not available in the requested window.
 

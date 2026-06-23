@@ -27,6 +27,7 @@ class PolymarketTopMention:
         yes_price (float | None | Unset): Latest YES price
         no_price (float | None | Unset): Latest NO price
         end_date (None | str | Unset): Market end date (ISO)
+        market_status (str | None | Unset): Compact market status, e.g. tradable, open, resolved, expired, or inactive
     """
 
     condition_id: str
@@ -40,6 +41,7 @@ class PolymarketTopMention:
     yes_price: float | None | Unset = UNSET
     no_price: float | None | Unset = UNSET
     end_date: None | str | Unset = UNSET
+    market_status: str | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -85,6 +87,12 @@ class PolymarketTopMention:
         else:
             end_date = self.end_date
 
+        market_status: str | None | Unset
+        if isinstance(self.market_status, Unset):
+            market_status = UNSET
+        else:
+            market_status = self.market_status
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -107,6 +115,8 @@ class PolymarketTopMention:
             field_dict["no_price"] = no_price
         if end_date is not UNSET:
             field_dict["end_date"] = end_date
+        if market_status is not UNSET:
+            field_dict["market_status"] = market_status
 
         return field_dict
 
@@ -170,6 +180,15 @@ class PolymarketTopMention:
 
         end_date = _parse_end_date(d.pop("end_date", UNSET))
 
+        def _parse_market_status(data: object) -> str | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(str | None | Unset, data)
+
+        market_status = _parse_market_status(d.pop("market_status", UNSET))
+
         polymarket_top_mention = cls(
             condition_id=condition_id,
             question=question,
@@ -182,6 +201,7 @@ class PolymarketTopMention:
             yes_price=yes_price,
             no_price=no_price,
             end_date=end_date,
+            market_status=market_status,
         )
 
         polymarket_top_mention.additional_properties = d

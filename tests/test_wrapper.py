@@ -1,6 +1,7 @@
 """Tests for the AdanosClient wrapper."""
 
 import sys
+import json
 from pathlib import Path
 
 import pytest
@@ -228,7 +229,6 @@ X_STOCK_DETAIL = {
             "date": "2026-03-18",
             "mentions": 48,
             "sentiment_score": 0.244,
-            "avg_rank": 5.2,
             "buzz_score": 74.1,
         }
     ],
@@ -266,6 +266,17 @@ POLYMARKET_STOCK_DETAIL = {
             "trade_count": 8,
             "sentiment_score": 0.114,
             "buzz_score": 71.4,
+        }
+    ],
+    "top_mentions": [
+        {
+            "condition_id": "0xabc",
+            "question": "Will AAPL close above $220 this week?",
+            "market_type": "close_above",
+            "liquidity": 7905.52,
+            "volume_24h": 2408.43,
+            "active": True,
+            "market_status": "tradable",
         }
     ],
 }
@@ -419,6 +430,65 @@ class TestRootHealth:
         assert route.called
         assert result.status.value == "healthy"
         assert result.summary.total == 5
+
+
+class TestSentimentNamespace:
+    @respx.mock
+    def test_analyze(self, client):
+        route = respx.post(f"{BASE_URL}/sentiment/v1/analyze").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "text": "TSLA looks like a short squeeze setup",
+                    "sentiment_score": 0.78,
+                    "sentiment_label": "positive",
+                    "components": {
+                        "engine_version": "5.4",
+                        "vader_compound": 0.34,
+                        "roberta_score": 0.61,
+                        "emoji_score": 0.0,
+                        "phrase_adjustment": 0.21,
+                        "phrase_matches": [{"phrase": "short squeeze", "score": 3.5}],
+                        "contextual_finance_matches": [],
+                    },
+                },
+            )
+        )
+        result = client.sentiment.analyze("TSLA looks like a short squeeze setup")
+        assert route.called
+        assert json.loads(route.calls[0].request.content) == {"text": "TSLA looks like a short squeeze setup"}
+        assert result["sentiment_label"] == "positive"
+        assert result["components"]["phrase_matches"][0]["phrase"] == "short squeeze"
+
+    @respx.mock
+    @pytest.mark.asyncio
+    async def test_analyze_async(self):
+        route = respx.post(f"{BASE_URL}/sentiment/v1/analyze").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "text": "NVDA strength continues",
+                    "sentiment_score": 0.42,
+                    "sentiment_label": "positive",
+                    "components": {
+                        "engine_version": "5.4",
+                        "vader_compound": 0.2,
+                        "roberta_score": None,
+                        "emoji_score": 0.0,
+                        "phrase_adjustment": 0.0,
+                        "phrase_matches": [],
+                        "contextual_finance_matches": [],
+                    },
+                },
+            )
+        )
+        client = AdanosClient(api_key=API_KEY, base_url=BASE_URL)
+        try:
+            result = await client.sentiment.analyze_async("NVDA strength continues")
+        finally:
+            await client.aclose()
+        assert route.called
+        assert result["sentiment_score"] == 0.42
 
 
 # --- Reddit namespace ---
@@ -978,6 +1048,9 @@ class TestXStock:
         assert route.called
         assert result.ticker == "NVDA"
         assert result.mentions == 156
+        assert result.daily_trend[0].sentiment_score == 0.244
+        assert "avg_rank" not in result.daily_trend[0].to_dict()
+        assert not hasattr(result.daily_trend[0], "avg_rank")
         assert "total_mentions" not in result.to_dict()
         assert "is_validated" not in result.to_dict()
         assert not hasattr(result, "is_validated")
@@ -1109,6 +1182,7 @@ class TestPolymarketStock:
         assert result.current_market_count == 2
         assert result.daily_trend[0].sentiment_score == 0.114
         assert "sentiment" not in result.daily_trend[0].to_dict()
+        assert result.top_mentions[0].market_status == "tradable"
 
     @respx.mock
     def test_mentions(self, client):
@@ -1448,7 +1522,17 @@ POLYMARKET_HEALTH = {
     "tickers_tracked": 50,
 }
 X_STATS = {"total_mentions": 935, "unique_tickers": 100, "mentions_today": 25, "unique_tickers_today": 8, "supported_tickers": 11800}
-POLYMARKET_STATS = {"total_trades": 15420, "total_markets": 713, "unique_tickers": 119, "trades_today": 55, "unique_tickers_today": 12, "supported_tickers": 11800}
+POLYMARKET_STATS = {
+    "total_trades": 15420,
+    "total_markets": 713,
+    "unique_tickers": 119,
+    "open_markets_current": 284,
+    "open_tickers_current": 71,
+    "traded_markets_today": 39,
+    "traded_tickers_today": 17,
+    "trades_today": 55,
+    "supported_tickers": 11800,
+}
 REDDIT_STATS = {"total_mentions": 12833, "unique_tickers": 65, "mentions_today": 342, "unique_tickers_today": 21, "supported_tickers": 11800}
 CRYPTO_MARKET_SENTIMENT = {
     "buzz_score": 52.4,
@@ -1607,8 +1691,14 @@ class TestStatsAndHealth:
         result = client.polymarket.stats()
         assert route.called
         assert result.total_markets == 713
+        assert result.open_markets_current == 284
+        assert result.open_tickers_current == 71
+        assert result.traded_markets_today == 39
+        assert result.traded_tickers_today == 17
         assert result.trades_today == 55
         assert "tickers" not in result.to_dict()
+        assert "unique_tickers_today" not in result.to_dict()
+        assert not hasattr(result, "unique_tickers_today")
 
     @respx.mock
     def test_all_health_endpoints(self, client):

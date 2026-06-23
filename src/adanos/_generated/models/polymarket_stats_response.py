@@ -16,21 +16,29 @@ class PolymarketStatsResponse:
     """Polymarket service statistics.
 
     Attributes:
-        total_trades (int): Total aggregated trade_count (all time)
-        total_markets (int): Distinct Polymarket condition_id count (all time)
-        unique_tickers (int): Distinct tickers with indexed market rows
+        total_trades (int): Total Polymarket trade activity from daily aggregates
+        total_markets (int): Distinct Polymarket condition_id count
+        unique_tickers (int): Distinct tickers with Polymarket market rows in the database
         supported_tickers (int): Ticker count in ticker_reference
-        trades_today (int | Unset): Polymarket trades observed since today's UTC midnight Default: 0.
-        unique_tickers_today (int | Unset): Unique tickers in Polymarket snapshot rows fetched since today's UTC
-            midnight Default: 0.
+        open_markets_current (int | Unset): Currently open Polymarket markets where active=true, closed=false, and
+            end_date has not passed Default: 0.
+        open_tickers_current (int | Unset): Distinct tickers with at least one currently open Polymarket market
+            Default: 0.
+        traded_markets_today (int | Unset): Distinct Polymarket condition_id values with UTC-day trade activity
+            Default: 0.
+        traded_tickers_today (int | Unset): Distinct tickers with UTC-day Polymarket trade activity Default: 0.
+        trades_today (int | Unset): Polymarket trade activity during today's UTC date Default: 0.
     """
 
     total_trades: int
     total_markets: int
     unique_tickers: int
     supported_tickers: int
+    open_markets_current: int | Unset = 0
+    open_tickers_current: int | Unset = 0
+    traded_markets_today: int | Unset = 0
+    traded_tickers_today: int | Unset = 0
     trades_today: int | Unset = 0
-    unique_tickers_today: int | Unset = 0
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -42,9 +50,15 @@ class PolymarketStatsResponse:
 
         supported_tickers = self.supported_tickers
 
-        trades_today = self.trades_today
+        open_markets_current = self.open_markets_current
 
-        unique_tickers_today = self.unique_tickers_today
+        open_tickers_current = self.open_tickers_current
+
+        traded_markets_today = self.traded_markets_today
+
+        traded_tickers_today = self.traded_tickers_today
+
+        trades_today = self.trades_today
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
@@ -56,10 +70,16 @@ class PolymarketStatsResponse:
                 "supported_tickers": supported_tickers,
             }
         )
+        if open_markets_current is not UNSET:
+            field_dict["open_markets_current"] = open_markets_current
+        if open_tickers_current is not UNSET:
+            field_dict["open_tickers_current"] = open_tickers_current
+        if traded_markets_today is not UNSET:
+            field_dict["traded_markets_today"] = traded_markets_today
+        if traded_tickers_today is not UNSET:
+            field_dict["traded_tickers_today"] = traded_tickers_today
         if trades_today is not UNSET:
             field_dict["trades_today"] = trades_today
-        if unique_tickers_today is not UNSET:
-            field_dict["unique_tickers_today"] = unique_tickers_today
 
         return field_dict
 
@@ -74,17 +94,26 @@ class PolymarketStatsResponse:
 
         supported_tickers = d.pop("supported_tickers")
 
-        trades_today = d.pop("trades_today", UNSET)
+        open_markets_current = d.pop("open_markets_current", UNSET)
 
-        unique_tickers_today = d.pop("unique_tickers_today", UNSET)
+        open_tickers_current = d.pop("open_tickers_current", UNSET)
+
+        traded_markets_today = d.pop("traded_markets_today", UNSET)
+
+        traded_tickers_today = d.pop("traded_tickers_today", UNSET)
+
+        trades_today = d.pop("trades_today", UNSET)
 
         polymarket_stats_response = cls(
             total_trades=total_trades,
             total_markets=total_markets,
             unique_tickers=unique_tickers,
             supported_tickers=supported_tickers,
+            open_markets_current=open_markets_current,
+            open_tickers_current=open_tickers_current,
+            traded_markets_today=traded_markets_today,
+            traded_tickers_today=traded_tickers_today,
             trades_today=trades_today,
-            unique_tickers_today=unique_tickers_today,
         )
 
         polymarket_stats_response.additional_properties = d
