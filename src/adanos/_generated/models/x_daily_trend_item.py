@@ -19,14 +19,12 @@ class XDailyTrendItem:
         date (str): Date in YYYY-MM-DD format
         mentions (int): Number of tweet mentions on this date
         sentiment_score (float | None | Unset): Canonical average sentiment score for the day
-        avg_rank (float | None | Unset): Average X rank on this date (X-specific)
         buzz_score (float | None | Unset): Buzz score for this date (0-100)
     """
 
     date: str
     mentions: int
     sentiment_score: float | None | Unset = UNSET
-    avg_rank: float | None | Unset = UNSET
     buzz_score: float | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
@@ -40,12 +38,6 @@ class XDailyTrendItem:
             sentiment_score = UNSET
         else:
             sentiment_score = self.sentiment_score
-
-        avg_rank: float | None | Unset
-        if isinstance(self.avg_rank, Unset):
-            avg_rank = UNSET
-        else:
-            avg_rank = self.avg_rank
 
         buzz_score: float | None | Unset
         if isinstance(self.buzz_score, Unset):
@@ -63,8 +55,6 @@ class XDailyTrendItem:
         )
         if sentiment_score is not UNSET:
             field_dict["sentiment_score"] = sentiment_score
-        if avg_rank is not UNSET:
-            field_dict["avg_rank"] = avg_rank
         if buzz_score is not UNSET:
             field_dict["buzz_score"] = buzz_score
 
@@ -86,15 +76,6 @@ class XDailyTrendItem:
 
         sentiment_score = _parse_sentiment_score(d.pop("sentiment_score", UNSET))
 
-        def _parse_avg_rank(data: object) -> float | None | Unset:
-            if data is None:
-                return data
-            if isinstance(data, Unset):
-                return data
-            return cast(float | None | Unset, data)
-
-        avg_rank = _parse_avg_rank(d.pop("avg_rank", UNSET))
-
         def _parse_buzz_score(data: object) -> float | None | Unset:
             if data is None:
                 return data
@@ -108,7 +89,6 @@ class XDailyTrendItem:
             date=date,
             mentions=mentions,
             sentiment_score=sentiment_score,
-            avg_rank=avg_rank,
             buzz_score=buzz_score,
         )
 

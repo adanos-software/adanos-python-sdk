@@ -1100,6 +1100,33 @@ class _RedditCryptoNamespace:
         return await get_reddit_crypto_health.asyncio(client=self._client)
 
 
+class _SentimentNamespace:
+    """Access direct text sentiment endpoints via ``client.sentiment.*``."""
+
+    def __init__(self, client: AuthenticatedClient) -> None:
+        self._client = client
+
+    def analyze(self, text: str) -> dict[str, Any]:
+        """Analyze one finance or trading text."""
+        response = self._client.get_httpx_client().request(
+            "post",
+            "/sentiment/v1/analyze",
+            json={"text": text},
+        )
+        response.raise_for_status()
+        return response.json()
+
+    async def analyze_async(self, text: str) -> dict[str, Any]:
+        """Async variant of :meth:`analyze`."""
+        response = await self._client.get_async_httpx_client().request(
+            "post",
+            "/sentiment/v1/analyze",
+            json={"text": text},
+        )
+        response.raise_for_status()
+        return response.json()
+
+
 class AdanosClient:
     """Client for the Adanos Market Sentiment API.
 
@@ -1138,6 +1165,7 @@ class AdanosClient:
         self.reddit_crypto = self.crypto
         self.x = _XNamespace(self._client)
         self.polymarket = _PolymarketNamespace(self._client)
+        self.sentiment = _SentimentNamespace(self._client)
 
     def health(self) -> Any:
         """Get root API health aggregated across all services."""

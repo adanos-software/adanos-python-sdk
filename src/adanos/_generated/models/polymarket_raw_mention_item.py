@@ -44,6 +44,7 @@ class PolymarketRawMentionItem:
             `sentiment_score`: positive=bullish, negative=bearish, neutral=flat; null when `sentiment_score` is null
         end_date (datetime.datetime | None | Unset): Market end timestamp when available. Unlike summary `top_mentions`,
             raw rows preserve the full timestamp from the stored snapshot.
+        market_status (str | None | Unset): Compact market status, e.g. tradable, open, resolved, expired, or inactive
     """
 
     condition_id: str
@@ -67,6 +68,7 @@ class PolymarketRawMentionItem:
     sentiment_score: float | None | Unset = UNSET
     sentiment_label: None | PolymarketRawMentionItemSentimentLabelType0 | Unset = UNSET
     end_date: datetime.datetime | None | Unset = UNSET
+    market_status: str | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -154,6 +156,12 @@ class PolymarketRawMentionItem:
         else:
             end_date = self.end_date
 
+        market_status: str | None | Unset
+        if isinstance(self.market_status, Unset):
+            market_status = UNSET
+        else:
+            market_status = self.market_status
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -190,6 +198,8 @@ class PolymarketRawMentionItem:
             field_dict["sentiment_label"] = sentiment_label
         if end_date is not UNSET:
             field_dict["end_date"] = end_date
+        if market_status is not UNSET:
+            field_dict["market_status"] = market_status
 
         return field_dict
 
@@ -325,6 +335,15 @@ class PolymarketRawMentionItem:
 
         end_date = _parse_end_date(d.pop("end_date", UNSET))
 
+        def _parse_market_status(data: object) -> str | None | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            return cast(str | None | Unset, data)
+
+        market_status = _parse_market_status(d.pop("market_status", UNSET))
+
         polymarket_raw_mention_item = cls(
             condition_id=condition_id,
             event_id=event_id,
@@ -347,6 +366,7 @@ class PolymarketRawMentionItem:
             sentiment_score=sentiment_score,
             sentiment_label=sentiment_label,
             end_date=end_date,
+            market_status=market_status,
         )
 
         polymarket_raw_mention_item.additional_properties = d

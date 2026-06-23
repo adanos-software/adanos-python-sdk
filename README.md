@@ -10,6 +10,7 @@ It gives you typed access to:
 - X/Twitter stock sentiment
 - Polymarket stock activity and market attention
 - Reddit crypto sentiment
+- Direct finance text sentiment analysis
 
 Links:
 - Source: https://github.com/adanos-software/adanos-python-sdk
@@ -37,10 +38,12 @@ client = AdanosClient(api_key="sk_live_...")
 trending = client.reddit.trending(limit=10)
 tsla = client.reddit.stock("TSLA")
 explanation = client.reddit.explain("TSLA")
+direct = client.sentiment.analyze("TSLA looks like a short squeeze setup")
 
 print(trending[0].ticker)
 print(tsla.buzz_score)
 print(explanation.explanation)
+print(direct["sentiment_label"])
 ```
 
 ## What You Can Do
@@ -61,6 +64,7 @@ print(explanation.explanation)
 - `client.polymarket.*` for Polymarket Stocks
 - `client.crypto.*` for Reddit Crypto
 - `client.reddit_crypto.*` is an alias for `client.crypto.*`
+- `client.sentiment.*` for direct finance text sentiment
 - `client.health()` for root API health aggregated across services
 
 ## Examples
@@ -248,6 +252,12 @@ Period options: use `from_` and `to` as `YYYY-MM-DD` inclusive UTC dates for rep
 | `stats()` | Dataset statistics |
 | `health()` | Public service health |
 
+### `client.sentiment.*`
+
+| Method | Description |
+|--------|-------------|
+| `analyze(text)` / `analyze_async(text)` | Analyze one finance or trading text. Requires a Professional account. |
+
 ## Async Usage
 
 Every namespace method also has an `_async` variant.
@@ -315,7 +325,8 @@ Typical platform limits:
 | Tier | Monthly Requests | Burst Limit |
 |------|------------------|-------------|
 | Free | 250 | 100/min |
-| Paid | Unlimited | 1000/min |
+| Hobby | 250,000 | 1000/min |
+| Professional/Premium | 2,500,000 | 1000/min |
 
 See the live API docs for the current contract and plan details.
 

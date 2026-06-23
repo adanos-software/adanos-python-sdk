@@ -42,7 +42,7 @@ class XStockDetailResponse:
             bullish_pct (int | None | Unset): Percentage of bullish tweet mentions
             bearish_pct (int | None | Unset): Percentage of bearish tweet mentions
             period_days (int | None | Unset): Analysis period in days
-            daily_trend (list[XDailyTrendItem] | None | Unset): Daily trend data with avg_rank (X-specific)
+        daily_trend (list[XDailyTrendItem] | None | Unset): Daily trend data
             top_tweets (list[XTopTweet] | None | Unset): Top 10 tweets by engagement (likes + retweets)
             top_authors (list[XTopAuthor] | None | Unset): Top X authors in the selected period.
     """
