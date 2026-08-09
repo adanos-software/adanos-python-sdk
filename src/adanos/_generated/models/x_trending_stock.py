@@ -42,7 +42,7 @@ class XTrendingStock:
 
     ticker: str
     buzz_score: float | None
-    trend: XTrendingStockTrend
+    trend: XTrendingStockTrend | str
     mentions: int
     company_name: None | str | Unset = UNSET
     sentiment_score: float | None | Unset = UNSET
@@ -59,7 +59,7 @@ class XTrendingStock:
         buzz_score: float | None
         buzz_score = self.buzz_score
 
-        trend = self.trend.value
+        trend = self.trend.value if isinstance(self.trend, XTrendingStockTrend) else self.trend
 
         mentions = self.mentions
 

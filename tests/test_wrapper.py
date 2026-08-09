@@ -1315,6 +1315,23 @@ class TestPolymarketMarketSentiment:
 
         assert result.unique_traders is None
 
+    def test_generated_model_keeps_legacy_positional_constructor_order(self):
+        from adanos._generated.models import PolymarketMarketSentimentResponse
+
+        result = PolymarketMarketSentimentResponse(50.0, 1, 2, 3, 4, 5.0, 6, 7, 8, 9, 10, 11)
+
+        assert result.unique_traders == 4
+        assert result.total_liquidity == 5.0
+
+
+class TestXTrendingStockCompatibility:
+    def test_generated_model_serializes_legacy_string_trend(self):
+        from adanos._generated.models import XTrendingStock
+
+        result = XTrendingStock("AAPL", 50.0, "rising", 10)
+
+        assert result.to_dict()["trend"] == "rising"
+
 
 class TestPeriodParams:
     @respx.mock

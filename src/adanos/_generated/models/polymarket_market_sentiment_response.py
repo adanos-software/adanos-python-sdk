@@ -28,6 +28,8 @@ class PolymarketMarketSentimentResponse:
             cross-ticker global condition-id union
         current_market_count (int): Sum of ticker-level currently open markets in the latest UTC-day snapshot; use this
             for live-only market breadth
+        unique_traders (int | None | Unset): Exact service-wide observed participant/proxy-wallet union in the selected
+            period; null when retained wallet-level trades do not fully cover the requested window
         total_liquidity (float): Windowed aggregated liquidity signal in USD over the selected period
         active_tickers (int): Number of tickers with market activity in the selected period
         positive_count (int): Deprecated. Outcome-aware bullish market count retained for v1 compatibility; prefer
@@ -41,8 +43,6 @@ class PolymarketMarketSentimentResponse:
         trend (None | PolymarketMarketSentimentResponseTrendType0 | Unset): Flow momentum over the current 3 UTC days vs
             previous 3 UTC days using trades, volume, market breadth and liquidity; not price movement. Null when the
             selected window has no measurable Polymarket heat. For `from`/`to`, anchors at `to` (or now when `to` is today).
-        unique_traders (int | None | Unset): Exact service-wide observed participant/proxy-wallet union in the selected
-            period; null when retained wallet-level trades do not fully cover the requested window
         sentiment_score (float | None | Unset): Service-wide weighted orderbook-aware implied sentiment score
         trend_history (list[float] | Unset): Daily service-wide buzz scores (oldest→newest) using the same relative
             baseline calibration. Length = max(requested_days, 7) for successful requests; windows before platform
@@ -55,6 +55,7 @@ class PolymarketMarketSentimentResponse:
     trade_count: int
     market_count: int
     current_market_count: int
+    unique_traders: int | None | Unset
     total_liquidity: float
     active_tickers: int
     positive_count: int
@@ -63,7 +64,6 @@ class PolymarketMarketSentimentResponse:
     bullish_pct: int
     bearish_pct: int
     trend: None | PolymarketMarketSentimentResponseTrendType0 | Unset = UNSET
-    unique_traders: int | None | Unset = UNSET
     sentiment_score: float | None | Unset = UNSET
     trend_history: list[float] | Unset = UNSET
     drivers: list[PolymarketMarketSentimentDriver] | Unset = UNSET
