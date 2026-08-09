@@ -6,13 +6,12 @@ from typing import TYPE_CHECKING, Any, TypeVar, cast
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
-from ..models.polymarket_stock_detail_response_trend_type_0 import (
-    PolymarketStockDetailResponseTrendType0,
-)
+from ..models.polymarket_stock_detail_response_trend_type_0 import PolymarketStockDetailResponseTrendType0
 from ..types import UNSET, Unset
 
 if TYPE_CHECKING:
     from ..models.polymarket_daily_trend_item import PolymarketDailyTrendItem
+    from ..models.polymarket_ticker_pulse import PolymarketTickerPulse
     from ..models.polymarket_top_mention import PolymarketTopMention
 
 
@@ -25,24 +24,48 @@ class PolymarketStockDetailResponse:
 
     Attributes:
         ticker (str): Stock ticker symbol
-        found (bool): Whether data for ticker exists
+        found (bool): Legacy v1 data-availability flag. `true` means this service has qualifying data for this
+            asset/window. `false` means the asset is supported, but this service has no qualifying data for the requested
+            window. Planned for removal in v2.
         company_name (None | str | Unset): Company name from ticker_reference
         buzz_score (float | None | Unset): Buzz score (0-100)
-        trend (None | PolymarketStockDetailResponseTrendType0 | Unset): UTC-day activity trend vs previous UTC day
+        trend (None | PolymarketStockDetailResponseTrendType0 | Unset): Flow momentum over the current 3 UTC days vs
+            previous 3 UTC days using trades, volume, market breadth and liquidity; not price movement. For `from`/`to`,
+            anchors at `to` (or now when `to` is today).
         period_days (int | None | Unset): Analysis period in days
         trade_count (int | None | Unset): Trade count in period
-        market_count (int | None | Unset): Number of active markets for ticker
-        current_market_count (int | None | Unset): Number of currently active markets in the latest UTC-day snapshot
-        unique_traders (int | None | Unset): Sum of per-market day unique trader counters (can overcount across markets)
-        sentiment_score (float | None | Unset): Implied sentiment
-        positive_count (int | None | Unset): Markets with YES > 0.5
-        negative_count (int | None | Unset): Markets with YES < 0.5
-        neutral_count (int | None | Unset): Markets with YES ~= 0.5
-        bullish_pct (int | None | Unset): Bullish market share
-        bearish_pct (int | None | Unset): Bearish market share
-        total_liquidity (float | None | Unset): Total liquidity (USD)
-        daily_trend (list[PolymarketDailyTrendItem] | None | Unset): Daily trend data (completed days)
-        top_mentions (list[PolymarketTopMention] | None | Unset): Top active markets by liquidity
+        market_count (int | None | Unset): Distinct markets that existed for ticker within the selected UTC window,
+            counted by market-catalog lifetime overlap
+        current_market_count (int | None | Unset): Number of currently open markets in the latest UTC-day snapshot for
+            ticker; use this for live-only market breadth
+        unique_traders (int | None | Unset): Exact distinct union of observed proxy and explicit maker wallet hashes for
+            the delivered scope and UTC window; null when retained wallet-level trades do not fully cover the window; not a
+            complete market-wide participant census
+        sentiment_score (float | None | Unset): Orderbook-aware implied sentiment; null when no directional sentiment
+            evidence exists in the selected period
+        positive_count (int | None | Unset): Deprecated. Outcome-aware bullish market count retained for v1
+            compatibility; prefer bullish_pct with trade_count and market_count for public analysis.
+        negative_count (int | None | Unset): Deprecated. Outcome-aware bearish market count retained for v1
+            compatibility; prefer bearish_pct with trade_count and market_count for public analysis.
+        neutral_count (int | None | Unset): Deprecated. Outcome-aware neutral/unclassified market count retained for v1
+            compatibility; prefer bullish_pct, bearish_pct, trade_count and market_count for public analysis.
+        bullish_pct (int | None | Unset): Outcome-aware bullish market percentage
+        bearish_pct (int | None | Unset): Outcome-aware bearish market percentage
+        total_liquidity (float | None | Unset): Windowed aggregated liquidity signal in USD over the selected period;
+            not a current snapshot
+        daily_trend (list[PolymarketDailyTrendItem] | None | Unset): Daily activity breakdown for the selected period
+        top_mentions (list[PolymarketTopMention] | None | Unset): Top markets with an active/open snapshot during the
+            retained snapshot portion of the selected UTC-day period for this ticker (including the current UTC day so far),
+            capped at 10 and sorted as representative sentiment evidence: outcome-aware directional markets first, opposing
+            signals kept visible when present, then trade count, with non-open markets de-prioritized and 24h volume and
+            liquidity as tie-breakers. For windows longer than raw snapshot retention, ticker analytics still use
+            `polymarket_daily_stats`, but this representative snapshot list is limited to retained
+            `polymarket_market_snapshots`. Item prices and liquidity come from the selected in-period snapshot, not
+            necessarily the current market state. `active` indicates whether the market is currently open, so historical in-
+            period evidence can now have a non-open current state. `market_status` gives the compact current state.
+        pulse (None | PolymarketTickerPulse | Unset): Compact current Polymarket interpretation built from locally
+            stored latest snapshot evidence. Does not duplicate top-level aggregate fields; concrete market evidence remains
+            in `top_mentions`.
     """
 
     ticker: str
@@ -64,9 +87,12 @@ class PolymarketStockDetailResponse:
     total_liquidity: float | None | Unset = UNSET
     daily_trend: list[PolymarketDailyTrendItem] | None | Unset = UNSET
     top_mentions: list[PolymarketTopMention] | None | Unset = UNSET
+    pulse: None | PolymarketTickerPulse | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
+        from ..models.polymarket_ticker_pulse import PolymarketTickerPulse
+
         ticker = self.ticker
 
         found = self.found
@@ -187,6 +213,14 @@ class PolymarketStockDetailResponse:
         else:
             top_mentions = self.top_mentions
 
+        pulse: dict[str, Any] | None | Unset
+        if isinstance(self.pulse, Unset):
+            pulse = UNSET
+        elif isinstance(self.pulse, PolymarketTickerPulse):
+            pulse = self.pulse.to_dict()
+        else:
+            pulse = self.pulse
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -229,12 +263,15 @@ class PolymarketStockDetailResponse:
             field_dict["daily_trend"] = daily_trend
         if top_mentions is not UNSET:
             field_dict["top_mentions"] = top_mentions
+        if pulse is not UNSET:
+            field_dict["pulse"] = pulse
 
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.polymarket_daily_trend_item import PolymarketDailyTrendItem
+        from ..models.polymarket_ticker_pulse import PolymarketTickerPulse
         from ..models.polymarket_top_mention import PolymarketTopMention
 
         d = dict(src_dict)
@@ -260,9 +297,7 @@ class PolymarketStockDetailResponse:
 
         buzz_score = _parse_buzz_score(d.pop("buzz_score", UNSET))
 
-        def _parse_trend(
-            data: object,
-        ) -> None | PolymarketStockDetailResponseTrendType0 | Unset:
+        def _parse_trend(data: object) -> None | PolymarketStockDetailResponseTrendType0 | Unset:
             if data is None:
                 return data
             if isinstance(data, Unset):
@@ -387,9 +422,7 @@ class PolymarketStockDetailResponse:
 
         total_liquidity = _parse_total_liquidity(d.pop("total_liquidity", UNSET))
 
-        def _parse_daily_trend(
-            data: object,
-        ) -> list[PolymarketDailyTrendItem] | None | Unset:
+        def _parse_daily_trend(data: object) -> list[PolymarketDailyTrendItem] | None | Unset:
             if data is None:
                 return data
             if isinstance(data, Unset):
@@ -400,9 +433,7 @@ class PolymarketStockDetailResponse:
                 daily_trend_type_0 = []
                 _daily_trend_type_0 = data
                 for daily_trend_type_0_item_data in _daily_trend_type_0:
-                    daily_trend_type_0_item = PolymarketDailyTrendItem.from_dict(
-                        daily_trend_type_0_item_data
-                    )
+                    daily_trend_type_0_item = PolymarketDailyTrendItem.from_dict(daily_trend_type_0_item_data)
 
                     daily_trend_type_0.append(daily_trend_type_0_item)
 
@@ -413,9 +444,7 @@ class PolymarketStockDetailResponse:
 
         daily_trend = _parse_daily_trend(d.pop("daily_trend", UNSET))
 
-        def _parse_top_mentions(
-            data: object,
-        ) -> list[PolymarketTopMention] | None | Unset:
+        def _parse_top_mentions(data: object) -> list[PolymarketTopMention] | None | Unset:
             if data is None:
                 return data
             if isinstance(data, Unset):
@@ -426,9 +455,7 @@ class PolymarketStockDetailResponse:
                 top_mentions_type_0 = []
                 _top_mentions_type_0 = data
                 for top_mentions_type_0_item_data in _top_mentions_type_0:
-                    top_mentions_type_0_item = PolymarketTopMention.from_dict(
-                        top_mentions_type_0_item_data
-                    )
+                    top_mentions_type_0_item = PolymarketTopMention.from_dict(top_mentions_type_0_item_data)
 
                     top_mentions_type_0.append(top_mentions_type_0_item)
 
@@ -438,6 +465,23 @@ class PolymarketStockDetailResponse:
             return cast(list[PolymarketTopMention] | None | Unset, data)
 
         top_mentions = _parse_top_mentions(d.pop("top_mentions", UNSET))
+
+        def _parse_pulse(data: object) -> None | PolymarketTickerPulse | Unset:
+            if data is None:
+                return data
+            if isinstance(data, Unset):
+                return data
+            try:
+                if not isinstance(data, dict):
+                    raise TypeError()
+                pulse_type_0 = PolymarketTickerPulse.from_dict(data)
+
+                return pulse_type_0
+            except (TypeError, ValueError, AttributeError, KeyError):
+                pass
+            return cast(None | PolymarketTickerPulse | Unset, data)
+
+        pulse = _parse_pulse(d.pop("pulse", UNSET))
 
         polymarket_stock_detail_response = cls(
             ticker=ticker,
@@ -459,6 +503,7 @@ class PolymarketStockDetailResponse:
             total_liquidity=total_liquidity,
             daily_trend=daily_trend,
             top_mentions=top_mentions,
+            pulse=pulse,
         )
 
         polymarket_stock_detail_response.additional_properties = d

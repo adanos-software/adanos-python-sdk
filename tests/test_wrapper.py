@@ -46,6 +46,8 @@ STOCK_SENTIMENT = {
             "mentions": 61,
             "sentiment_score": 0.245,
             "buzz_score": 71.2,
+            "bullish_pct": 62,
+            "bearish_pct": 18,
         }
     ],
 }
@@ -266,6 +268,8 @@ POLYMARKET_STOCK_DETAIL = {
             "trade_count": 8,
             "sentiment_score": 0.114,
             "buzz_score": 71.4,
+            "bullish_pct": 64,
+            "bearish_pct": 21,
         }
     ],
     "top_mentions": [
@@ -279,6 +283,20 @@ POLYMARKET_STOCK_DETAIL = {
             "market_status": "tradable",
         }
     ],
+    "pulse": {
+        "mood": "mixed",
+        "confidence": 60.0,
+        "thin_data": False,
+        "why": ["opposing_market_signals"],
+        "warnings": ["high_average_spread"],
+        "evidence": {
+            "directional_coverage": 1.0,
+            "traded_market_pct": 0.231,
+            "zero_trade_market_pct": 0.769,
+            "avg_spread": 0.099,
+            "snapshot_at": "2026-06-24T06:25:53Z",
+        },
+    },
 }
 
 POLYMARKET_COMPARE_RESPONSE = {
@@ -1181,8 +1199,11 @@ class TestPolymarketStock:
         assert result.found is True
         assert result.current_market_count == 2
         assert result.daily_trend[0].sentiment_score == 0.114
+        assert result.daily_trend[0].bullish_pct == 64
         assert "sentiment" not in result.daily_trend[0].to_dict()
         assert result.top_mentions[0].market_status == "tradable"
+        assert result.pulse.mood.value == "mixed"
+        assert result.pulse.evidence.directional_coverage == 1.0
 
     @respx.mock
     def test_mentions(self, client):
@@ -1247,6 +1268,29 @@ class TestPolymarketCompare:
         assert result.stocks[0].current_market_count == 2
         assert result.stocks[0].trend_history[-1] == 71.4
 
+    @respx.mock
+    def test_compare_limit_returns_structured_error(self, client):
+        from adanos._generated.models import CompareLimitError
+
+        respx.get(f"{BASE_URL}/polymarket/stocks/v1/compare").mock(
+            return_value=httpx.Response(
+                400,
+                json={
+                    "detail": {
+                        "error": "too_many_tickers",
+                        "message": "Too many tickers.",
+                        "max_items": 10,
+                        "item_name": "ticker",
+                    }
+                },
+            )
+        )
+
+        result = client.polymarket.compare(["AAPL"] * 11)
+
+        assert isinstance(result, CompareLimitError)
+        assert result.detail.max_items == 10
+
 
 class TestPolymarketMarketSentiment:
     @respx.mock
@@ -1259,6 +1303,17 @@ class TestPolymarketMarketSentiment:
         assert request_params(route)["days"] == "2"
         assert result.current_market_count == 64
         assert result.drivers[0].trade_count == 52
+
+    @respx.mock
+    def test_market_sentiment_allows_unknown_trader_coverage(self, client):
+        payload = {**POLYMARKET_MARKET_SENTIMENT, "unique_traders": None}
+        respx.get(f"{BASE_URL}/polymarket/stocks/v1/market-sentiment").mock(
+            return_value=httpx.Response(200, json=payload)
+        )
+
+        result = client.polymarket.market_sentiment(days=365)
+
+        assert result.unique_traders is None
 
 
 class TestPeriodParams:
@@ -1347,6 +1402,27 @@ class TestErrors:
         assert result.detail == "Invalid API key"
 
     @respx.mock
+    def test_404_returns_unsupported_asset_error(self, client):
+        from adanos._generated.models import UnsupportedAssetError
+
+        respx.get(f"{BASE_URL}/reddit/stocks/v1/stock/NOPE").mock(
+            return_value=httpx.Response(
+                404,
+                json={
+                    "detail": {
+                        "error_code": "unsupported_ticker",
+                        "message": "Unsupported ticker.",
+                    }
+                },
+            )
+        )
+
+        result = client.reddit.stock("NOPE")
+
+        assert isinstance(result, UnsupportedAssetError)
+        assert result.detail.error_code == "unsupported_ticker"
+
+    @respx.mock
     def test_429_returns_error_response(self, client):
         """429 is a documented status — returns ErrorResponse."""
         respx.get(f"{BASE_URL}/reddit/stocks/v1/trending").mock(
@@ -1378,6 +1454,29 @@ class TestErrors:
         assert result.to_dict() == payload
 
     @respx.mock
+    def test_422_data_unavailable_returns_structured_period_error(self, client):
+        from adanos._generated.models import InvalidPeriodError
+
+        payload = {
+            "detail": {
+                "error": "data_unavailable",
+                "message": "Requested period predates public data.",
+                "field": "from",
+                "value": "2020-01-01",
+                "available_since": "2025-01-01",
+            }
+        }
+        respx.get(f"{BASE_URL}/reddit/stocks/v1/trending").mock(
+            return_value=httpx.Response(422, json=payload)
+        )
+
+        result = client.reddit.trending(from_="2020-01-01", to="2020-01-07")
+
+        assert isinstance(result, InvalidPeriodError)
+        assert result.detail.error == "data_unavailable"
+        assert result.detail.field == "from"
+
+    @respx.mock
     def test_422_non_period_dict_detail_is_preserved(self, client):
         """Non-period custom 422 envelopes should remain generic validation responses."""
         payload = {"detail": {"error": "bad_query", "message": "Query is invalid."}}
@@ -1403,6 +1502,48 @@ class TestErrors:
         result = InvalidPeriodError.from_dict(payload)
         assert result.detail.period_from.isoformat() == "2026-01-01"
         assert result.to_dict() == payload
+
+    def test_api_149_structured_error_models_round_trip(self):
+        from adanos._generated.models import (
+            CompareLimitError,
+            InvalidPeriodError,
+            UnsupportedAssetError,
+        )
+
+        period_payload = {
+            "detail": {
+                "error": "data_unavailable",
+                "message": "Requested period predates public data.",
+                "field": "from",
+                "value": "2020-01-01",
+                "today": "2026-08-09",
+                "period_from": "2020-01-01",
+                "period_to": "2020-01-07",
+                "available_since": "2025-01-01",
+                "retention_from": "2025-07-01",
+                "requested_days": 7,
+                "max_days": 365,
+                "platform": "reddit-stocks",
+            }
+        }
+        compare_payload = {
+            "detail": {
+                "error": "too_many_tickers",
+                "message": "Too many tickers.",
+                "max_items": 10,
+                "item_name": "ticker",
+            }
+        }
+        unsupported_payload = {
+            "detail": {
+                "error_code": "unsupported_ticker",
+                "message": "Unsupported ticker.",
+            }
+        }
+
+        assert InvalidPeriodError.from_dict(period_payload).to_dict() == period_payload
+        assert CompareLimitError.from_dict(compare_payload).to_dict() == compare_payload
+        assert UnsupportedAssetError.from_dict(unsupported_payload).to_dict() == unsupported_payload
 
     @respx.mock
     def test_422_non_validation_list_detail_is_preserved(self, client):

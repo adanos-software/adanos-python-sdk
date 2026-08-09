@@ -5,6 +5,7 @@ import httpx
 
 from ... import errors
 from ...client import AuthenticatedClient, Client
+from ...models.compare_limit_error import CompareLimitError
 from ...models.compare_response import CompareResponse
 from ...models.error_response import ErrorResponse
 from ...models.historical_limit_error import HistoricalLimitError
@@ -58,7 +59,7 @@ def _parse_response(
         return response_200
 
     if response.status_code == 400:
-        response_400 = cast(Any, None)
+        response_400 = CompareLimitError.from_dict(response.json())
         return response_400
 
     if response.status_code == 401:
@@ -79,7 +80,7 @@ def _parse_response(
                     raise TypeError()
                 detail = data.get("detail")
                 error = str(detail.get("error", "")).lower().replace(" ", "_") if isinstance(detail, dict) else ""
-                if error != "invalid_period":
+                if error not in {"invalid_period", "data_unavailable"}:
                     raise TypeError()
                 response_422_type_0 = InvalidPeriodError.from_dict(data)
 

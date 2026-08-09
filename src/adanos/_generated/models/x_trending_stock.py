@@ -6,6 +6,7 @@ from typing import Any, TypeVar, cast
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
+from ..models.x_trending_stock_trend import XTrendingStockTrend
 from ..types import UNSET, Unset
 
 T = TypeVar("T", bound="XTrendingStock")
@@ -15,15 +16,18 @@ T = TypeVar("T", bound="XTrendingStock")
 class XTrendingStock:
     """Trending stock on X/Twitter - unified format matching Reddit API structure.
 
-    V5.4: Uses real tweet data from x_mentions (collected via twscrape).
-    All metrics now available - sentiment, upvotes, author diversity.
+    V5.5: Uses real tweet data from x_mentions (collected via twscrape).
+    Author diversity now prefers HHI-based effective authors from
+    author_distribution and falls back to scaled unique_authors only when the
+    full distribution is unavailable.
 
         Attributes:
             ticker (str): Stock ticker symbol
-            buzz_score (float): V5.4 buzz score from real tweet data. Components: mentions (20), sentiment (20), quality
-                (10), author diversity (14, HHI-based), trend (-10 to +20). Asymptotic scaling caps at 100.
-            trend (str): Multi-Factor Activity Score trend (24h vs previous 24h). 60% rank + 25% upvotes + 15% author
-                diversity. rising: >10% improvement. falling: >10% decline. stable: ±10%.
+            buzz_score (float | None): V5.5 buzz score from real tweet data. Components: mentions (20), sentiment (20),
+                quality (10), author diversity (14, HHI-based when author_distribution is available, else scaled
+                unique_authors), trend (-10 to +20). Asymptotic scaling caps at 100.
+            trend (XTrendingStockTrend): Activity momentum over the current 3 UTC days vs previous 3 UTC days, not price
+                movement or Grok rank movement.
             mentions (int): Number of tweet mentions from x_mentions table
             company_name (None | str | Unset): Company name from ticker_reference
             sentiment_score (float | None | Unset): Average sentiment score from tweet analysis (-1 to +1)
@@ -31,13 +35,14 @@ class XTrendingStock:
             bearish_pct (int | None | Unset): Percentage of bearish tweet mentions
             total_upvotes (int | None | Unset): Total likes across all tweet mentions
             unique_tweets (int | None | Unset): Number of unique tweets mentioning this ticker (distinct tweet_id)
-            trend_history (list[float] | Unset): Daily buzz scores (oldest to newest). Length = max(days, 7). The last
-                element equals the current `buzz_score`.
+            trend_history (list[float] | Unset): Daily buzz scores (oldest→newest). Length follows the resolved period, with
+                a minimum of 7 values. For live windows, the final value is the current live buzz_score; closed historical
+                windows end at `to`.
     """
 
     ticker: str
-    buzz_score: float
-    trend: str
+    buzz_score: float | None
+    trend: XTrendingStockTrend
     mentions: int
     company_name: None | str | Unset = UNSET
     sentiment_score: float | None | Unset = UNSET
@@ -51,9 +56,10 @@ class XTrendingStock:
     def to_dict(self) -> dict[str, Any]:
         ticker = self.ticker
 
+        buzz_score: float | None
         buzz_score = self.buzz_score
 
-        trend = self.trend
+        trend = self.trend.value
 
         mentions = self.mentions
 
@@ -129,9 +135,14 @@ class XTrendingStock:
         d = dict(src_dict)
         ticker = d.pop("ticker")
 
-        buzz_score = d.pop("buzz_score")
+        def _parse_buzz_score(data: object) -> float | None:
+            if data is None:
+                return data
+            return cast(float | None, data)
 
-        trend = d.pop("trend")
+        buzz_score = _parse_buzz_score(d.pop("buzz_score"))
+
+        trend = XTrendingStockTrend(d.pop("trend"))
 
         mentions = d.pop("mentions")
 
