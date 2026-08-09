@@ -1,5 +1,7 @@
 """Contains all the data models used in inputs/outputs"""
 
+from .compare_limit_error import CompareLimitError
+from .compare_limit_error_detail import CompareLimitErrorDetail
 from .compare_response import CompareResponse
 from .compare_stock_item import CompareStockItem
 from .compare_stock_item_trend_type_0 import CompareStockItemTrendType0
@@ -67,6 +69,7 @@ from .polymarket_health_response import PolymarketHealthResponse
 from .polymarket_market_sentiment_driver import PolymarketMarketSentimentDriver
 from .polymarket_market_sentiment_response import PolymarketMarketSentimentResponse
 from .polymarket_market_sentiment_response_trend_type_0 import PolymarketMarketSentimentResponseTrendType0
+from .polymarket_pulse_evidence import PolymarketPulseEvidence
 from .polymarket_raw_mention_item import PolymarketRawMentionItem
 from .polymarket_raw_mention_item_sentiment_label_type_0 import PolymarketRawMentionItemSentimentLabelType0
 from .polymarket_raw_mentions_response import PolymarketRawMentionsResponse
@@ -78,6 +81,8 @@ from .polymarket_search_summary_trend_type_0 import PolymarketSearchSummaryTrend
 from .polymarket_stats_response import PolymarketStatsResponse
 from .polymarket_stock_detail_response import PolymarketStockDetailResponse
 from .polymarket_stock_detail_response_trend_type_0 import PolymarketStockDetailResponseTrendType0
+from .polymarket_ticker_pulse import PolymarketTickerPulse
+from .polymarket_ticker_pulse_mood import PolymarketTickerPulseMood
 from .polymarket_top_mention import PolymarketTopMention
 from .polymarket_trending_country import PolymarketTrendingCountry
 from .polymarket_trending_country_trend import PolymarketTrendingCountryTrend
@@ -114,6 +119,8 @@ from .trending_sector import TrendingSector
 from .trending_sector_trend import TrendingSectorTrend
 from .trending_stock import TrendingStock
 from .trending_stock_trend import TrendingStockTrend
+from .unsupported_asset_error import UnsupportedAssetError
+from .unsupported_asset_error_detail import UnsupportedAssetErrorDetail
 from .validation_error import ValidationError
 from .validation_error_context import ValidationErrorContext
 from .x_compare_response import XCompareResponse
@@ -141,8 +148,11 @@ from .x_trending_country_trend import XTrendingCountryTrend
 from .x_trending_sector import XTrendingSector
 from .x_trending_sector_trend import XTrendingSectorTrend
 from .x_trending_stock import XTrendingStock
+from .x_trending_stock_trend import XTrendingStockTrend
 
 __all__ = (
+    "CompareLimitError",
+    "CompareLimitErrorDetail",
     "CompareResponse",
     "CompareStockItem",
     "CompareStockItemTrendType0",
@@ -210,6 +220,7 @@ __all__ = (
     "PolymarketMarketSentimentDriver",
     "PolymarketMarketSentimentResponse",
     "PolymarketMarketSentimentResponseTrendType0",
+    "PolymarketPulseEvidence",
     "PolymarketRawMentionItem",
     "PolymarketRawMentionItemSentimentLabelType0",
     "PolymarketRawMentionsResponse",
@@ -221,6 +232,8 @@ __all__ = (
     "PolymarketStatsResponse",
     "PolymarketStockDetailResponse",
     "PolymarketStockDetailResponseTrendType0",
+    "PolymarketTickerPulse",
+    "PolymarketTickerPulseMood",
     "PolymarketTopMention",
     "PolymarketTrendingCountry",
     "PolymarketTrendingCountryTrend",
@@ -257,6 +270,8 @@ __all__ = (
     "TrendingSectorTrend",
     "TrendingStock",
     "TrendingStockTrend",
+    "UnsupportedAssetError",
+    "UnsupportedAssetErrorDetail",
     "ValidationError",
     "ValidationErrorContext",
     "XCompareResponse",
@@ -284,4 +299,5 @@ __all__ = (
     "XTrendingSector",
     "XTrendingSectorTrend",
     "XTrendingStock",
+    "XTrendingStockTrend",
 )

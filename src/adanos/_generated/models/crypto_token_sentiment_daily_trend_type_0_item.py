@@ -19,6 +19,8 @@ class CryptoTokenSentimentDailyTrendType0Item:
     mentions: int
     sentiment_score: float | None | Unset = UNSET
     buzz_score: float | None | Unset = UNSET
+    bullish_pct: int | None | Unset = UNSET
+    bearish_pct: int | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -29,6 +31,10 @@ class CryptoTokenSentimentDailyTrendType0Item:
             field_dict["sentiment_score"] = self.sentiment_score
         if self.buzz_score is not UNSET:
             field_dict["buzz_score"] = self.buzz_score
+        if self.bullish_pct is not UNSET:
+            field_dict["bullish_pct"] = self.bullish_pct
+        if self.bearish_pct is not UNSET:
+            field_dict["bearish_pct"] = self.bearish_pct
         return field_dict
 
     @classmethod
@@ -47,6 +53,8 @@ class CryptoTokenSentimentDailyTrendType0Item:
             mentions=d.pop("mentions"),
             sentiment_score=_parse_float(d.pop("sentiment_score", UNSET)),
             buzz_score=_parse_float(d.pop("buzz_score", UNSET)),
+            bullish_pct=cast(int | None | Unset, d.pop("bullish_pct", UNSET)),
+            bearish_pct=cast(int | None | Unset, d.pop("bearish_pct", UNSET)),
         )
         item.additional_properties = d
         return item

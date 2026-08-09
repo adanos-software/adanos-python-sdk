@@ -5,6 +5,16 @@ All notable changes to the Adanos Python SDK will be documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
+## [2.7.0] - 2026-08-09
+
+### Added
+- Synced generated model coverage with Adanos Market Sentiment API `1.49.0`, including Polymarket ticker `pulse`, daily bullish/bearish percentages, and structured compare/unsupported-asset errors.
+
+### Changed
+- Polymarket market-level `unique_traders` is nullable when retained wallet-level trades do not cover the requested window.
+- X/Twitter trending `trend` now uses the documented `rising` / `falling` / `stable` enum.
+- Documented stable per-UTC-day `trend_history` semantics from API `1.48.1`.
+
 ## [2.6.0] - 2026-06-23
 
 ### Added

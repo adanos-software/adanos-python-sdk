@@ -20,12 +20,16 @@ class DailyTrendItem:
         mentions (int): Number of mentions on this date
         sentiment_score (float | None | Unset): Canonical average sentiment for this date
         buzz_score (float | None | Unset): Buzz score for this date (0-100)
+        bullish_pct (int | None | Unset): Bullish mention percentage for this date
+        bearish_pct (int | None | Unset): Bearish mention percentage for this date
     """
 
     date: str
     mentions: int
     sentiment_score: float | None | Unset = UNSET
     buzz_score: float | None | Unset = UNSET
+    bullish_pct: int | None | Unset = UNSET
+    bearish_pct: int | None | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -45,6 +49,10 @@ class DailyTrendItem:
         else:
             buzz_score = self.buzz_score
 
+        bullish_pct = self.bullish_pct
+
+        bearish_pct = self.bearish_pct
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -57,6 +65,10 @@ class DailyTrendItem:
             field_dict["sentiment_score"] = sentiment_score
         if buzz_score is not UNSET:
             field_dict["buzz_score"] = buzz_score
+        if bullish_pct is not UNSET:
+            field_dict["bullish_pct"] = bullish_pct
+        if bearish_pct is not UNSET:
+            field_dict["bearish_pct"] = bearish_pct
 
         return field_dict
 
@@ -85,11 +97,17 @@ class DailyTrendItem:
 
         buzz_score = _parse_buzz_score(d.pop("buzz_score", UNSET))
 
+        bullish_pct = cast(int | None | Unset, d.pop("bullish_pct", UNSET))
+
+        bearish_pct = cast(int | None | Unset, d.pop("bearish_pct", UNSET))
+
         daily_trend_item = cls(
             date=date,
             mentions=mentions,
             sentiment_score=sentiment_score,
             buzz_score=buzz_score,
+            bullish_pct=bullish_pct,
+            bearish_pct=bearish_pct,
         )
 
         daily_trend_item.additional_properties = d

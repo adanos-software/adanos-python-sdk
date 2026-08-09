@@ -97,7 +97,7 @@ def _parse_response(
                     raise TypeError()
                 detail = data.get("detail")
                 error = str(detail.get("error", "")).lower().replace(" ", "_") if isinstance(detail, dict) else ""
-                if error != "invalid_period":
+                if error not in {"invalid_period", "data_unavailable"}:
                     raise TypeError()
                 response_422_type_0 = InvalidPeriodError.from_dict(data)
 

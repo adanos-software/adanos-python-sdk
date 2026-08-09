@@ -10,6 +10,7 @@ from ...models.error_response import ErrorResponse
 from ...models.historical_limit_error import HistoricalLimitError
 from ...models.http_validation_error import HTTPValidationError
 from ...models.invalid_period_error import InvalidPeriodError
+from ...models.unsupported_asset_error import UnsupportedAssetError
 from ...models.x_stock_detail_response import XStockDetailResponse
 from ...types import UNSET, Response, Unset
 
@@ -69,7 +70,7 @@ def _parse_response(
         return response_403
 
     if response.status_code == 404:
-        response_404 = cast(Any, None)
+        response_404 = UnsupportedAssetError.from_dict(response.json())
         return response_404
 
     if response.status_code == 422:
@@ -80,7 +81,7 @@ def _parse_response(
                     raise TypeError()
                 detail = data.get("detail")
                 error = str(detail.get("error", "")).lower().replace(" ", "_") if isinstance(detail, dict) else ""
-                if error != "invalid_period":
+                if error not in {"invalid_period", "data_unavailable"}:
                     raise TypeError()
                 response_422_type_0 = InvalidPeriodError.from_dict(data)
 
