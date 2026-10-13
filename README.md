@@ -2,7 +2,9 @@
 
 [![PyPI version](https://img.shields.io/pypi/v/adanos.svg)](https://pypi.org/project/adanos/)
 
-`adanos` is the public Python SDK for the [Adanos Market Sentiment API](https://api.adanos.org/docs).
+`adanos` is the public Python SDK for the [Adanos Market Sentiment API](https://api.adanos.com/docs).
+
+This SDK targets API `1.54.0`.
 
 It gives you typed access to:
 - Reddit stock sentiment
@@ -15,8 +17,8 @@ It gives you typed access to:
 Links:
 - Source: https://github.com/adanos-software/adanos-python-sdk
 - PyPI: https://pypi.org/project/adanos/
-- API docs: https://api.adanos.org/docs
-- Homepage: https://adanos.org
+- API docs: https://api.adanos.com/docs
+- Homepage: https://adanos.com
 
 Package and import:
 - PyPI package: `adanos`
@@ -106,6 +108,8 @@ stats = client.news.stats()
 health = client.news.health()
 ```
 
+News ticker arguments identify one company. Exchange suffixes such as `ABX.DE` are supported. The API rejects share classes and malformed tickers.
+
 ### X/Twitter
 
 ```python
@@ -143,6 +147,8 @@ stats = client.polymarket.stats()
 health = client.polymarket.health()
 ```
 
+Polymarket history starts on `2025-10-11`. Earlier requested windows return an availability error.
+
 Polymarket semantics:
 - `buzz_score` is activity-first and optimized for current market attention
 - `total_liquidity` is a windowed signal over the selected period
@@ -169,6 +175,8 @@ market = client.crypto.market_sentiment()
 stats = client.crypto.stats()
 health = client.crypto.health()
 ```
+
+Reddit crypto `total_upvotes` and mention `upvotes` are signed Reddit scores and can be negative. Raw mention `created_utc` UTC timestamps parse into timezone-aware `datetime` values.
 
 ## Available Methods
 
@@ -260,7 +268,15 @@ Period options: use `from_` and `to` as `YYYY-MM-DD` inclusive UTC dates for rep
 
 | Method | Description |
 |--------|-------------|
-| `analyze(text)` / `analyze_async(text)` | Analyze one finance or trading text. Requires a Professional account. |
+| `analyze(text, target=None)` / `analyze_async(text, target=None)` | Analyze one finance or trading text, optionally for a target company. Requires a Professional account. |
+
+`target` is keyword-only and accepts up to 100 characters. Omitting it or passing `None` sends text-only analysis. The API validates the target.
+
+```python
+result = client.sentiment.analyze("Tesla gained while Ford fell", target="Tesla")
+```
+
+Sentiment responses are JSON dictionaries. `components.model_score` can be absent or `None`. Legacy component fields remain in responses but are deprecated.
 
 ## Async Usage
 
@@ -287,21 +303,21 @@ asyncio.run(main())
 
 ## Authentication and Configuration
 
-Get an API key at https://api.adanos.org/docs
+Get an API key at https://api.adanos.com/docs
 
 ```python
 from adanos import AdanosClient
 
 client = AdanosClient(
     api_key="sk_live_...",
-    base_url="https://api.adanos.org",
+    base_url="https://api.adanos.com",
     timeout=60.0,
 )
 ```
 
 Notes:
 - `api_key` is required for protected endpoints
-- `base_url` lets you target another deployment or staging environment
+- `base_url` defaults to `https://api.adanos.com`. Explicit `https://api.adanos.org` and custom deployments remain supported
 - `timeout` is passed through to the underlying `httpx` client
 - the SDK does not auto-load local CLI profiles or env-specific config files
 

@@ -40,8 +40,8 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://adanos.org"
-API_Docs = "https://api.adanos.org/docs"
+Homepage = "https://adanos.com"
+API_Docs = "https://api.adanos.com/docs"
 Documentation = "https://github.com/adanos-software/adanos-python-sdk#readme"
 Repository = "https://github.com/adanos-software/adanos-python-sdk"
 Issues = "https://github.com/adanos-software/adanos-python-sdk/issues"
