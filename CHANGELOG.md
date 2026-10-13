@@ -7,6 +7,8 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [2.8.0] - 2026-10-13
+
 ### Added
 - Optional keyword-only `target` for synchronous and asynchronous direct sentiment analysis.
 
