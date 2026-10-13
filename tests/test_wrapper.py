@@ -2,6 +2,7 @@
 
 import sys
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -415,6 +416,19 @@ def client():
 # --- Auth header ---
 
 class TestAuth:
+    @pytest.mark.parametrize("base_url", [None, "https://api.adanos.org", "https://custom.example.com"])
+    @respx.mock
+    def test_base_url_routes_requests(self, base_url):
+        expected_url = base_url or "https://api.adanos.com"
+        route = respx.get(f"{expected_url}/reddit/stocks/v1/trending").mock(
+            return_value=httpx.Response(200, json=[])
+        )
+        kwargs = {} if base_url is None else {"base_url": base_url}
+        with AdanosClient(api_key=API_KEY, **kwargs) as client:
+            assert client.reddit.trending() == []
+        assert route.call_count == 1
+        assert route.calls[0].request.headers["X-API-Key"] == API_KEY
+
     @respx.mock
     def test_api_key_header_sent(self, client):
         route = respx.get(f"{BASE_URL}/reddit/stocks/v1/trending").mock(
@@ -451,8 +465,13 @@ class TestRootHealth:
 
 
 class TestSentimentNamespace:
+    @pytest.mark.parametrize("target, expected_body", [
+        (None, {"text": "TSLA looks like a short squeeze setup"}),
+        ("Tesla", {"text": "TSLA looks like a short squeeze setup", "target": "Tesla"}),
+        ("", {"text": "TSLA looks like a short squeeze setup", "target": ""}),
+    ])
     @respx.mock
-    def test_analyze(self, client):
+    def test_analyze(self, client, target, expected_body):
         route = respx.post(f"{BASE_URL}/sentiment/v1/analyze").mock(
             return_value=httpx.Response(
                 200,
@@ -461,26 +480,34 @@ class TestSentimentNamespace:
                     "sentiment_score": 0.78,
                     "sentiment_label": "positive",
                     "components": {
-                        "engine_version": "5.4",
-                        "vader_compound": 0.34,
-                        "roberta_score": 0.61,
+                        "engine_version": "5.5",
+                        "model_score": 0.78,
+                        "vader_compound": None,
+                        "roberta_score": None,
                         "emoji_score": 0.0,
-                        "phrase_adjustment": 0.21,
-                        "phrase_matches": [{"phrase": "short squeeze", "score": 3.5}],
+                        "phrase_adjustment": 0.0,
+                        "phrase_matches": [],
                         "contextual_finance_matches": [],
                     },
                 },
             )
         )
-        result = client.sentiment.analyze("TSLA looks like a short squeeze setup")
+        result = client.sentiment.analyze("TSLA looks like a short squeeze setup", target=target)
         assert route.called
-        assert json.loads(route.calls[0].request.content) == {"text": "TSLA looks like a short squeeze setup"}
+        assert json.loads(route.calls[0].request.content) == expected_body
         assert result["sentiment_label"] == "positive"
-        assert result["components"]["phrase_matches"][0]["phrase"] == "short squeeze"
+        assert result["components"]["model_score"] == 0.78
+        assert result["components"]["vader_compound"] is None
+        assert result["components"]["phrase_matches"] == []
 
+    @pytest.mark.parametrize("target, expected_body", [
+        (None, {"text": "NVDA strength continues"}),
+        ("NVIDIA", {"text": "NVDA strength continues", "target": "NVIDIA"}),
+        ("", {"text": "NVDA strength continues", "target": ""}),
+    ])
     @respx.mock
     @pytest.mark.asyncio
-    async def test_analyze_async(self):
+    async def test_analyze_async(self, target, expected_body):
         route = respx.post(f"{BASE_URL}/sentiment/v1/analyze").mock(
             return_value=httpx.Response(
                 200,
@@ -489,8 +516,9 @@ class TestSentimentNamespace:
                     "sentiment_score": 0.42,
                     "sentiment_label": "positive",
                     "components": {
-                        "engine_version": "5.4",
-                        "vader_compound": 0.2,
+                        "engine_version": "5.5",
+                        "model_score": None,
+                        "vader_compound": None,
                         "roberta_score": None,
                         "emoji_score": 0.0,
                         "phrase_adjustment": 0.0,
@@ -502,11 +530,30 @@ class TestSentimentNamespace:
         )
         client = AdanosClient(api_key=API_KEY, base_url=BASE_URL)
         try:
-            result = await client.sentiment.analyze_async("NVDA strength continues")
+            result = await client.sentiment.analyze_async("NVDA strength continues", target=target)
         finally:
             await client.aclose()
         assert route.called
+        assert json.loads(route.calls[0].request.content) == expected_body
         assert result["sentiment_score"] == 0.42
+        assert result["components"]["model_score"] is None
+
+
+    @pytest.mark.parametrize("is_async", [False, True])
+    @respx.mock
+    @pytest.mark.asyncio
+    async def test_analyze_propagates_target_validation_error(self, is_async):
+        route = respx.post(f"{BASE_URL}/sentiment/v1/analyze").mock(
+            return_value=httpx.Response(422, json={"detail": "Invalid target"})
+        )
+        async with AdanosClient(api_key=API_KEY, base_url=BASE_URL) as client:
+            with pytest.raises(httpx.HTTPStatusError) as error:
+                if is_async:
+                    await client.sentiment.analyze_async("Tesla gained", target="")
+                else:
+                    client.sentiment.analyze("Tesla gained", target="")
+            assert error.value.response.status_code == 422
+            assert json.loads(route.calls[0].request.content) == {"text": "Tesla gained", "target": ""}
 
 
 # --- Reddit namespace ---
@@ -694,14 +741,15 @@ class TestNews:
         assert params["days"] == "7"
         assert params["source"] == "reuters"
 
+    @pytest.mark.parametrize("ticker", ["TSLA", "ABX.DE"])
     @respx.mock
-    def test_news_stock(self, client):
-        route = respx.get(f"{BASE_URL}/news/stocks/v1/stock/TSLA").mock(
-            return_value=httpx.Response(200, json=STOCK_SENTIMENT)
+    def test_news_stock(self, client, ticker):
+        route = respx.get(f"{BASE_URL}/news/stocks/v1/stock/{ticker}").mock(
+            return_value=httpx.Response(200, json={**STOCK_SENTIMENT, "ticker": ticker})
         )
-        result = client.news.stock("TSLA")
+        result = client.news.stock(ticker)
         assert route.called
-        assert result.ticker == "TSLA"
+        assert result.ticker == ticker
         assert result.mentions == 342
         assert "total_mentions" not in result.to_dict()
         assert request_params(route) == {}
@@ -1021,7 +1069,7 @@ class TestAsync:
                     "symbol": "BTC",
                     "period_days": 7,
                     "count": 1,
-                    "results": [{"text_snippet": "BTC range", "created_utc": "2026-03-20T18:42:10Z", "upvotes": 4, "is_inherited": False}],
+                    "results": [{"text_snippet": "BTC range", "created_utc": "2026-03-20T18:42:10Z", "upvotes": -4, "is_inherited": False}],
                 },
             )
         )
@@ -1030,6 +1078,8 @@ class TestAsync:
         assert route.called
         assert request_params(route) == {"days": "7", "limit": "10", "offset": "20", "include_inherited": "true"}
         assert result.results[0].text_snippet == "BTC range"
+        assert result.results[0].upvotes == -4
+        assert result.results[0].created_utc == datetime(2026, 3, 20, 18, 42, 10, tzinfo=timezone.utc)
 
 
 # --- X namespace ---
@@ -1712,14 +1762,16 @@ CRYPTO_MARKET_SENTIMENT = {
 
 
 class TestCryptoNamespace:
+    @pytest.mark.parametrize("total_upvotes", [9900, -25])
     @respx.mock
-    def test_crypto_token(self, client):
+    def test_crypto_token(self, client, total_upvotes):
         route = respx.get(f"{BASE_URL}/reddit/crypto/v1/token/BTC").mock(
-            return_value=httpx.Response(200, json=CRYPTO_TOKEN_DETAIL)
+            return_value=httpx.Response(200, json={**CRYPTO_TOKEN_DETAIL, "total_upvotes": total_upvotes})
         )
         result = client.crypto.token("BTC")
         assert route.called
         assert result.symbol == "BTC"
+        assert result.total_upvotes == total_upvotes
         assert result.found is True
         assert result.mentions == 321
         assert "total_mentions" not in result.to_dict()
@@ -1733,7 +1785,7 @@ class TestCryptoNamespace:
                     "symbol": "BTC",
                     "period_days": 7,
                     "count": 1,
-                    "results": [{"text_snippet": "BTC range", "created_utc": "2026-03-20T18:42:10Z", "upvotes": 4, "is_inherited": False}],
+                    "results": [{"text_snippet": "BTC range", "created_utc": "2026-03-20T18:42:10Z", "upvotes": -4, "is_inherited": False}],
                 },
             )
         )
@@ -1741,6 +1793,8 @@ class TestCryptoNamespace:
         assert route.called
         assert request_params(route) == {"days": "7", "limit": "10", "offset": "20", "include_inherited": "true"}
         assert result.results[0].text_snippet == "BTC range"
+        assert result.results[0].upvotes == -4
+        assert result.results[0].created_utc == datetime(2026, 3, 20, 18, 42, 10, tzinfo=timezone.utc)
 
     @respx.mock
     def test_crypto_market_sentiment(self, client):

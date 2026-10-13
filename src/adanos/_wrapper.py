@@ -1106,22 +1106,28 @@ class _SentimentNamespace:
     def __init__(self, client: AuthenticatedClient) -> None:
         self._client = client
 
-    def analyze(self, text: str) -> dict[str, Any]:
-        """Analyze one finance or trading text."""
+    def analyze(self, text: str, *, target: Optional[str] = None) -> dict[str, Any]:
+        """Analyze finance text, optionally for a target company."""
+        body = {"text": text}
+        if target is not None:
+            body["target"] = target
         response = self._client.get_httpx_client().request(
             "post",
             "/sentiment/v1/analyze",
-            json={"text": text},
+            json=body,
         )
         response.raise_for_status()
         return response.json()
 
-    async def analyze_async(self, text: str) -> dict[str, Any]:
+    async def analyze_async(self, text: str, *, target: Optional[str] = None) -> dict[str, Any]:
         """Async variant of :meth:`analyze`."""
+        body = {"text": text}
+        if target is not None:
+            body["target"] = target
         response = await self._client.get_async_httpx_client().request(
             "post",
             "/sentiment/v1/analyze",
-            json={"text": text},
+            json=body,
         )
         response.raise_for_status()
         return response.json()
@@ -1132,7 +1138,7 @@ class AdanosClient:
 
     Args:
         api_key: Your API key (``sk_live_...``).
-        base_url: API base URL. Defaults to ``https://api.adanos.org``.
+        base_url: API base URL. Defaults to ``https://api.adanos.com``.
         timeout: Request timeout in seconds. Defaults to 30.
 
     Example::
@@ -1146,7 +1152,7 @@ class AdanosClient:
     def __init__(
         self,
         api_key: str,
-        base_url: str = "https://api.adanos.org",
+        base_url: str = "https://api.adanos.com",
         timeout: float = 30.0,
     ) -> None:
         import httpx

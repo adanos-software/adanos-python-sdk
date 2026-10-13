@@ -5,6 +5,15 @@ All notable changes to the Adanos Python SDK will be documented in this file.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
+## [Unreleased]
+
+### Added
+- Optional keyword-only `target` for synchronous and asynchronous direct sentiment analysis.
+
+### Changed
+- Default API host and documentation links use `api.adanos.com` for API `1.54.0`. Explicit `.org` and custom base URLs remain supported.
+- Documented nullable sentiment `model_score`, News exchange suffixes, signed Reddit Crypto scores, and UTC mention timestamps.
+
 ## [2.7.0] - 2026-08-09
 
 ### Added
