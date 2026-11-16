@@ -103,6 +103,9 @@ def _parse_response(
 
         return response_429
 
+    if response.status_code == 503:
+        return ErrorResponse.from_dict(response.json())
+
     if client.raise_on_unexpected_status:
         raise errors.UnexpectedStatus(response.status_code, response.content)
     else:
@@ -147,7 +150,7 @@ def sync_detailed(
      Get detailed Polymarket metrics for a ticker.
 
     Args:
-        ticker (str): Stock ticker symbol (e.g., TSLA, $AAPL)
+        ticker (str): Instrument Graph company or ETF key (e.g., BRK, EWG, SAP.DE)
         from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
         to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Time period in days (1-30 free, 1-90 paid) Default: 7.
@@ -195,7 +198,7 @@ def sync(
      Get detailed Polymarket metrics for a ticker.
 
     Args:
-        ticker (str): Stock ticker symbol (e.g., TSLA, $AAPL)
+        ticker (str): Instrument Graph company or ETF key (e.g., BRK, EWG, SAP.DE)
         from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
         to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Time period in days (1-30 free, 1-90 paid) Default: 7.
@@ -237,7 +240,7 @@ async def asyncio_detailed(
      Get detailed Polymarket metrics for a ticker.
 
     Args:
-        ticker (str): Stock ticker symbol (e.g., TSLA, $AAPL)
+        ticker (str): Instrument Graph company or ETF key (e.g., BRK, EWG, SAP.DE)
         from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
         to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Time period in days (1-30 free, 1-90 paid) Default: 7.
@@ -283,7 +286,7 @@ async def asyncio(
      Get detailed Polymarket metrics for a ticker.
 
     Args:
-        ticker (str): Stock ticker symbol (e.g., TSLA, $AAPL)
+        ticker (str): Instrument Graph company or ETF key (e.g., BRK, EWG, SAP.DE)
         from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
         to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Time period in days (1-30 free, 1-90 paid) Default: 7.

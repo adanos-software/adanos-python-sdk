@@ -684,7 +684,10 @@ class _XNamespace:
 
 
 class _PolymarketNamespace:
-    """Access Polymarket sentiment endpoints via ``client.polymarket.*``."""
+    """Access Polymarket sentiment using Instrument Graph company and ETF keys.
+
+    Use ``BRK``, ``EWG``, or venue-qualified keys such as ``SAP.DE``.
+    Listing aliases and share classes are not rewritten; find keys with ``search()``."""
 
     def __init__(self, client: AuthenticatedClient) -> None:
         self._client = client
@@ -786,7 +789,7 @@ class _PolymarketNamespace:
         """Get Polymarket sentiment for a specific stock ticker.
 
         Args:
-            ticker: Stock symbol (e.g. ``"TSLA"``).
+            ticker: Graph company or ETF key (e.g. ``"BRK"``, ``"EWG"``, ``"SAP.DE"``).
             days: Time period (1-90). Free tier limited to 30.
         """
         from ._generated.api.polymarket_stocks import get_polymarket_stock
@@ -803,7 +806,7 @@ class _PolymarketNamespace:
         """Get raw Polymarket mention rows for a stock ticker.
 
         Args:
-            ticker: Stock symbol (e.g. ``"TSLA"``).
+            ticker: Graph company or ETF key (e.g. ``"BRK"``, ``"EWG"``, ``"SAP.DE"``).
             days: Time period (1-90). Free tier limited to 30.
             limit: Max results (1-100).
             offset: Pagination offset.
@@ -851,7 +854,7 @@ class _PolymarketNamespace:
         """Compare multiple stocks side-by-side on Polymarket.
 
         Args:
-            tickers: List of ticker symbols (max 10).
+            tickers: Instrument Graph keys (max 10), without alias rewriting.
             days: Time period (1-90).
         """
         from ._generated.api.polymarket_stocks import compare_polymarket_stocks

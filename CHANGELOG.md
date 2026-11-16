@@ -7,6 +7,11 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+### Changed
+- Align Polymarket documentation and generated endpoint docstrings with API `1.55.0` Graph company/ETF keys.
+- Parse the documented raw-mentions `404` and detail/mentions `503` responses in sync and async clients.
+- Accept nullable compare `buzz_score` and default omitted `trend_history` to an empty list.
+
 ## [2.8.0] - 2026-10-13
 
 ### Added

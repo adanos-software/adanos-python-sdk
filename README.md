@@ -4,7 +4,7 @@
 
 `adanos` is the public Python SDK for the [Adanos Market Sentiment API](https://api.adanos.com/docs).
 
-This SDK targets API `1.54.0`.
+This SDK targets API `1.55.0`.
 
 It gives you typed access to:
 - Reddit stock sentiment
@@ -148,6 +148,8 @@ health = client.polymarket.health()
 ```
 
 Polymarket history starts on `2025-10-11`. Earlier requested windows return an availability error.
+
+Polymarket uses Instrument Graph keys in API `1.55.0`: stocks, ADRs, and share classes of one company share a key; ETFs keep their own keys. Use `BRK`, `BNY`, or `EWG`, and keep venue suffixes returned by Search, such as `SAP.DE`. Find replacement keys with Search. For example, `BK` is now `BNY` and `DAX` is `EWG`. Stock detail and raw mentions return `404` for unknown keys and `503` when identity lookup is unavailable. Share classes such as `BRK.B` or `BRK-B`, cashtags, and unknown suffixes return `422`. Compare keeps unknown keys as zero-activity rows without a company name and does not rewrite aliases. A `null` compare `buzz_score` means unavailable data, not zero; `trend_history` can be absent. Raw `strike_price` is `null` for company-value or reported-figure thresholds, such as market capitalization or capex.
 
 Polymarket semantics:
 - `buzz_score` is activity-first and optimized for current market attention
