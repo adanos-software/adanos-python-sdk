@@ -16,12 +16,12 @@ class PolymarketCompareStockItem:
     """Single stock item for Polymarket compare endpoint."""
 
     ticker: str
-    buzz_score: float
+    buzz_score: float | None
     trade_count: int
     market_count: int
     current_market_count: int
     total_liquidity: float
-    trend_history: list[float]
+    trend_history: list[float] = _attrs_field(factory=list)
     company_name: None | str | Unset = UNSET
     trend: None | str | Unset = UNSET
     unique_traders: int | None | Unset = UNSET
@@ -97,7 +97,7 @@ class PolymarketCompareStockItem:
             market_count=d.pop("market_count"),
             current_market_count=d.pop("current_market_count"),
             total_liquidity=d.pop("total_liquidity"),
-            trend_history=cast(list[float], d.pop("trend_history")),
+            trend_history=cast(list[float], d.pop("trend_history", [])),
             company_name=_parse_company_name(d.pop("company_name", UNSET)),
             trend=_parse_string(d.pop("trend", UNSET)),
             unique_traders=_parse_int(d.pop("unique_traders", UNSET)),

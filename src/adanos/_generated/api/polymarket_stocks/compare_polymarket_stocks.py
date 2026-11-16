@@ -146,7 +146,7 @@ def sync_detailed(
      Compare up to 10 stocks side-by-side.
 
     Args:
-        tickers (str): Comma-separated ticker list (max 10)
+        tickers (str): Comma-separated Instrument Graph keys (max 10); aliases are not rewritten
         from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
         to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Time period in days (1-30 free, 1-90 paid) Default: 7.
@@ -194,7 +194,7 @@ def sync(
      Compare up to 10 stocks side-by-side.
 
     Args:
-        tickers (str): Comma-separated ticker list (max 10)
+        tickers (str): Comma-separated Instrument Graph keys (max 10); aliases are not rewritten
         from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
         to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Time period in days (1-30 free, 1-90 paid) Default: 7.
@@ -236,7 +236,7 @@ async def asyncio_detailed(
      Compare up to 10 stocks side-by-side.
 
     Args:
-        tickers (str): Comma-separated ticker list (max 10)
+        tickers (str): Comma-separated Instrument Graph keys (max 10); aliases are not rewritten
         from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
         to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Time period in days (1-30 free, 1-90 paid) Default: 7.
@@ -282,7 +282,7 @@ async def asyncio(
      Compare up to 10 stocks side-by-side.
 
     Args:
-        tickers (str): Comma-separated ticker list (max 10)
+        tickers (str): Comma-separated Instrument Graph keys (max 10); aliases are not rewritten
         from_ (str | Unset): Inclusive UTC start date (`YYYY-MM-DD`).
         to (str | Unset): Inclusive UTC end date (`YYYY-MM-DD`).
         days (int | Unset): Time period in days (1-30 free, 1-90 paid) Default: 7.
