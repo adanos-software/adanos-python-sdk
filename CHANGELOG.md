@@ -7,6 +7,8 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [2.8.1] - 2026-11-16
+
 ### Changed
 - Align Polymarket documentation and generated endpoint docstrings with API `1.55.0` Graph company/ETF keys.
 - Parse the documented raw-mentions `404` and detail/mentions `503` responses in sync and async clients.
